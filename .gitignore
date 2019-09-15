@@ -1,0 +1,8 @@
+# LaTeX auxiliary file
+*.aux
+*.log
+*.out
+*.gz
+*.synctex
+*.synctex(busy)
+*.toc

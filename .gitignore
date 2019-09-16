@@ -9,3 +9,16 @@
 
 # LaTeX minted package
 _minted*/
+
+# Maven project
+target/
+.classpath
+.factorypath
+.project
+.settings/
+
+# vscode
+.vscode/
+
+# Test data
+test-data/

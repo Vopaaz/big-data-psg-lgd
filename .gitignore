@@ -6,3 +6,6 @@
 *.synctex
 *.synctex(busy)
 *.toc
+
+# LaTeX minted package
+_minted*/

@@ -1,11 +1,12 @@
 \documentclass{article}
+\usepackage[T1]{fontenc}
 \usepackage{geometry}
 \geometry{a4paper}
 \usepackage{setspace}
 \usepackage{enumerate}
 \usepackage{enumitem}
 \usepackage{hyperref}
-\hypersetup{colorlinks,allcolors=black}
+\hypersetup{colorlinks,allcolors=black,urlcolor=blue}
 
 \setenumerate[1]{itemsep=0pt,partopsep=2pt,parsep=0pt ,topsep=2pt}
 \setitemize[1]{itemsep=0pt,partopsep=2pt,parsep=0pt ,topsep=2pt}
@@ -26,6 +27,25 @@
 \setmainfont{EB Garamond}
 
 \usepackage{multicol}
+
+\usepackage[semibold]{sourcecodepro}
+
+\usepackage{xcolor}
+\usepackage{minted}
+\usemintedstyle{friendly}
+
+\definecolor{bg}{rgb}{0.95,0.95,0.95}
+\newcommand{\codeinline}[1]{
+	\mintinline[bgcolor=bg, fontsize=\scriptsize]{text}{#1}
+}
+
+\newenvironment{console}{% Caution:
+	\VerbatimEnvironment
+	\begin{minted}[xleftmargin=2em,bgcolor=bg,fontsize=\small]{console}% Do NOT delete these comments
+	}% Otherwise there will be error when compiling
+	{%
+	\end{minted}%
+}
 
 %-----------%
 
@@ -50,9 +70,81 @@
 
 %-------%
 
+\section{Dota2 Game Replay Analysis}
 
+\subsection{Data Preprocessing and Specification}
 
+As the raw data is completely unstructured \codeinline{.dem.bz2} file,
+preliminary preprocessing must be done before we store the data in our database.
 
+Firstly, we can decompress the \codeinline{.bz2} file with \codeinline{bzip2},
+which will give us a \codeinline{.dem} file:
+
+\begin{console}
+$ bzip2 -d data.dem.bz2
+\end{console}
+
+Next, we can utilize \href{https://github.com/skadistats/clarity}{clarity},
+an open source Dota2 replay parser, to extract useful information from the \codeinline{.dem} file.
+Based on our exploration and the \href{https://github.com/skadistats/clarity-examples}{examples}
+provided by clarity, the following data will be available:
+
+\begin{itemize}
+	% info
+	\item Player name, id, team formation and hero choice
+	% combatlog
+	\item Detailed log of the game, including a hero:
+	\begin{itemize}
+		\item deals damage to another one
+		\item heals another one
+		\item receives/loses a buff/debuff
+		\item kills another one
+		\item uses his ability
+		\item uses an item
+		\item buys an item
+		\item receives/loses some gold
+		\item gains some XP
+		\item buys back (spending money in order to instantly re-spawn)
+	\end{itemize}
+	% lifestate
+	\item Spawn/death of heros and NPCs
+	% matchend
+	\item Summary of each player's performance in the whole match, including:
+	\begin{itemize}
+		\item Final level
+		\item Kills
+		\item Deaths
+		\item Assistance
+		\item Gold
+		\item Last hit
+		\item Deny
+	\end{itemize}
+\end{itemize}
+
+% --------------------------------------------
+
+% Except for those listed above:
+
+% Run success but hard to find meaning:
+% 	dump, dumpbaselines, dumpmana, gameevent, modifiers, particles
+%	propertychange, resources, seek, spawngroups, stringtabledump, tick
+
+% Run failed: allchat, livesource, metadata, serializers,
+
+% Unknown:
+%   - dtinspector: Seems to provide a GUI interface but I(LYF) run in docker, which raises an exception.
+%	- entityrun: No output
+%	- matchend: Produced result but also raises exception
+%	- tempentities: No output
+
+% --------------------------------------------
+
+The following fields are critical to answering our Business Question, ``???".
+They will need to be cleansed and validated.
+
+% TODO:
+% In order to "Describe fields that are critical for your analysis that will need to be cleansed/validated.",
+% I need the Business Question first
 
 
 

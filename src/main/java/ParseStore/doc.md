@@ -61,6 +61,10 @@ it follows such format:
 }
 ```
 
+### Explanation of "time"
+
+The time is a float representing the total seconds since the game starts.
+
 ### Events
 
 Different type of events have different inner structure.

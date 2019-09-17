@@ -2,6 +2,7 @@ package ParseStore;
 
 import java.util.ArrayList;
 
+import org.bson.BsonTimestamp;
 import org.bson.Document;
 import org.joda.time.Duration;
 import org.joda.time.format.PeriodFormatter;
@@ -17,10 +18,6 @@ import skadistats.clarity.source.MappedFileSource;
 public class Combatlog {
 
     private final Logger log = LoggerFactory.getLogger(Main.class.getPackage().getClass());
-
-    private final PeriodFormatter GAMETIME_FORMATTER = new PeriodFormatterBuilder().minimumPrintedDigits(2)
-            .printZeroAlways().appendHours().appendLiteral(":").appendMinutes().appendLiteral(":").appendSeconds()
-            .appendLiteral(".").appendMillis3Digit().toFormatter();
 
     private ArrayList<Document> eventList = new ArrayList<Document>();
 
@@ -39,10 +36,7 @@ public class Combatlog {
 
     @OnCombatLogEntry
     public void onCombatLogEntry(CombatLogEntry cle) {
-        // TODO: Make time to be TimeStamp rather than a string.
-
-        String time = "[" + GAMETIME_FORMATTER.print(Duration.millis((int) (1000.0f * cle.getTimestamp())).toPeriod())
-                + "]";
+        float time = cle.getTimestamp();
 
         Document temp;
         switch (cle.getType()) {

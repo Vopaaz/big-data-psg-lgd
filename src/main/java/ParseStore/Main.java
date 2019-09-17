@@ -1,106 +1,92 @@
 package ParseStore;
 
-import org.joda.time.Duration;
-import org.joda.time.format.PeriodFormatter;
-import org.joda.time.format.PeriodFormatterBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import skadistats.clarity.model.CombatLogEntry;
-import skadistats.clarity.processor.gameevents.OnCombatLogEntry;
-import skadistats.clarity.processor.runner.SimpleRunner;
-import skadistats.clarity.source.MappedFileSource;
-import skadistats.clarity.wire.common.proto.DotaUserMessages;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+
+import org.bson.BsonArray;
+import org.bson.Document;
+import org.yaml.snakeyaml.Yaml;
 
 public class Main {
+    public static void main(String[] args) {
+        try {
+            String file = args[0];
 
-    private final Logger log = LoggerFactory.getLogger(Main.class.getPackage().getClass());
+            Config conf = new Config();
+            MongoClient mongoClient = MongoClients
+                    .create(String.format("mongodb://%s:%d", conf.getMongoHost(), conf.getMongoPort()));
+            MongoDatabase database = mongoClient.getDatabase(conf.getMongoDatabaseName());
+            MongoCollection<Document> collection = database.getCollection(conf.getMongoReplayCollectionName());
 
-    private final PeriodFormatter GAMETIME_FORMATTER = new PeriodFormatterBuilder().minimumPrintedDigits(2)
-            .printZeroAlways().appendHours().appendLiteral(":").appendMinutes().appendLiteral(":").appendSeconds()
-            .appendLiteral(".").appendMillis3Digit().toFormatter();
+            Document document = null;
 
-    private String compileName(String attackerName, boolean isIllusion) {
-        return attackerName != null ? attackerName + (isIllusion ? " (illusion)" : "") : "UNKNOWN";
+            document = new Document("matchid", "test");
+            document.append("combatlog", new Combatlog().getEvents(file));
+            document.append("info", 1);
+            document.append("lifestate", 2);
+            document.append("matchend", 3);
+            collection.insertOne(document);
+
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+}
 
-    private String getAttackerNameCompiled(CombatLogEntry cle) {
-        return compileName(cle.getAttackerName(), cle.isAttackerIllusion());
-    }
+class Config {
+    private String path = "config.yml";
+    private LinkedHashMap<String, Object> config = null;
 
-    private String getTargetNameCompiled(CombatLogEntry cle) {
-        return compileName(cle.getTargetName(), cle.isTargetIllusion());
-    }
+    public Config() {
+        try {
+            config = new Yaml().load(new FileReader(path));
 
-    @OnCombatLogEntry
-    public void onCombatLogEntry(CombatLogEntry cle) {
-        String time = "[" + GAMETIME_FORMATTER.print(Duration.millis((int) (1000.0f * cle.getTimestamp())).toPeriod())
-                + "]";
-        switch (cle.getType()) {
-        case DOTA_COMBATLOG_DAMAGE:
-            log.info("{} {} hits {}{} for {} damage{}", time, getAttackerNameCompiled(cle), getTargetNameCompiled(cle),
-                    cle.getInflictorName() != null ? String.format(" with %s", cle.getInflictorName()) : "",
-                    cle.getValue(),
-                    cle.getHealth() != 0 ? String.format(" (%s->%s)", cle.getHealth() + cle.getValue(), cle.getHealth())
-                            : "");
-            break;
-        case DOTA_COMBATLOG_HEAL:
-            log.info("{} {}'s {} heals {} for {} health ({}->{})", time, getAttackerNameCompiled(cle),
-                    cle.getInflictorName(), getTargetNameCompiled(cle), cle.getValue(),
-                    cle.getHealth() - cle.getValue(), cle.getHealth());
-            break;
-        case DOTA_COMBATLOG_MODIFIER_ADD:
-            log.info("{} {} receives {} buff/debuff from {}", time, getTargetNameCompiled(cle), cle.getInflictorName(),
-                    getAttackerNameCompiled(cle));
-            break;
-        case DOTA_COMBATLOG_MODIFIER_REMOVE:
-            log.info("{} {} loses {} buff/debuff", time, getTargetNameCompiled(cle), cle.getInflictorName());
-            break;
-        case DOTA_COMBATLOG_DEATH:
-            log.info("{} {} is killed by {}", time, getTargetNameCompiled(cle), getAttackerNameCompiled(cle));
-            break;
-        case DOTA_COMBATLOG_ABILITY:
-            log.info("{} {} {} ability {} (lvl {}){}{}", time, getAttackerNameCompiled(cle),
-                    cle.isAbilityToggleOn() || cle.isAbilityToggleOff() ? "toggles" : "casts", cle.getInflictorName(),
-                    cle.getAbilityLevel(), cle.isAbilityToggleOn() ? " on" : cle.isAbilityToggleOff() ? " off" : "",
-                    cle.getTargetName() != null ? " on " + getTargetNameCompiled(cle) : "");
-            break;
-        case DOTA_COMBATLOG_ITEM:
-            log.info("{} {} uses {}", time, getAttackerNameCompiled(cle), cle.getInflictorName());
-            break;
-        case DOTA_COMBATLOG_GOLD:
-            log.info("{} {} {} {} gold", time, getTargetNameCompiled(cle), cle.getValue() < 0 ? "looses" : "receives",
-                    Math.abs(cle.getValue()));
-            break;
-        case DOTA_COMBATLOG_GAME_STATE:
-            log.info("{} game state is now {}", time, cle.getValue());
-            break;
-        case DOTA_COMBATLOG_XP:
-            log.info("{} {} gains {} XP", time, getTargetNameCompiled(cle), cle.getValue());
-            break;
-        case DOTA_COMBATLOG_PURCHASE:
-            log.info("{} {} buys item {}", time, getTargetNameCompiled(cle), cle.getValueName());
-            break;
-        case DOTA_COMBATLOG_BUYBACK:
-            log.info("{} player in slot {} has bought back", time, cle.getValue());
-            break;
-
-        default:
-            DotaUserMessages.DOTA_COMBATLOG_TYPES type = cle.getType();
-            log.info("\n{} ({}): {}\n", type.name(), type.ordinal(), cle);
-            break;
-
+            if (config == null) {
+                throw new FileNotFoundException();
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("config.yml not found.");
+            e.printStackTrace();
         }
     }
 
-    public void run(String[] args) throws Exception {
-        long tStart = System.currentTimeMillis();
-        new SimpleRunner(new MappedFileSource(args[0])).runWith(this);
-        long tMatch = System.currentTimeMillis() - tStart;
-        log.info("total time taken: {}s", (tMatch) / 1000.0);
+    private String getConfigItem(String... tags) {
+        Map temp = config;
+        String result = null;
+        for (int i = 0; i < tags.length; i++) {
+            if (i != tags.length - 1) {
+                temp = (Map) temp.get(tags[i]);
+            } else {
+                result = temp.get(tags[i]).toString();
+            }
+        }
+        return result;
     }
 
-    public static void main(String[] args) throws Exception {
-        new Main().run(args);
+    public int getMongoPort() {
+        return Integer.parseInt(getConfigItem("MongoDB", "port"));
     }
 
+    public String getMongoHost() {
+        return getConfigItem("MongoDB", "host");
+    }
+
+    public String getMongoDatabaseName() {
+        return getConfigItem("MongoDB", "database");
+    }
+
+    public String getMongoReplayCollectionName() {
+        return getConfigItem("MongoDB", "collection", "replay-collection");
+    }
 }

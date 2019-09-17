@@ -1,0 +1,6 @@
+MongoDB:
+  host: localhost
+  port: 27017
+  database: Dota2
+  collection:
+    replay-collection: Replay

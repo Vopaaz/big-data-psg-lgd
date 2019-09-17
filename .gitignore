@@ -21,4 +21,7 @@ target/
 .vscode/
 
 # Test data
-test-data/
+test-data/*.dem
+
+# Project configuration
+config.yml

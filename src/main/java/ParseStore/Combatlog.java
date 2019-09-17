@@ -2,11 +2,7 @@ package ParseStore;
 
 import java.util.ArrayList;
 
-import org.bson.BsonTimestamp;
 import org.bson.Document;
-import org.joda.time.Duration;
-import org.joda.time.format.PeriodFormatter;
-import org.joda.time.format.PeriodFormatterBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

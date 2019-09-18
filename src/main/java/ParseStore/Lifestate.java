@@ -16,8 +16,6 @@ import skadistats.clarity.source.MappedFileSource;
 
 public class Lifestate {
 
-    private final Logger log = LoggerFactory.getLogger(Lifestate.class);
-
     private ArrayList<HashMap<String, Object>> eventList = new ArrayList<HashMap<String, Object>>();
     private HashMap<String, Object> tmpEvent;
 

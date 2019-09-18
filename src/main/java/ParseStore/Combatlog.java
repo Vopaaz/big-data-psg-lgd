@@ -116,10 +116,7 @@ public class Combatlog {
     }
 
     public ArrayList<Document> getEvents(String file) throws Exception {
-        long tStart = System.currentTimeMillis();
         new SimpleRunner(new MappedFileSource(file)).runWith(this);
-        long tMatch = System.currentTimeMillis() - tStart;
-        log.info("total time taken: {}s", (tMatch) / 1000.0);
         return eventList;
     }
 }

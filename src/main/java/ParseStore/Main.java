@@ -31,11 +31,11 @@ public class Main {
 
             document = new Document("matchid", "test");
             // document.append("combatlog", new Combatlog().getEvents(file));
-            document.append("info", new Info().getInfo(file));
+            // document.append("info", new Info().getInfo(file));
+            document.append("chat", new Chat().getChat(file));
             document.append("lifestate", 2);
             document.append("matchend", 3);
             collection.insertOne(document);
-
 
         } catch (Exception e) {
             e.printStackTrace();

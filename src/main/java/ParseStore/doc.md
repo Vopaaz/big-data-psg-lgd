@@ -229,7 +229,7 @@ player_info:[
         hero_name:
         game_team: 2 or 3, as explained before
         is_fake_client:
-        player_name: 
+        player_name:
     },
     {
         steamid:

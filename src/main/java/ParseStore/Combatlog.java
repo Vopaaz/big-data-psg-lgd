@@ -18,8 +18,7 @@ public class Combatlog {
     private ArrayList<Document> eventList = new ArrayList<Document>();
 
     private String compileName(String attackerName, boolean isIllusion) {
-        return (attackerName != null ? attackerName + (isIllusion ? " (illusion)" : "") : "UNKNOWN")
-                .replaceAll("npc_dota_", "");
+        return (attackerName != null ? attackerName + (isIllusion ? " (illusion)" : "") : "UNKNOWN");
     }
 
     private String getAttackerNameCompiled(CombatLogEntry cle) {

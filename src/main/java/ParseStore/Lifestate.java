@@ -5,6 +5,9 @@ import java.util.HashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ParseStore.helper.OnEntityDied;
+import ParseStore.helper.OnEntitySpawned;
 import skadistats.clarity.event.Insert;
 import skadistats.clarity.model.Entity;
 import skadistats.clarity.processor.runner.Context;

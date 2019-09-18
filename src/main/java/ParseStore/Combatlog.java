@@ -13,8 +13,6 @@ import skadistats.clarity.source.MappedFileSource;
 
 public class Combatlog {
 
-    private final Logger log = LoggerFactory.getLogger(Main.class.getPackage().getClass());
-
     private ArrayList<Document> eventList = new ArrayList<Document>();
 
     private String compileName(String attackerName, boolean isIllusion) {

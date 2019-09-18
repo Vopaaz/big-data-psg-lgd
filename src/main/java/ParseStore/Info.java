@@ -60,7 +60,7 @@ public class Info {
             resultList.add(temp);
         }
 
-        String key = (list.get(0) instanceof CPlayerInfo) ? "PlayerInfo" : "HeroSelectEvert";
+        String key = (list.get(0) instanceof CPlayerInfo) ? "PlayerInfo" : "HeroSelectEvent";
 
         HashMap<String, ArrayList<HashMap<String, Object>>> res = new HashMap<String, ArrayList<HashMap<String, Object>>>();
         res.put(key, resultList);

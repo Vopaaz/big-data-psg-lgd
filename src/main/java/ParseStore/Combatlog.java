@@ -109,8 +109,6 @@ public class Combatlog {
             break;
 
         default:
-            // DotaUserMessages.DOTA_COMBATLOG_TYPES type = cle.getType();
-            // log.info("\n{} ({}): {}\n", type.name(), type.ordinal(), cle);
             break;
         }
     }

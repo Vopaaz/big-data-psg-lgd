@@ -23,9 +23,7 @@ public class Chat {
     }
 
     public ArrayList<HashMap<String, String>> getChat(String file) throws Exception {
-        Source source = new MappedFileSource(file);
-        SimpleRunner runner = new SimpleRunner(source);
-        runner.runWith(this);
+        new SimpleRunner(new MappedFileSource(file)).runWith(this);
         return chatList;
     }
 

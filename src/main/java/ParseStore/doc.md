@@ -48,6 +48,7 @@ it follows such format:
 ```text
 {
     _id: <BUILT-IN ID>,
+    matchid: <Field reserved for marking each match, value can be customized>
     combatlog:[
         {
             <EVENT-LOG1>
@@ -57,17 +58,20 @@ it follows such format:
         },
         ...
     ],
-    TODO: info, lifestate, matchend
+    info:{
+        <GAME-INFO>
+    }
+    TODO: lifestate, matchend
 }
 ```
 
-### Explanation of "time"
 
-The time is a float representing the total seconds since the game starts.
 
-### Events
+### Combatlog
 
-Different type of events have different inner structure.
+*Explanation of "time": The time is a float representing the total seconds since the game starts.*
+
+Different type of events in the combatlog have different inner structure.
 
 #### Damage
 
@@ -184,3 +188,56 @@ A hero buys back. The fields are:
 
 
 
+
+### Info
+
+Contains game meta information. The fields are:
+
+- game_winner: An integer, either 2 or 3 representing the winning team.
+- leagueid
+- match_id
+- end_time: A very large integer, have different meaning with the "time" in Combatlog
+- game_mode: integer. Do not know the meaning
+- picks_bans:
+
+```text
+picks_bans:[
+    {
+        team: An integer, either 2 or 3
+        hero_id: An integer, do not know what hero it represents
+        is_pick: <boolean, is_pick if true else is_ban>
+    },
+    {
+        team:
+        hero_id:
+        is_pick:
+    },
+    ...
+]
+```
+
+- radiant_team_id
+- radiant_team_tag
+- dire_team_id
+- dire_team_tag
+- player_info:
+
+```text
+player_info:[
+    {
+        steamid:
+        hero_name:
+        game_team: 2 or 3, as explained before
+        is_fake_client:
+        player_name: 
+    },
+    {
+        steamid:
+        hero_name:
+        game_team:
+        is_fake_client:
+        player_name:
+    },
+    ...
+]
+```

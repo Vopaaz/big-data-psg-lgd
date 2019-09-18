@@ -69,8 +69,17 @@ it follows such format:
             <CHAT2>
         },
         ...
+    ],
+    lifestate:[
+        {
+            <LIFE-EVENT1>
+        },
+        {
+            <LIFE-EVENT2>
+        },
+        ...
     ]
-    TODO: lifestate, matchend
+    TODO: matchend
 }
 ```
 
@@ -212,8 +221,8 @@ Contains game meta information. The fields are:
 ```text
 picks_bans:[
     {
-        team: An integer, either 2 or 3
-        hero_id: An integer, do not know what hero it represents
+        team: <An integer, either 2 or 3>
+        hero_id: <An integer, do not know what hero it represents>
         is_pick: <boolean, is_pick if true else is_ban>
     },
     {
@@ -236,7 +245,7 @@ player_info:[
     {
         steamid:
         hero_name:
-        game_team: 2 or 3, as explained before
+        game_team: <2 or 3, as explained before>
         is_fake_client:
         player_name:
     },
@@ -257,3 +266,13 @@ In each chat, there are two fields:
 
 - sender
 - message
+
+### Lifestate
+
+Each entry is when an object spawns or dies. The fields are:
+
+- tick: Integer, seemingly related to the game time, but do not know the exact meaning
+- type: String, either "spawn" or "die"
+- object
+
+

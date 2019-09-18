@@ -33,7 +33,7 @@ public class Info {
         return map;
     }
 
-    private HashMap<String, ArrayList<HashMap<String, Object>>> disentangleList(List list) throws Exception {
+    private ArrayList<HashMap<String, Object>> disentangleList(List list) throws Exception {
 
         ArrayList<HashMap<String, Object>> resultList = new ArrayList<HashMap<String, Object>>();
         HashMap<String, Object> temp;
@@ -60,10 +60,6 @@ public class Info {
             resultList.add(temp);
         }
 
-        String key = (list.get(0) instanceof CPlayerInfo) ? "PlayerInfo" : "HeroSelectEvent";
-
-        HashMap<String, ArrayList<HashMap<String, Object>>> res = new HashMap<String, ArrayList<HashMap<String, Object>>>();
-        res.put(key, resultList);
-        return res;
+        return resultList;
     }
 }

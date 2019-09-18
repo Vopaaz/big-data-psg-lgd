@@ -25,8 +25,6 @@ public class Info {
 
             if (v instanceof List) {
                 v = disentangleList((List) v);
-            } else {
-                v = v.toString();
             }
 
             map.put(k.getFullName().replace('.', '-').replaceAll("CGameInfo-CDotaGameInfo-", ""), v);

@@ -60,7 +60,16 @@ it follows such format:
     ],
     info:{
         <GAME-INFO>
-    }
+    },
+    chat:[
+        {
+            <CHAT1>
+        },
+        {
+            <CHAT2>
+        },
+        ...
+    ]
     TODO: lifestate, matchend
 }
 ```
@@ -241,3 +250,10 @@ player_info:[
     ...
 ]
 ```
+
+### Chat
+
+In each chat, there are two fields:
+
+- sender
+- message

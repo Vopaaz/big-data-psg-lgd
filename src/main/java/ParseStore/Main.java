@@ -89,4 +89,5 @@ class Config {
     public String getMongoReplayCollectionName() {
         return getConfigItem("MongoDB", "collection", "replay-collection");
     }
+
 }

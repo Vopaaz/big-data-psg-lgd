@@ -30,11 +30,10 @@ public class Main {
             Document document = null;
 
             document = new Document("matchid", "test");
-            // document.append("combatlog", new Combatlog().getEvents(file));
-            // document.append("info", new Info().getInfo(file));
-            // document.append("chat", new Chat().getChat(file));
+            document.append("combatlog", new Combatlog().getEvents(file));
+            document.append("info", new Info().getInfo(file));
+            document.append("chat", new Chat().getChat(file));
             document.append("lifestate", new Lifestate().getStates(file));
-            document.append("matchend", 3);
             collection.insertOne(document);
 
         } catch (Exception e) {

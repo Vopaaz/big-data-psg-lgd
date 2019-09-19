@@ -4,6 +4,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -18,8 +20,9 @@ import org.yaml.snakeyaml.Yaml;
 
 public class ParseStoreExecutor {
     private final MongoCollection<Document> collection;
+    private final String version = "v0.1.0";
 
-    ParseStoreExecutor(){
+    ParseStoreExecutor() {
         Config conf = new Config();
         MongoClient mongoClient = MongoClients
                 .create(String.format("mongodb://%s:%d", conf.getMongoHost(), conf.getMongoPort()));
@@ -28,12 +31,36 @@ public class ParseStoreExecutor {
     }
 
     public void parseFileStoreMongo(String file, String matchId) throws Exception {
+
+        Date start = new Date();
         Document document = new Document("matchid", matchId);
         document.append("combatlog", new Combatlog().getEvents(file));
         document.append("info", new Info().getInfo(file));
         document.append("chat", new Chat().getChat(file));
         document.append("lifestate", new Lifestate().getStates(file));
+        Date end = new Date();
+
+        addProvenance(document, start, end);
+
         collection.insertOne(document);
+    }
+
+    private void addProvenance(Document document, Date start, Date end) {
+        ArrayList<HashMap<String, Object>> provenanceList = new ArrayList<HashMap<String, Object>>();
+        HashMap<String, Object> provenance = new HashMap<String, Object>();
+        provenance.put("name", "Parse .dem file to MongoDB");
+        provenance.put("code", "ParseStore.ParseStoreExecutor.parseFileStoreMongo");
+        provenance.put("version", version);
+        provenance.put("start", start);
+        provenance.put("end", end);
+        provenance.put("elapsed_ms", end.getTime() - start.getTime());
+        provenanceList.add(provenance);
+
+        document.append("provenance", provenanceList);
+    }
+
+    public String getVersion() {
+        return version;
     }
 
 }

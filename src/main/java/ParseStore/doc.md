@@ -23,19 +23,29 @@ MongoDB:
 
 You can refer to the [example](//config-sample.yml).
 
-## Execution Script
+## Using
 
-<!-- Todo: fix the execution instructions after the API is finalized. -->
+### API
 
-This is a **deveopment stage script**, the APIs have not been finalized.
+`ParseStore.ParseStoreExecutor` provides the `parseFileStoreMongo` method.
 
-Put a `test1.dem` file in test-data directory, and run the [`jmake` script](//jmake.bat).
+Params:
 
-It is a batch file so only works for windows. On *nix system please do these manually.
+- `file`: `String`, path to the `.dem` file
+- `matchId`: `String`, unique id of a match
+
+### Execute from console
+
+#### Packaging
 
 ```bash
 $ mvn -P ParseStore package
-$ java -jar target/ParseStore.one-jar.jar test-data/test1.dem
+```
+
+#### Parse and Store
+
+```bash
+$ java -jar target/ParseStore.one-jar.jar "path/to/replay.dem"
 ```
 
 ## Replay MongoDB Collection Specification

@@ -7,7 +7,6 @@ import skadistats.clarity.processor.reader.OnMessage;
 import skadistats.clarity.processor.runner.Context;
 import skadistats.clarity.processor.runner.SimpleRunner;
 import skadistats.clarity.source.MappedFileSource;
-import skadistats.clarity.source.Source;
 import skadistats.clarity.wire.s2.proto.S2UserMessages;
 
 public class Chat {

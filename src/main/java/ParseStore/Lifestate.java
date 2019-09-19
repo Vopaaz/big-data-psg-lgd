@@ -3,9 +3,6 @@ package ParseStore;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import ParseStore.helper.OnEntityDied;
 import ParseStore.helper.OnEntitySpawned;
 import skadistats.clarity.event.Insert;

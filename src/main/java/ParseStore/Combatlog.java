@@ -3,8 +3,6 @@ package ParseStore;
 import java.util.ArrayList;
 
 import org.bson.Document;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import skadistats.clarity.model.CombatLogEntry;
 import skadistats.clarity.processor.gameevents.OnCombatLogEntry;

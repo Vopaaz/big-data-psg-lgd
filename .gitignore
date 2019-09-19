@@ -10,6 +10,9 @@
 # LaTeX minted package
 _minted*/
 
+# Mac's auxiliary file
+.DS_Store
+
 # Maven project
 target/
 .classpath

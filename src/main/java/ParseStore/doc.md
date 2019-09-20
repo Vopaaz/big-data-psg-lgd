@@ -23,19 +23,29 @@ MongoDB:
 
 You can refer to the [example](//config-sample.yml).
 
-## Execution Script
+## Using
 
-<!-- Todo: fix the execution instructions after the API is finalized. -->
+### API
 
-This is a **deveopment stage script**, the APIs have not been finalized.
+`ParseStore.ParseStoreExecutor` provides the `parseFileStoreMongo` method.
 
-Put a `test1.dem` file in test-data directory, and run the [`jmake` script](//jmake.bat).
+Params:
 
-It is a batch file so only works for windows. On *nix system please do these manually.
+- `file`: `String`, path to the `.dem` file
+- `matchId`: `String`, unique id of a match
+
+### Execute from console
+
+#### Packaging
 
 ```bash
 $ mvn -P ParseStore package
-$ java -jar target/ParseStore.one-jar.jar test-data/test1.dem
+```
+
+#### Parse and Store
+
+```bash
+$ java -jar target/ParseStore.one-jar.jar "path/to/replay.dem"
 ```
 
 ## Replay MongoDB Collection Specification
@@ -48,6 +58,7 @@ it follows such format:
 ```text
 {
     _id: <BUILT-IN ID>,
+    matchid: <Field reserved for marking each match, value can be customized>
     combatlog:[
         {
             <EVENT-LOG1>
@@ -57,13 +68,37 @@ it follows such format:
         },
         ...
     ],
-    TODO: info, lifestate, matchend
+    info:{
+        <GAME-INFO>
+    },
+    chat:[
+        {
+            <CHAT1>
+        },
+        {
+            <CHAT2>
+        },
+        ...
+    ],
+    lifestate:[
+        {
+            <LIFE-EVENT1>
+        },
+        {
+            <LIFE-EVENT2>
+        },
+        ...
+    ]
 }
 ```
 
-### Events
 
-Different type of events have different inner structure.
+
+### Combatlog
+
+*Explanation of "time": The time is a float representing the total seconds since the game starts.*
+
+Different type of events in the combatlog have different inner structure.
 
 #### Damage
 
@@ -178,5 +213,75 @@ A hero buys back. The fields are:
 
 
 
+
+
+
+### Info
+
+Contains game meta information. The fields are:
+
+- game_winner: An integer, either 2 or 3 representing the winning team.
+- leagueid
+- match_id
+- end_time: A very large integer, have different meaning with the "time" in Combatlog
+- game_mode: integer. Do not know the meaning
+- picks_bans:
+
+```text
+picks_bans:[
+    {
+        team: <An integer, either 2 or 3>
+        hero_id: <An integer, do not know what hero it represents>
+        is_pick: <boolean, is_pick if true else is_ban>
+    },
+    {
+        team:
+        hero_id:
+        is_pick:
+    },
+    ...
+]
+```
+
+- radiant_team_id
+- radiant_team_tag
+- dire_team_id
+- dire_team_tag
+- player_info:
+
+```text
+player_info:[
+    {
+        steamid:
+        hero_name:
+        game_team: <2 or 3, as explained before>
+        is_fake_client:
+        player_name:
+    },
+    {
+        steamid:
+        hero_name:
+        game_team:
+        is_fake_client:
+        player_name:
+    },
+    ...
+]
+```
+
+### Chat
+
+In each chat, there are two fields:
+
+- sender
+- message
+
+### Lifestate
+
+Each entry is when an object spawns or dies. The fields are:
+
+- tick: Integer, seemingly related to the game time, but do not know the exact meaning
+- type: String, either "spawn" or "die"
+- object
 
 

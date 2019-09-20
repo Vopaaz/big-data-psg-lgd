@@ -71,6 +71,44 @@
 %-------%
 
 \section{Dota2 Game Replay Analysis}
+\subsection{Potential Datasets}
+Our team aims at exploring data about a popular and long-lived computer game, Dota2. We will primarily get our data from the following three origins:
+
+\begin{enumerate}
+\item \href{https://wiki.teamfortress.com/wiki/WebAPI}{Dota2's official API}
+\item \href{https://docs.opendota.com/}{OpenDota API}
+\item Valve's Dota2 replay servers
+\end{enumerate}
+
+We will get the match results data from Dota2's official API. Also we get the data we need to retrieve a replay from replay servers, then get replays. So basically we will have two different kinds of data for our further analysis, relatively large-scale but coarse-grained match results data, and very fine-grained replays data. Considering the file size of one replay, we decide to only include recent professional games for the replay data. Specifically, we can collect them by the following instructions:
+
+\begin{enumerate}
+\item Match Results:
+	\begin{itemize}
+		\item Use \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchHistoryBySequenceNum}{GetMatchHistoryBySequenceNum} API to get the match ids, we will need a a field called \\ \codeinline{start_at_match_seq_num} to specify the starting match sequence number of the results. 
+		\item Then  we can extract the last sequence number of the results as the \codeinline{start_at_match_seq_num} for the next call. By doing this iteratively we can enlarge our dataset for our first kind of data.
+	\end{itemize}
+\item Replays:
+	\begin{itemize}
+		\item Get the match ids of recent professional games from the first dataset we collect.
+		\item Use the those ids via \href{https://docs.opendota.com/#tag/matches}{OpenDota API} to get the information we need \\ (\codeinline{cluster} and \codeinline{replay_salt}) for retrieving replays from Valve's replay server
+		\item Constructing links in this format:\\  \codeinline{ http://replay<cluster>.valve.net/570/<match_id>_<replay_salt>.dem.bz2} to get the replays.
+	\end{itemize}
+\end{enumerate}
+
+
+
+\subsection{Datasets Description}
+
+We found the approaches to get those data on a \href{https://dev.dota2.com}{developer's forum of Dota2}. Valve's official document of many APIs is outdated so the forum is the only way for us to understand the resulting data.
+
+The match results data is in JSON format, which contains snapshot information about a game's end, like how much gold one player earned at the end of the match, and also contains some information after a match, like how many players thumbs-up the game.
+
+The JSON file for one match will be between 3KB\textasciitilde 5KB, we planed to collect 1,000,000 matches' results data, which will add up to about 5GB.
+
+The replay data is originally in binary format, but we found an open-source program to parse it into strings. So we will be handling the logs of all the activity happens in a single game. We may further parse this file considering that the file size of one single match and it contains many irrelevant information. The size of one replay's size is between 20MB\textasciitilde 80MB. We plan to collect 1,000 matches' replays, which will add up to about 50GB.
+
+
 
 \subsection{Data Preprocessing and Specification}
 

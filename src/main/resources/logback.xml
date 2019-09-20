@@ -1,4 +1,5 @@
 <configuration>
+<<<<<<< HEAD
     <timestamp key="byDay" datePattern="yyyyMMdd'T'HHmmss"/>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -22,3 +23,21 @@
     </root>
 
 </configuration>
+=======
+	<appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<logger name="ParseStore" level="info" />
+
+	<root level="info">
+		<appender-ref ref="stdout" />
+	</root>
+
+</configuration>
+
+
+
+>>>>>>> parse-dem-store-mongo

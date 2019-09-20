@@ -3,11 +3,6 @@ package ParseStore;
 import java.util.ArrayList;
 
 import org.bson.Document;
-import org.joda.time.Duration;
-import org.joda.time.format.PeriodFormatter;
-import org.joda.time.format.PeriodFormatterBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import skadistats.clarity.model.CombatLogEntry;
 import skadistats.clarity.processor.gameevents.OnCombatLogEntry;
@@ -16,17 +11,10 @@ import skadistats.clarity.source.MappedFileSource;
 
 public class Combatlog {
 
-    private final Logger log = LoggerFactory.getLogger(Main.class.getPackage().getClass());
-
-    private final PeriodFormatter GAMETIME_FORMATTER = new PeriodFormatterBuilder().minimumPrintedDigits(2)
-            .printZeroAlways().appendHours().appendLiteral(":").appendMinutes().appendLiteral(":").appendSeconds()
-            .appendLiteral(".").appendMillis3Digit().toFormatter();
-
     private ArrayList<Document> eventList = new ArrayList<Document>();
 
     private String compileName(String attackerName, boolean isIllusion) {
-        return (attackerName != null ? attackerName + (isIllusion ? " (illusion)" : "") : "UNKNOWN")
-                .replaceAll("npc_dota_", "");
+        return (attackerName != null ? attackerName + (isIllusion ? " (illusion)" : "") : "UNKNOWN");
     }
 
     private String getAttackerNameCompiled(CombatLogEntry cle) {
@@ -39,10 +27,7 @@ public class Combatlog {
 
     @OnCombatLogEntry
     public void onCombatLogEntry(CombatLogEntry cle) {
-        // TODO: Make time to be TimeStamp rather than a string.
-
-        String time = "[" + GAMETIME_FORMATTER.print(Duration.millis((int) (1000.0f * cle.getTimestamp())).toPeriod())
-                + "]";
+        float time = cle.getTimestamp();
 
         Document temp;
         switch (cle.getType()) {
@@ -120,17 +105,12 @@ public class Combatlog {
             break;
 
         default:
-            // DotaUserMessages.DOTA_COMBATLOG_TYPES type = cle.getType();
-            // log.info("\n{} ({}): {}\n", type.name(), type.ordinal(), cle);
             break;
         }
     }
 
     public ArrayList<Document> getEvents(String file) throws Exception {
-        long tStart = System.currentTimeMillis();
         new SimpleRunner(new MappedFileSource(file)).runWith(this);
-        long tMatch = System.currentTimeMillis() - tStart;
-        log.info("total time taken: {}s", (tMatch) / 1000.0);
         return eventList;
     }
 }

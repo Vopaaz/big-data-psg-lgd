@@ -12,3 +12,19 @@ _minted*/
 
 # Mac's auxiliary file
 .DS_Store
+
+# Maven project
+target/
+.classpath
+.factorypath
+.project
+.settings/
+
+# vscode
+.vscode/
+
+# Test data
+test-data/*.dem
+
+# Project configuration
+config.yml

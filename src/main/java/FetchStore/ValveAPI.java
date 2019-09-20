@@ -8,7 +8,6 @@ import java.util.List;
 import java.io.*;
 import java.util.*;
 
-import com.sun.tools.corba.se.idl.StringGen;
 import org.apache.commons.compress.compressors.bzip2.*;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
@@ -18,6 +17,8 @@ import org.apache.commons.io.*;
 import org.json.*;
 import Mongo.MongoConfig;
 import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ValveAPI {
 
@@ -32,16 +33,25 @@ public class ValveAPI {
     private final String version = "v0.1.0";
     private final String replaysZippedDirPrefix = "./test-data/replays/zipped/";
     private final String replaysZippedDirSuffix = ".dem.bz2";
+    private final String professionalGames = "professional/";
+    private final String publicGames = "public/";
+    private final String rankedGames = "ranked/";
     private final String replaysUnzippedDirPrefix = "./test-data/replays/unzipped/";
     private final String replaysUnzippedDirSuffix = ".dem";
+    private final String jsonPrefix = "./test-data/match-details/";
+    private final String jsonSuffix = ".json";
+    private int publicGamesNum;
+    private int rankedGamesNum;
     MongoConfig conf;
     MongoClient mongoClient;
     MongoDatabase database;
     MongoCollection<Document> repCollection;
     MongoCollection<Document> matchCollection;
     OpendotaAPI opendotaAPI;
+    Logger logger;
 
     public ValveAPI(String configPath) {
+        logger = LoggerFactory.getLogger(ValveAPI.class);
         conf = new MongoConfig(configPath);
         mongoClient = MongoClients
                 .create(String.format("mongodb://%s:%d", conf.getMongoHost(), conf.getMongoPort()));
@@ -49,6 +59,8 @@ public class ValveAPI {
         matchCollection = database.getCollection(conf.getMongoMatchDetailsCollectionName());
         repCollection = database.getCollection(conf.getMongoReplayCollectionName());
         opendotaAPI = new OpendotaAPI();
+        publicGamesNum = 0;
+        rankedGamesNum = 0;
     }
 
     public boolean uncompressBz2(String source, String target) {
@@ -65,29 +77,53 @@ public class ValveAPI {
             bzIn.close();
         }
         catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
         return true;
     }
 
     private void writeMultipleMatchesToDB(JSONArray matches) throws Exception {
-        List<String> toDownload = new ArrayList<>();
         for(int i = 0; i < matches.length(); ++i) {
             Date start = new Date();
             JSONObject curMatch = matches.getJSONObject(i);
-            if(curMatch.getInt("leagueid") != 0) toDownload.add(Long.toString(curMatch.getLong("match_id")));
+            if(curMatch.getInt("leagueid") != 0) {
+                List<String> list = new ArrayList<>();
+                list.add(Long.toString(curMatch.getLong("match_id")));
+                downloadRepByMatchID(list, professionalGames);
+            }
+            if(publicGamesNum != 0 && curMatch.getInt("lobby_type") == 0) {
+                List<String> list = new ArrayList<>();
+                list.add(Long.toString(curMatch.getLong("match_id")));
+                downloadRepByMatchID(list, publicGames);
+            }
+            if(rankedGamesNum != 0 && curMatch.getInt("lobby_type") == 7) {
+                List<String> list = new ArrayList<>();
+                list.add(Long.toString(curMatch.getLong("match_id")));
+                downloadRepByMatchID(list, rankedGames);
+            }
             writeDetailsToDB(curMatch, start);
         }
-        downloadRepByMatchID(toDownload);
     }
 
-    private void downloadRepByMatchID(List<String> proMatches) throws Exception {
-        List<String> urls = opendotaAPI.getRepInfo(proMatches);
-        for(int i = 0; i < proMatches.size(); ++i) {
-            String zippedDir = replaysZippedDirPrefix + proMatches + replaysZippedDirSuffix;
-            String unzippedDir = replaysUnzippedDirPrefix + proMatches + replaysUnzippedDirSuffix;
-            downloadURL(urls.get(i), zippedDir);
-            uncompressBz2(zippedDir, unzippedDir);
+    private void downloadRepByMatchID(List<String> matches, String directory) throws Exception {
+        List<String> urls = opendotaAPI.getRepInfo(matches);
+        for(int i = 0; i < matches.size(); ++i) {
+            String zippedDir = replaysZippedDirPrefix + directory + matches.get(i) + replaysZippedDirSuffix;
+            String unzippedDir = replaysUnzippedDirPrefix + directory + matches.get(i) + replaysUnzippedDirSuffix;
+            if(downloadURL(urls.get(i), zippedDir)) {
+                uncompressBz2(zippedDir, unzippedDir);
+                if(directory.equals(publicGames)) {
+                    publicGamesNum--;
+                }
+                else if(directory.equals(rankedGames)) {
+                    rankedGamesNum--;
+                }
+                else {
+                    publicGamesNum++;
+                    rankedGamesNum++;
+                }
+            }
         }
     }
 
@@ -103,7 +139,6 @@ public class ValveAPI {
         provenance.put("end", end);
         provenance.put("elapsed_ms", end.getTime() - start.getTime());
         provenanceList.add(provenance);
-
         document.append("provenance", provenanceList);
         matchCollection.insertOne(document);
     }
@@ -111,65 +146,99 @@ public class ValveAPI {
     public static void main(String[] args) throws Exception {
         ValveAPI api = new ValveAPI("config.yml");
         api.getMultipleMatchesBySeqNum("4182489531", 20, 5);
-//        api.getRecentMatches("10");
-//        api.getMatchesBySeqNum("4218902824", 20);
-//        List<String> test = new ArrayList<>();
-//        test.add("4986461644");
-//        test.add("4986362254");
-//        test.add("4986260666");
-//        List<String> repUrls = api1.getRepInfo(test);
-//        int curIndex = 1;
-//        for(String s: repUrls){
-//            System.out.println("Downloading: " + s);
-//            api.downloadURL(s, "./test-data/replays/" + (curIndex++) + ".dem.bz2");
-//        }
-//        api.uncompressBz2("./test-data/replays/1.dem.bz2", "./test-data/replays/1.dem");
-//        api.writeDetailsToDB("4986461644");
     }
 
 
-    private void downloadURL(String url, String fileTarget) throws Exception{
-        URL obj = new URL(url);
-        File target = new File(fileTarget);
-        FileUtils.copyURLToFile(obj, target);
+    private boolean downloadURL(String url, String fileTarget) {
+        try {
+            logger.info("Start downloading {} to address {}.", url, fileTarget);
+            URL obj = new URL(url);
+            File target = new File(fileTarget);
+            FileUtils.copyURLToFile(obj, target);
+            logger.info("Successfully downloaded {} to address {}.", url, fileTarget);
+        }
+        catch (Exception e) {
+            logger.error("Failed to download {} to address {}.", url, fileTarget);
+            logger.error("Skip the file from URL {}.", url);
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
-    public String getMatchesBySeqNum(String seqNum, int num) throws Exception{
-        String numString = Integer.toString(num);
+    public String getMatchesBySeqNum(String seqNum, int num) {
+        try {
+            String numString = Integer.toString(num);
+            logger.info("Start getting matches through Valve's API.");
+            logger.info("Matches sequence numbers start by {}, and with total number {}", seqNum, num);
+            List<String> fields = new ArrayList<>();
 
-        List<String> fields = new ArrayList<>();
+            fields.add("key");
+            fields.add(AUTHORIZE_KEY);
+            fields.add("start_at_match_seq_num");
+            fields.add(seqNum);
+            fields.add("matches_requested");
+            fields.add(numString);
 
-        fields.add("key");
-        fields.add(AUTHORIZE_KEY);
-        fields.add("start_at_match_seq_num");
-        fields.add(seqNum);
-        fields.add("matches_requested");
-        fields.add(numString);
-
-        String url = constructURL(fields, GET_MATCH_HISTORY_BY_SEQUENCE_NUM);
-
-        String res = sendGetRequest(url);
-//        JSONObject obj = new JSONObject(res);
-//        System.out.println(obj.getJSONObject("result").toString());
-        System.out.println(res);
-        return res;
+            String url = constructURL(fields, GET_MATCH_HISTORY_BY_SEQUENCE_NUM);
+            String res = sendGetRequest(url);
+            return res;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            logger.error("Failed to get matches sequence numbers start by {}, and with total number {}", seqNum, num);
+            return null;
+        }
     }
 
     public void getMultipleMatchesBySeqNum(String startSeqNum, int totalNum, int batchSize) throws Exception {
+        logger.info("Starting a new task.");
+        logger.info("Get {} matches with batch size of {} and sequence number start by {}.", totalNum, batchSize, startSeqNum);
+        Date start = new Date();
         int sofar = 0;
-        String lastStartSeqNum = "";
         String curStartSeqNum = startSeqNum;
-        while(sofar < totalNum && !lastStartSeqNum.equals(curStartSeqNum)) {
+        while(sofar < totalNum) {
+            logger.info("Starting to get a batch start with sequence number {}.", curStartSeqNum);
             String seqResult = getMatchesBySeqNum(curStartSeqNum, batchSize);
+            if(seqResult == null) {
+                logger.error("Failed to get batch start with sequence number {}", curStartSeqNum);
+                logger.debug("Skip the current sequence number");
+                long nextSeqNum = Long.parseLong(curStartSeqNum);
+                curStartSeqNum = Long.toString(++nextSeqNum);
+                continue;
+            }
+            logger.info("Successfully get a batch start with sequence number {}.", curStartSeqNum);
             JSONObject jsonResult = new JSONObject(seqResult);
             JSONArray matches = jsonResult.getJSONObject("result").getJSONArray("matches");
+            logger.info("Trying to write the previous result to database");
             writeMultipleMatchesToDB(matches);
+            logger.info("Successfully writing a batch start with sequence number {} to database.", curStartSeqNum);
             sofar += matches.length();
-            lastStartSeqNum = curStartSeqNum;
             long nextSeqNum = matches.getJSONObject(matches.length() - 1).getLong("match_seq_num");
+            String fileName = curStartSeqNum + "_to_" + nextSeqNum;
+            logger.info("Trying to save the previous result as a JSON file");
+            writeJSONToFile(jsonResult, fileName, jsonPrefix, jsonSuffix);
+            logger.info("Successfully writing to a local JSON file");
             curStartSeqNum = Long.toString(++nextSeqNum);
+            logger.info("Next batch starting sequence is {}.", curStartSeqNum);
         }
+        Date end = new Date();
+        logger.info("Successfully complete the task with start sequence number {}, and total number {}.", startSeqNum, totalNum);
+        logger.info("Next batch should start with sequence number: {}.", curStartSeqNum);
+        logger.info("The task was done in {} seconds.", (end.getTime() - start.getTime()) / 1000.0);
+    }
 
+    private void writeJSONToFile(JSONObject obj, String fileName, String filePrefix, String fileSuffix) {
+        String path = filePrefix + fileName + fileSuffix;
+        try {
+            logger.info("Writing to file {}.", path);
+            File targetFile = new File(path);
+            FileUtils.writeStringToFile(targetFile, obj.toString(), "US-ASCII");
+        }
+        catch (Exception e) {
+            logger.error("Failed to write to file {}.", path);
+            e.printStackTrace();
+        }
     }
 
     public void getRecentMatches(String reqNum) throws Exception {
@@ -198,8 +267,8 @@ public class ValveAPI {
         con.setRequestProperty("User-Agent", USER_AGENT);
 
         int responseCode = con.getResponseCode();
-        System.out.println("\nSending 'GET' request to URL : " + url);
-        System.out.println("Response Code : " + responseCode);
+        logger.info("Sending 'GET' request to URL {}.", url);
+        logger.info("Response Code : {}", responseCode);
 
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(con.getInputStream()));
@@ -211,9 +280,8 @@ public class ValveAPI {
         }
 
         in.close();
-        //  print result
         String res = response.toString();
-//        System.out.println(res);
+        logger.info("Successfully get the result from URL {}.", url);
         return res;
     }
 
@@ -221,7 +289,6 @@ public class ValveAPI {
         if(fields.size() == 0) return api;
         StringBuilder sb = new StringBuilder(api);
         sb.append('?');
-
         for(int i = 0; i < fields.size(); i += 2) {
             if(i != 0) sb.append("&");
             sb.append(fields.get(i));
@@ -230,6 +297,5 @@ public class ValveAPI {
         }
 
         return sb.toString();
-
     }
 }

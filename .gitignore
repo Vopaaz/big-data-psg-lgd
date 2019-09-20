@@ -34,3 +34,7 @@ config.yml
 
 # idea auxiliary file
 .idea
+
+# log files
+**/*.log
+**/*.txt

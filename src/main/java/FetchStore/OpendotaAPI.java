@@ -3,10 +3,8 @@ package FetchStore;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.ResponseCache;
 import java.net.URL;
 
-import com.sun.tools.corba.se.idl.StringGen;
 import org.json.*;
 import java.util.List;
 import java.util.ArrayList;

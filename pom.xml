@@ -9,9 +9,10 @@
     <url>https://github.com/Vopaaz/big-data-psg-lgd</url>
 
     <properties>
-        <maven.compiler.target>1.7</maven.compiler.target>
-        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
     </properties>
 
     <licenses>
@@ -63,8 +64,14 @@
             <artifactId>commons-compress</artifactId>
             <version>1.19</version>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.6</version>
+        </dependency>
 
     </dependencies>
+
 
     <build>
         <finalName>${scriptName}</finalName>
@@ -101,6 +108,18 @@
             <id>ParseStore</id>
             <properties>
                 <scriptName>ParseStore</scriptName>
+            </properties>
+        </profile>
+        <profile>
+            <id>FetchStore</id>
+            <properties>
+                <scriptName>FetchStore</scriptName>
+            </properties>
+        </profile>
+        <profile>
+            <id>Mongo</id>
+            <properties>
+                <scriptName>Mongo</scriptName>
             </properties>
         </profile>
     </profiles>

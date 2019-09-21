@@ -73,6 +73,8 @@ public class ValveAPI {
 
     public boolean uncompressBz2(String source, String target) {
         try {
+            source = FilenameUtils.separatorsToSystem(source);
+            target = FilenameUtils.separatorsToSystem(target);
             FileInputStream in = new FileInputStream(source);
             FileOutputStream out = new FileOutputStream(target);
             BZip2CompressorInputStream bzIn = new BZip2CompressorInputStream(in);

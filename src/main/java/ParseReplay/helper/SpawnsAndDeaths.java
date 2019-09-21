@@ -1,4 +1,4 @@
-package ParseStore.helper;
+package ParseReplay.helper;
 
 import skadistats.clarity.event.Event;
 import skadistats.clarity.event.EventListener;

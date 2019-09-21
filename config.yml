@@ -1,0 +1,9 @@
+MongoDB:
+  host: localhost
+  port: 27017
+  database: Dota2
+  collection:
+    ranked-collections: rankedgames
+    public-collections: publicgames
+    professional-collections: professionalgames
+    match-result-collections: matchresults

@@ -2,13 +2,12 @@ package FetchStore;
 import java.io.BufferedReader;
 
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.io.*;
 import java.util.*;
 
-import ParseStore.ParseStoreExecutor;
+import ParseReplay.ParseReplayExecutor;
 import org.apache.commons.compress.compressors.bzip2.*;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
@@ -44,6 +43,7 @@ public class ValveAPI {
     private final String jsonSuffix = ".json";
     private int publicGamesNum;
     private int rankedGamesNum;
+
     MongoConfig conf;
     MongoClient mongoClient;
     MongoDatabase database;
@@ -51,7 +51,7 @@ public class ValveAPI {
     MongoCollection<Document> rankedCollection;
     MongoCollection<Document> professionalCollection;
     MongoCollection<Document> matchesCollection;
-    ParseStoreExecutor parser;
+    ParseReplayExecutor parser;
     OpendotaAPI opendotaAPI;
     Logger logger;
 
@@ -68,7 +68,7 @@ public class ValveAPI {
         opendotaAPI = new OpendotaAPI();
         publicGamesNum = 0;
         rankedGamesNum = 0;
-        parser = new ParseStoreExecutor();
+        parser = new ParseReplayExecutor();
     }
 
     public boolean uncompressBz2(String source, String target) {
@@ -231,14 +231,18 @@ public class ValveAPI {
             logger.info("Successfully get a batch start with sequence number {}.", curStartSeqNum);
             JSONObject jsonResult = new JSONObject(seqResult);
             JSONArray matches = jsonResult.getJSONObject("result").getJSONArray("matches");
+
             logger.info("Trying to write the previous result to database");
             writeMultipleMatchesToDB(matches);
+
             logger.info("Successfully writing a batch start with sequence number {} to database.", curStartSeqNum);
             sofar += matches.length();
             long nextSeqNum = matches.getJSONObject(matches.length() - 1).getLong("match_seq_num");
             String fileName = curStartSeqNum + "_to_" + nextSeqNum;
+
             logger.info("Trying to save the previous result as a JSON file");
             writeJSONToFile(jsonResult, fileName, jsonPrefix, jsonSuffix);
+
             logger.info("Successfully writing to a local JSON file");
             curStartSeqNum = Long.toString(++nextSeqNum);
             logger.info("Next batch starting sequence is {}.", curStartSeqNum);

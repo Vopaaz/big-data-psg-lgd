@@ -1,4 +1,4 @@
-package ParseStore.helper;
+package ParseReplay.helper;
 
 import skadistats.clarity.event.UsagePointMarker;
 import skadistats.clarity.event.UsagePointType;

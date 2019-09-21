@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.skadistats</groupId>
-    <artifactId>parse-dem-store-mongo</artifactId>
+    <artifactId>data-pipelie-dota2</artifactId>
     <version>v0.0.1</version>
     <packaging>jar</packaging>
     <name>parse-dem-store-mongo</name>
-    <description>Parse the Dota2 replay dem file and store it to MongoDB</description>
+    <description>Data pipelines for matches details and parse replays</description>
     <url>https://github.com/Vopaaz/big-data-psg-lgd</url>
 
     <properties>

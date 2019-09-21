@@ -1,4 +1,4 @@
-package ParseStore.helper;
+package ParseReplay.helper;
 
 import skadistats.clarity.event.UsagePointMarker;
 import skadistats.clarity.event.UsagePointType;
@@ -12,5 +12,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = ElementType.METHOD)
 @UsagePointMarker(value = UsagePointType.EVENT_LISTENER, parameterClasses = { Entity.class })
-public @interface OnEntityDied {
+public @interface OnEntityDying {
 }

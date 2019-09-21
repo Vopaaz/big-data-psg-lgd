@@ -29,6 +29,7 @@ mvn -P FetchStore package
 ```bash
 java -jar target/ParseStore.one-jar.jar start_sequence_num total_num batch_size
 ```
+You can check logs to see what's the next the starting sequence number
 ##Saved Files
 1.  Logs will be in directory `./logs`
 2.  Downloaded replays will be in directory `./test-data/replays/zipped`

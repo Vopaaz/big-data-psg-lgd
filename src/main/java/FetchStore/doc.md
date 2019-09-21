@@ -40,6 +40,13 @@ You can check logs to see what's the next the starting sequence number
 1.  Logs contain all the logging information equal or higher than 'info' level.
 2.  JSON files of match result are the raw result from
  API: https://wiki.teamfortress.com/wiki/WebAPI/GetMatchHistoryBySequenceNum
-3.  Replays are binary files that can be executed by the Dota2's client
+3.  Replays are binary files that can be executed by the Dota2's client. When we meet a professional game, we download its
+replay, and download a random public match and a rank match too.
 4.  Parsed data should be refer to: 
 https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/java/ParseStore/doc.md
+
+##Error Handling
+When we encounter an error calling [valve's API](https://wiki.teamfortress.com/wiki/WebAPI/GetMatchHistoryBySequenceNum)。
+We increase the starting sequence number and continue.<br>
+When we encounter a downloading error, we skip the current downloading task. <br>
+When we can't connect to the database, we crash our program.

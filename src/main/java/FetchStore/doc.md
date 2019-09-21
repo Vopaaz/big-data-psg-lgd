@@ -29,6 +29,12 @@ mvn -P FetchStore package
 ```bash
 java -jar target/FetchStore.one-jar.jar start_sequence_num total_num batch_size
 ```
+start_sequence_num is a field that works similarly as match id, it's unique for every match.
+You can test the result by setting the sequence number to `4182489531`, which is a very famous professional dota2 game.
+Generally, you can pick any ten-digit number smaller than `4182489531`, but I can't guarantee that there is a professional game 
+in the sequence number range you randomly chosen, which means you probably can't trigger the program to download and parse
+replays.
+
 You can check logs to see what's the next the starting sequence number
 ## Saved Files
 1.  Logs will be in directory `./logs`
@@ -50,3 +56,4 @@ When we encounter an error calling [valve's API](https://wiki.teamfortress.com/w
 We increase the starting sequence number and continue.<br>
 When we encounter a downloading error, we skip the current downloading task. <br>
 When we can't connect to the database, we crash our program.
+If the current sequence number is too large, end the program.

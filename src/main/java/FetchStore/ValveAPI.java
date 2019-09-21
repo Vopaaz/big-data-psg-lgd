@@ -124,19 +124,19 @@ public class ValveAPI {
                     if(directory.equals(publicGames)) {
                         logger.info("One public matching game was downloaded.");
                         logger.info("Start parsing it and save the result to db");
-                        insertDocumentToDB(parser.parseFileStoreMongo(unzippedDir, matches.get(i)), publicCollection);
+                        insertDocumentToDB(parser.getReplayInfoDocument(unzippedDir, matches.get(i)), publicCollection);
                         publicGamesNum--;
                     }
                     else if(directory.equals(rankedGames)) {
                         logger.info("One ranked game was downloaded.");
                         logger.info("Start parsing it and save the result to db");
-                        insertDocumentToDB(parser.parseFileStoreMongo(unzippedDir, matches.get(i)), rankedCollection);
+                        insertDocumentToDB(parser.getReplayInfoDocument(unzippedDir, matches.get(i)), rankedCollection);
                         rankedGamesNum--;
                     }
                     else {
                         logger.info("One professional game was downloaded.");
                         logger.info("Start parsing it and save the result to db");
-                        insertDocumentToDB(parser.parseFileStoreMongo(unzippedDir, matches.get(i)), professionalCollection);
+                        insertDocumentToDB(parser.getReplayInfoDocument(unzippedDir, matches.get(i)), professionalCollection);
                         publicGamesNum++;
                         rankedGamesNum++;
                     }

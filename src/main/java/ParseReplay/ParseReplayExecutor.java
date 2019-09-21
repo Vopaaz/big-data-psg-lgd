@@ -7,13 +7,9 @@ import java.util.HashMap;
 import org.bson.Document;
 
 public class ParseReplayExecutor {
-    private final String version = "v0.1.0";
+    private final String version = "v0.1.1";
 
-    public ParseReplayExecutor() {
-
-    }
-
-    public Document parseFileStoreMongo(String file, String matchId) {
+    public Document getReplayInfoDocument(String file, String matchId) {
         try {
             Date start = new Date();
             Document document = new Document("matchid", matchId);
@@ -37,7 +33,7 @@ public class ParseReplayExecutor {
         ArrayList<HashMap<String, Object>> provenanceList = new ArrayList<HashMap<String, Object>>();
         HashMap<String, Object> provenance = new HashMap<String, Object>();
         provenance.put("name", "Parse .dem file to MongoDB");
-        provenance.put("code", "ParseStore.ParseReplayExecutor.parseFileStoreMongo");
+        provenance.put("code", "ParseStore.ParseReplayExecutor.getReplayInfoDocument");
         provenance.put("version", version);
         provenance.put("start", start);
         provenance.put("end", end);

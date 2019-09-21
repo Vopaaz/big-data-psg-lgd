@@ -1,6 +1,6 @@
 # Documentation for ParseStore Component
 
-This component can extract information from a `.dem` file and store it into MongoDB.
+This component can extract information from a `.dem` file and return an `org.bson.Document` object, so as to store in the MongoDB.
 
 ## Prerequisite
 
@@ -8,51 +8,22 @@ This component can extract information from a `.dem` file and store it into Mong
 - Maven
 - MongoDB
 
-## Configuration
-
-In the project root, create a file `config.yml` to provide the database configuration information.
-
-```yaml
-MongoDB:
-  host: <Database host>
-  port: <Database port>
-  database: <Name of the MongoDB database>
-  collection:
-    replay-collection: <Name of the collection to store replay file>
-```
-
-You can refer to the [example](//config-sample.yml).
-
 ## Using
 
 ### API
 
-`ParseStore.ParseStoreExecutor` provides the `parseFileStoreMongo` method.
+`ParseStore.ParseReplayExecutor` provides the `getReplayInfoDocument` method.
 
 Params:
 
 - `file`: `String`, path to the `.dem` file
 - `matchId`: `String`, unique id of a match
 
-### Execute from console
-
-#### Packaging
-
-```bash
-$ mvn -P ParseStore package
-```
-
-#### Parse and Store
-
-```bash
-$ java -jar target/ParseStore.one-jar.jar "path/to/replay.dem"
-```
-
-## Replay MongoDB Collection Specification
+## Replay MongoDB Document Specification
 
 ### Top-level
 
-Each document in the replay collection contains all information of one match replay,
+Each document contains all information of one match replay,
 it follows such format:
 
 ```text

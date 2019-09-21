@@ -8,6 +8,7 @@ import java.util.List;
 import java.io.*;
 import java.util.*;
 
+import ParseStore.ParseStoreExecutor;
 import org.apache.commons.compress.compressors.bzip2.*;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
@@ -19,6 +20,7 @@ import Mongo.MongoConfig;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 public class ValveAPI {
 
@@ -45,8 +47,11 @@ public class ValveAPI {
     MongoConfig conf;
     MongoClient mongoClient;
     MongoDatabase database;
-    MongoCollection<Document> repCollection;
-    MongoCollection<Document> matchCollection;
+    MongoCollection<Document> publicCollection;
+    MongoCollection<Document> rankedCollection;
+    MongoCollection<Document> professionalCollection;
+    MongoCollection<Document> matchesCollection;
+    ParseStoreExecutor parser;
     OpendotaAPI opendotaAPI;
     Logger logger;
 
@@ -56,11 +61,14 @@ public class ValveAPI {
         mongoClient = MongoClients
                 .create(String.format("mongodb://%s:%d", conf.getMongoHost(), conf.getMongoPort()));
         database = mongoClient.getDatabase(conf.getMongoDatabaseName());
-        matchCollection = database.getCollection(conf.getMongoMatchDetailsCollectionName());
-        repCollection = database.getCollection(conf.getMongoReplayCollectionName());
+        publicCollection = database.getCollection(conf.getMongoPublicMatchCollectionName());
+        rankedCollection = database.getCollection(conf.getMongoRankedMatchCollectionName());
+        professionalCollection = database.getCollection(conf.getMongoProfessionalMatchCollectionName());
+        matchesCollection = database.getCollection(conf.getMongoMatchDetailsCollectionName());
         opendotaAPI = new OpendotaAPI();
         publicGamesNum = 0;
         rankedGamesNum = 0;
+        parser = new ParseStoreExecutor();
     }
 
     public boolean uncompressBz2(String source, String target) {
@@ -112,16 +120,26 @@ public class ValveAPI {
             String zippedDir = replaysZippedDirPrefix + directory + matches.get(i) + replaysZippedDirSuffix;
             String unzippedDir = replaysUnzippedDirPrefix + directory + matches.get(i) + replaysUnzippedDirSuffix;
             if(downloadURL(urls.get(i), zippedDir)) {
-                uncompressBz2(zippedDir, unzippedDir);
-                if(directory.equals(publicGames)) {
-                    publicGamesNum--;
-                }
-                else if(directory.equals(rankedGames)) {
-                    rankedGamesNum--;
-                }
-                else {
-                    publicGamesNum++;
-                    rankedGamesNum++;
+                if(uncompressBz2(zippedDir, unzippedDir)) {
+                    if(directory.equals(publicGames)) {
+                        logger.info("One public matching game was downloaded.");
+                        logger.info("Start parsing it and save the result to db");
+                        insertDocumentToDB(parser.parseFileStoreMongo(unzippedDir, matches.get(i)), publicCollection);
+                        publicGamesNum--;
+                    }
+                    else if(directory.equals(rankedGames)) {
+                        logger.info("One ranked game was downloaded.");
+                        logger.info("Start parsing it and save the result to db");
+                        insertDocumentToDB(parser.parseFileStoreMongo(unzippedDir, matches.get(i)), rankedCollection);
+                        rankedGamesNum--;
+                    }
+                    else {
+                        logger.info("One professional game was downloaded.");
+                        logger.info("Start parsing it and save the result to db");
+                        insertDocumentToDB(parser.parseFileStoreMongo(unzippedDir, matches.get(i)), professionalCollection);
+                        publicGamesNum++;
+                        rankedGamesNum++;
+                    }
                 }
             }
         }
@@ -140,9 +158,12 @@ public class ValveAPI {
         provenance.put("elapsed_ms", end.getTime() - start.getTime());
         provenanceList.add(provenance);
         document.append("provenance", provenanceList);
-        matchCollection.insertOne(document);
+        matchesCollection.insertOne(document);
     }
 
+    private void insertDocumentToDB(Document document, MongoCollection<Document> collection) {
+        collection.insertOne(document);
+    }
     public static void main(String[] args) throws Exception {
         ValveAPI api = new ValveAPI("config.yml");
         api.getMultipleMatchesBySeqNum("4182489531", 20, 5);
@@ -202,7 +223,7 @@ public class ValveAPI {
             String seqResult = getMatchesBySeqNum(curStartSeqNum, batchSize);
             if(seqResult == null) {
                 logger.error("Failed to get batch start with sequence number {}", curStartSeqNum);
-                logger.debug("Skip the current sequence number");
+                logger.error("Skip the current sequence number");
                 long nextSeqNum = Long.parseLong(curStartSeqNum);
                 curStartSeqNum = Long.toString(++nextSeqNum);
                 continue;

@@ -50,12 +50,18 @@ public class MongoConfig {
         return getConfigItem("MongoDB", "database");
     }
 
-    public String getMongoReplayCollectionName() {
-        return getConfigItem("MongoDB", "collection", "replay-collection");
+    public String getMongoRankedMatchCollectionName() {
+        return getConfigItem("MongoDB", "collection", "ranked-collections");
+    }
+    public String getMongoPublicMatchCollectionName() {
+        return getConfigItem("MongoDB", "collection", "public-collections");
+    }
+    public String getMongoProfessionalMatchCollectionName() {
+        return getConfigItem("MongoDB", "collection", "professional-collections");
     }
 
     public String getMongoMatchDetailsCollectionName() {
-        return getConfigItem("MongoDB", "collection", "match-details");
+        return getConfigItem("MongoDB", "collection", "match-result-collections");
     }
 
 }

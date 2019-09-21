@@ -237,6 +237,15 @@ public class ValveAPI {
 
             logger.info("Successfully writing a batch start with sequence number {} to database.", curStartSeqNum);
             sofar += matches.length();
+
+            if(matches.length() == 0) {
+                logger.error("Current sequence number is larger than the sequence number of every match");
+                Date end = new Date();
+                logger.error("Can't continue to get the data.");
+                logger.error("The task was closed unsuccessfully in {} seconds.", (end.getTime() - start.getTime()) / 1000.0);
+                return;
+            }
+
             long nextSeqNum = matches.getJSONObject(matches.length() - 1).getLong("match_seq_num");
             String fileName = curStartSeqNum + "_to_" + nextSeqNum;
 

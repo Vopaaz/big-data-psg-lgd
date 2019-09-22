@@ -159,6 +159,7 @@ provided by clarity, the following data will be available:
 	\end{itemize}
 \end{itemize}
 
+
 % --------------------------------------------
 
 % Except for those listed above:
@@ -176,6 +177,42 @@ provided by clarity, the following data will be available:
 %	- tempentities: No output
 
 % --------------------------------------------
+
+\subsection{Potential Business Questions}
+
+As mentioned before, we can collect 2 kinds of data, one is match results and one is replays. A match result is in JSON format which provides us statistic information about every player and the entire game at the end of a game. To gain information during a game instead of at the end, we can use preprocessed replay data. By analyzing collected data, the following questions might be answered.
+\begin{itemize}
+    \item Easy questions:
+    \begin{itemize}
+        \item Who is the hero gaining gold/XP fastest in 15 minutes in normal games/professional games?
+        \item Who is the hero having most kills/assists/heals/deaths in normal games/professional games?
+        \item What is the most purchased item in normal games/professional games?
+        \item Who is the hero having most bad-manner players (players who are AFK or disconnected)?
+        \item Who is the hero gaining most positive/negative votes in normal games?
+        \item Who is the most popular hero (hero who has highest pick rate) in normal games/professional games?
+        \item Who is the hero having highest ban rate in professional games?
+        \item who is the hero having the most ban/pick rate in professional games?
+        \item How long does a game cost in average in normal games/professional games?
+        \item Which item is used most in normal games/professional games?
+    \end{itemize}
+    \item Moderately challenging questions:
+    \begin{itemize}
+        \item Does there exist correlation between the time of the first blood and the time of the entire game?
+        \item How is the benefits gained from buybacks in normal games/professional games？
+        \item How is the vision in normal games/professional games?
+        \item When does the first team battle happen in normal games/professional games?
+    \end{itemize}
+    \item Challenging questions:
+    \begin{itemize}
+        \item Which is lineup having highest win rate in normal games/professional games?
+        \item Which is the most popular lineup (lineup which has the highest pick rate) in normal games/professional games?
+        \item which is the most common ban-pick combo in professional games?
+        \item Does there exist correlation between the distribution of economy and the result of the game?
+        \item Does there exist correlation between the economic development and the time of the first team battle?
+    \end{itemize}
+\end{itemize}
+Moreover, we can use answers above to analyze the difference between normal games and professional games as well as the difference between the blind-pick game and the draft-pick game.
+
 
 The following fields are critical to answering our Business Question, ``???".
 They will need to be cleansed and validated.

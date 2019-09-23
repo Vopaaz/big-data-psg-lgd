@@ -1,17 +1,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.skadistats</groupId>
-    <artifactId>parse-dem-store-mongo</artifactId>
+    <artifactId>data-pipelie-dota2</artifactId>
     <version>v0.0.1</version>
     <packaging>jar</packaging>
     <name>parse-dem-store-mongo</name>
-    <description>Parse the Dota2 replay dem file and store it to MongoDB</description>
+    <description>Data pipelines for matches details and parse replays</description>
     <url>https://github.com/Vopaaz/big-data-psg-lgd</url>
 
     <properties>
-        <maven.compiler.target>1.7</maven.compiler.target>
-        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
     </properties>
 
     <licenses>
@@ -48,7 +49,29 @@
             <artifactId>snakeyaml</artifactId>
             <version>1.25</version>
         </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20190722</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>1.19</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.6</version>
+        </dependency>
+
     </dependencies>
+
 
     <build>
         <finalName>${scriptName}</finalName>
@@ -85,6 +108,18 @@
             <id>ParseStore</id>
             <properties>
                 <scriptName>ParseStore</scriptName>
+            </properties>
+        </profile>
+        <profile>
+            <id>FetchStore</id>
+            <properties>
+                <scriptName>FetchStore</scriptName>
+            </properties>
+        </profile>
+        <profile>
+            <id>Mongo</id>
+            <properties>
+                <scriptName>Mongo</scriptName>
             </properties>
         </profile>
     </profiles>

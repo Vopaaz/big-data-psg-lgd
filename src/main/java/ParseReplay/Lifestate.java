@@ -1,10 +1,10 @@
-package ParseStore;
+package ParseReplay;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import ParseStore.helper.OnEntityDied;
-import ParseStore.helper.OnEntitySpawned;
+import ParseReplay.helper.OnEntityDied;
+import ParseReplay.helper.OnEntitySpawned;
 import skadistats.clarity.event.Insert;
 import skadistats.clarity.model.Entity;
 import skadistats.clarity.processor.runner.Context;

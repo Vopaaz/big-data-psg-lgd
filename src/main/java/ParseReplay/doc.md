@@ -1,4 +1,4 @@
-# Documentation for ParseStore Component
+# Documentation for ParseReplay Component
 
 This component can extract information from a `.dem` file and return an `org.bson.Document` object, so as to store in the MongoDB.
 
@@ -12,7 +12,7 @@ This component can extract information from a `.dem` file and return an `org.bso
 
 ### API
 
-`ParseStore.ParseReplayExecutor` provides the `getReplayInfoDocument` method.
+`ParseReplay.ParseReplayExecutor` provides the `getReplayInfoDocument` method.
 
 Params:
 

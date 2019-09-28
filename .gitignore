@@ -37,6 +37,7 @@ test-data/**/*.dem.bz2
 
 # idea auxiliary file
 .idea
+*.iml
 
 # log files
 **/*.log

@@ -96,7 +96,18 @@ We will get the match results data from Dota2's official API. Also we get the da
 	\end{itemize}
 \end{enumerate}
 
-
+\subsection{Five Vs of Datasets}
+To assess the adequacy of adopting big data to our project, we firstly identify five Vs characteristics of our dataset.\\
+\textbf{Volume}\\
+Replays are one of datasets we plan to use, which are the full records of finished matches. Size of one replay is estimated to be about 50MB. We plan to collect 1000 replays whose size is about GB. Moreover, if we desire more data in the future implementation, we can always access it as long as dota 2 still has players.\\
+\textbf{Velocity}\\
+According to the statistic data in August 2019 from Steam which is a a video game digital distribution platform, the average number of players is 467,148.3 players and the peak number is 826,690. The large number of players makes both the replay data and result data high-velocity. Although, in our project, the velocity depends on the velocity of the API request. This statistic data reveals that it's potential to be high-velocity.\\
+\textbf{Variety}\\
+From the APIs mentioned above, we can directly access JSON format file, the match result data and binary format file, the replay data. The replay data will be transformed to strings by a parser.\\
+\textbf{Veracity}\\
+The overall quality of our datasets is good, because we access most of  them from the offical API. But there is still a few noise. For example, the time of a game is too short, which makes this game not representative. Thus, we plan to implement the data validation to filter the undesired matches.\\
+\textvf{Value}\\
+Our datasets are useful for a relatively long time. Because we plan to collect 50\% professional matches and 50\% normal matches. The professional matches are durable since we can always extract information about professional teams and players from them. As for the normal games, they are valuable as long as they are not too stale, like more than 2 years ago. In data validation step, we will set a filter on date for normal games which makes our datasets valueable.
 
 \subsection{Datasets Description}
 
@@ -196,16 +207,18 @@ As mentioned before, we can collect 2 kinds of data, one is match results and on
     \end{itemize}
     \item Moderately challenging questions:
     \begin{itemize}
-        \item Does there exist correlation between the time of the first blood and the time of the entire game?
         \item How is the benefits gained from buybacks in normal games/professional games？
         \item How is the vision in normal games/professional games?
         \item When does the first team battle happen in normal games/professional games?
-    \end{itemize}
-    \item Challenging questions:
-    \begin{itemize}
         \item Which is lineup having highest win rate in normal games/professional games?
         \item Which is the most popular lineup (lineup which has the highest pick rate) in normal games/professional games?
         \item which is the most common ban-pick combo in professional games?
+        \item Who is hero changed most in win/pick/ban rate after release new version of dota 2?
+    \end{itemize}
+    \item Challenging questions:
+    \begin{itemize}
+        \item Does there exist correlation between the time of the first blood and the time of the entire game?
+        \item Does there exist correlation between the gold/XP source of a hero and its win rate?
         \item Does there exist correlation between the distribution of economy and the result of the game?
         \item Does there exist correlation between the economic development and the time of the first team battle?
     \end{itemize}

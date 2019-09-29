@@ -105,10 +105,28 @@ Valve, which is the company that develop the game, initially try to provide all 
 	\end{itemize}
 \end{enumerate}
 
-The match results data is in JSON format, which contains snapshot information about a game's end. This data includes the the overall information of a game's result, like the kills of each team, which side wins, and the lineup of each team. It also includes more specific information of each player, like how many gold does a player earn, how many last hits does one player make and so on. Each JSON document contains about 30 fields, and about 15 of them are nested documents. The JSON file for one match will be between 3KB\textasciitilde 5KB, we planed to collect 10,000,000 matches' results data, which will add up to about 50GB. The 10,000,000 will be the matches in the recent versions, and we will filter the unqualified games, like games with escaped players and games with length shorter than 15 minutes.
+\subsection{Five Vs of Datasets}
+To assess the adequacy of adopting big data to our project, we firstly identify five Vs characteristics of our dataset.\\
+\textbf{Volume}\\
+Replays are one of datasets we plan to use, which are the full records of finished matches. Size of one replay is estimated to be about 60MB. We plan to collect 3000 replays whose size is about 180GB. As for match result data which is JSON-format data, size of each result is about 5KB. We plan to collect 10,000,000 match results whose size is about 50GB. Moreover, if we desire more data in the future implementation, we can always access it as long as dota 2 still has players.\\
+\textbf{Velocity}\\
+According to the statistic data in August 2019 from Steam which is a a video game digital distribution platform, the average number of players is 467,148.3 players and the peak number is 826,690. The large number of players makes both the replay data and result data high-velocity. Although, in our project, the velocity depends on the velocity of the API request. This statistic data reveals that it's potential to be high-velocity.\\
+\textbf{Variety}\\
+From the APIs mentioned above, we can directly access JSON format file, the match result data and binary format file, the replay data. The replay data will be transformed to strings by a parser.\\
+\textbf{Veracity}\\
+The overall quality of our datasets is good, because we access most of  them from the offical API. But there is still a few noise. For example, the time of a game is too short, which makes this game not representative. Thus, we plan to implement the data validation to filter the undesired matches.\\
+\textvf{Value}\\
+Our datasets are useful for a relatively long time. Because we plan to collect 1/3 professional matches and 2/3 public matches. The professional matches are durable since we can always extract information about professional teams and players from them. As for the normal games, they are valuable as long as they are not too stale, like more than 2 years ago. In data validation step, we will set a filter on date for normal games which makes our datasets valueable.
 
-The replay data is originally in binary format, but we will use an open-source project to parse it into strings, which is the combat log of the whole game. There are several types of the combat log, like damage, heal, buff, death, ability and so on, we can reproduce the whole game process using those combat log. Since we are using MongoDB, we write write a program to transform the string results from parsing to a JSON format file, then store it to the database. After parsing, we  The size of one replay's size is between 40MB\textasciitilde 80MB. We plan to collect 3,000 matches' replays, which will add up to about 180GB. The 3,000 games will consist of 1,000 most recently professional games, 1,000 randomly chosen qualified public games, and 1,000 randomly chosen qualified ranked games. Public games are standard games but don't influence the MMR of each player, while ranked games are standard games that will influence MMR.
+\subsection{Datasets Description}
 
+We found the approaches to get those data on a \href{https://dev.dota2.com}{developer's forum of Dota2}. Valve's official document of many APIs is outdated so the forum is the only way for us to understand the resulting data.
+
+The match results data is in JSON format, which contains snapshot information about a game's end, like how much gold one player earned at the end of the match, and also contains some information after a match, like how many players thumbs-up the game.
+
+The JSON file for one match will be between 3KB\textasciitilde 5KB, we planed to collect 1,000,000 matches' results data, which will add up to about 5GB.
+
+The replay data is originally in binary format, but we found an open-source program to parse it into strings. So we will be handling the logs of all the activity happens in a single game. We may further parse this file considering that the file size of one single match and it contains many irrelevant information. The size of one replay's size is between 20MB\textasciitilde 80MB. We plan to collect 1,000 matches' replays, which will add up to about 50GB.
 
 
 \subsection{Data Preprocessing and Specification}
@@ -160,6 +178,7 @@ provided by clarity, the following data will be available:
 	\end{itemize}
 \end{itemize}
 
+
 % --------------------------------------------
 
 % Except for those listed above:
@@ -177,6 +196,43 @@ provided by clarity, the following data will be available:
 %	- tempentities: No output
 
 % --------------------------------------------
+
+\subsection{Potential Business Questions}
+
+As mentioned before, we can collect 2 kinds of data, one is match results and one is replays. A match result is in JSON format which provides us statistic information about every player and the entire game at the end of a game. To gain information during a game instead of at the end, we can use preprocessed replay data. By analyzing collected data, the following questions might be answered.
+\begin{itemize}
+    \item Easy questions:
+    \begin{itemize}
+        \item Who is the hero gaining gold/XP fastest in 15 minutes in normal games/professional games?
+        \item Who is the hero having most kills/assists/heals/deaths in normal games/professional games?
+        \item What is the most purchased item in normal games/professional games?
+        \item Who is the hero having most bad-manner players (players who are AFK or disconnected)?
+        \item Who is the most popular hero (hero who has highest pick rate) in normal games/professional games?
+        \item Who is the hero having highest ban rate in professional games?
+        \item who is the hero having the most ban/pick rate in professional games?
+        \item How long does a game cost in average in normal games/professional games?
+        \item Which item is used most in normal games/professional games?
+    \end{itemize}
+    \item Moderately challenging questions:
+    \begin{itemize}
+        \item How is the benefits gained from buybacks in normal games/professional games？
+        \item How is the vision in normal games/professional games?
+        \item When does the first team battle happen in normal games/professional games?
+        \item Which is lineup having highest win rate in normal games/professional games?
+        \item Which is the most popular lineup (lineup which has the highest pick rate) in normal games/professional games?
+        \item which is the most common ban-pick combo in professional games?
+        \item Who is hero changed most in win/pick/ban rate after release new version of dota 2?
+    \end{itemize}
+    \item Challenging questions:
+    \begin{itemize}
+        \item Does there exist correlation between the time of the first blood and the time of the entire game?
+        \item Does there exist correlation between the gold/XP source of a hero and its win rate?
+        \item Does there exist correlation between the distribution of economy and the result of the game?
+        \item Does there exist correlation between the economic development and the time of the first team battle?
+    \end{itemize}
+\end{itemize}
+Moreover, we can use answers above to analyze the difference between normal games and professional games as well as the difference between the blind-pick game and the draft-pick game.
+
 
 The following fields are critical to answering our Business Question, ``???".
 They will need to be cleansed and validated.

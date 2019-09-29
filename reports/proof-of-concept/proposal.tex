@@ -209,7 +209,46 @@ The specific steps of gaining our data are as following:
 
 \subsection{Transformation}
 
-The match result is in JSON format so we can almost directly store it. However, the replay data is completely unstructured \codeinline{.dem.bz2} binary file,
+The match result is in JSON format so we can almost directly store it. The information it contains are:
+
+\begin{itemize}
+	\item Players information:
+	\begin{itemize}
+		\item Account id
+		\item Player slot
+		\item The hero he use in this match
+		\item The items he possess at the end of the match
+		\item The player's kills/deaths/assists
+		\item The player's leaver status (whether AFK/disconnected or not)
+		\item The gold he possess at the end of the match
+		\item The amount of last-hits and denies the player got during the match
+		\item The average gold/XP he gained per minute
+		\item The total gold he spent during the match
+		\item The amount of damage the player dealt to heroes/towers
+		\item The amount of health the player had healed on heroes
+		\item The player's level at match end
+		\item A list detailing a player's ability upgrades, including the ability and the upgrading time
+		\item Additional playable units owned by the player and its items
+	\end{itemize}
+	\item The season the game was played in
+	\item The winner team of the match
+	\item The length of the match
+	\item Unix timestamp of when the match began
+	\item The matches unique ID
+	\item A 'sequence number', representing the order in which matches were recorded
+	\item The tower status of both teams
+	\item The barracks status of both teams
+	\item The server cluster the match was played upon
+	\item The time in seconds since the match began when first-blood occurred
+	\item The mode of the match
+	\item The amount of human players within the match
+	\item The league that this match was a part of
+	\item The number of thumbs-up/thumbs-down the game has received by users
+	\item A list of the picks and bans in the match, if the game mode is Captains Mode
+\end{itemize}
+
+
+On the other hand, the replay data is completely unstructured \codeinline{.dem.bz2} binary file,
 data transformation must be done before we can store the data in our database.
 
 Firstly, we can decompress the \codeinline{.bz2} file with \codeinline{org.apache.commons.compress.compressors.bzip2} package in Java,
@@ -250,7 +289,7 @@ Most fields in our datasets are related to some of the above-mentioned business 
 They are all important.
 We will generally validate them, for example, fields like the HP, XP, total gold cannot be negative.
 
-What's more important is to filter out invalid data on the game level. Some of the games lasts for only two or three minutes, because some players are disconnected and others just quit the game very quick. We will completely drop these game records.
+What's more important is to filter out invalid data on the game level. Some of the games lasts for only two or three minutes, because some players are disconnected and others just quit the game very quick. Others are practicing games where most players are computer bots. We will completely drop these game records.
 
 
 

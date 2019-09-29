@@ -180,6 +180,32 @@ provided by clarity, the following data will be available:
 The following fields are critical to answering our Business Question, ``???".
 They will need to be cleansed and validated.
 
+% --------------------------------------------
+\subsection{NoSQL Storage Technology}\\
+As we mentioned above, we have two datasets - one is the match results data in JSON format, which is a kind of document that can be encoded using a text-based encoding scheme; the other one is preprocessed replay data. After we parsing those replay data, we can gather useful information from replay data in string format instead of binary format(which is inappropriate for document NoSQL database to store).\\
+
+Therefore, we choose to use MongoDB as our primary NoSQL storage technology.\\
+
+\begin{itemize}
+\item \textbf{MongoDB}\\
+MongoDB is a popular NoSQL storage device that can store high volume, high velocity, high variety Big Data datasets. It's a document storage device, which make storing semi-structure document-oriented data such as JSON much easier. It is an open source NoSQL database, so we are free to use it.\\
+
+Also, MongoDB support partial update. This will help us aggregate values in future games that we would potentially use.\\
+
+\item \textbf{Docker}\\
+In order to combine different needs, programming languages and developing environment of many technologies, we will adopt Docker to our project. Using Docker, we can deploy our application into any environment.\\
+
+Docker is a container technology that provide consistency. It's open source and there are many open source applications that have been made in \href{https://hub.docker.com}{Docker Hub}. Docker Hub provides official or verified images, so it's safe to use.\\
+
+In our project, we will build Dockerfile to let it connect with our project. We will use Scala as programming language, and we will get the match results data from Dota2’s official API. MongoDB will be used as database. And then we will put all of this into a Docker container.\\
+
+\item \textbf{AWS(Amazon Web Server)}\\
+As we mentioned before, we need 5GB to store JSON file, and we need 50GB to store replay data. In order to have enough capacity to store datasets, we will use AWS(Amazon Web Server) to deploy our project on cloud server. Running Docker on AWS will provide us a open source and free way to build and run distributed application and provide a reliable and easy way to scale out.\\
+
+AWS provides numbers of official ways to deploy docker on AWS, such as Amazon ECS, which is a highly scalable, high-performance container orchestration service to run Docker containers on the AWS cloud. After we package datasets and analytics packages into Docker, we will deploy Docker to Amazon ECS.\\
+\end{itemize}
+
+
 % TODO:
 % In order to "Describe fields that are critical for your analysis that will need to be cleansed/validated.",
 % I need the Business Question first

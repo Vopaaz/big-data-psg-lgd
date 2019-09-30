@@ -311,16 +311,15 @@ What's more important is to filter out invalid data on the game level. Some of t
 
 % --------------------------------------------
 
-\subsection{NoSQL Storage Technology}
+\subsection{Loading}
+
+\subsubsection{NoSQL Storage Technology}
 
 As we mentioned above, we have two datasets - one is the match results data in JSON format, which is a kind of document that can be encoded using a text-based encoding scheme.
-The other one is preprocessed replay data.
-After we parsing those replay data, we can gather useful information from replay data in string format instead of binary format(which is inappropriate for document NoSQL database to store).
-It is appropriate to store such documents of JSON format in document-oriented NoSQL database like MongoDB.
+The replay data is binary files which is inappropriate for document NoSQL database to store.
+But after we parsing those replay data, we can gather useful information from replay data in Document format.
 
 Therefore, we choose to use MongoDB as our primary NoSQL storage technology.
-
-\subsection{MongoDB}
 
 MongoDB is a popular NoSQL storage device that can store high volume, high velocity, high variety Big Data datasets.
 It's a document storage device, which make storing semi-structure document-oriented data such as JSON much easier.
@@ -329,7 +328,7 @@ It is an open source NoSQL database, so we are free to use it.
 Also, MongoDB support partial update.
 This will help us aggregate values in future games that we would potentially use.
 
-\subsection{Docker}
+\subsubsection{Docker}
 
 In order to combine different needs, programming languages and developing environment of many technologies, we will adopt Docker to our project.
 Using Docker, we can deploy our application into any environment.
@@ -339,13 +338,13 @@ It's open source and there are many open source applications that have been made
 Docker Hub provides official or verified images, so it's safe to use.
 
 In our project, we will build Dockerfile to let it connect with our project.
-We will use Scala as programming language, and we will get the match results data from Dota2’s official API.
+We will use Scala as programming language, and we will get the match results data from Dota2's official API.
 MongoDB will be used as database. And then we will put all of this into a Docker container.
 
-\subsection{AWS (Amazon Web Service)}
+\subsubsection{AWS (Amazon Web Service)}
 
 As we mentioned before, we need 50GB to store JSON file, and we need 180GB to store replay data, and the scale would be extended if we add more data in the datasets.
-In order to have enough capacity to store datasets, we will use AWS(Amazon Web Server) to deploy our project on cloud server.
+In order to have enough capacity to store datasets, we will use AWS (Amazon Web Server) to deploy our project on cloud server.
 Running Docker on AWS will provide us a open source and free way to build and run distributed application and provide a reliable and easy way to scale out.
 
 AWS provides numbers of official ways to deploy docker on AWS, such as Amazon ECS, which is a highly scalable, high-performance container orchestration service to run Docker containers on the AWS cloud.

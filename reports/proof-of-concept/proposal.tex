@@ -39,6 +39,12 @@
 	\mintinline[bgcolor=bg, fontsize=\scriptsize]{text}{#1}
 }
 
+
+\usepackage{relsize}
+\newcommand{\bigdataVs}[1]{
+	\subsection{#1}
+}
+
 \newenvironment{console}{% Caution:
 	\VerbatimEnvironment
 	\begin{minted}[xleftmargin=2em,bgcolor=bg,fontsize=\small]{console}% Do NOT delete these comments
@@ -49,7 +55,7 @@
 
 %-----------%
 
-\title{NoSQL Proof-of-Concept Proposal}
+\title{NoSQL Proof-of-Concept Proposal -- Dota2 Game Replay Analysis}
 \author{
 	Team name: PSG.LGD \\ \\
 	Yichun Yan \\
@@ -70,62 +76,191 @@
 
 %-------%
 
-\section{Dota2 Game Replay Analysis}
-\subsection{Potential Datasets}
-Our team aims at exploring data about a popular and long-lived computer game, Dota2. We will primarily get our data from the following three origins:
+\section{Potential Datasets}
+
+Our team aims at exploring data about a popular and long-lived computer game, Dota2.
+We will mainly use two datasets:
 
 \begin{enumerate}
-\item \href{https://wiki.teamfortress.com/wiki/WebAPI}{Dota2's official API}
-\item \href{https://docs.opendota.com/}{OpenDota API}
-\item Valve's Dota2 replay servers
+\item \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchDetails}{Dota2 match result dataset}
+\item \href{https://wiki.teamfortress.com/wiki/Replay}{Dota2 replay dataset}
 \end{enumerate}
 
-We will get the match results data from Dota2's official API. Also we get the data we need to retrieve a replay from replay servers, then get replays. So basically we will have two different kinds of data for our further analysis, relatively large-scale but coarse-grained match results data, and very fine-grained replays data. Considering the file size of one replay, we decide to only include recent professional games for the replay data. Specifically, we can collect them by the following instructions:
+The first dataset is the snapshot of the final state of each player and the whole game, containing only important information.
+The second one is a binary format file which can be executed by Dota2's client to reproduce everything happens in the game.
+
+The datasets can be retrieved from the following resources:
+
+\begin{enumerate}
+\item Valve's Dota2 replay servers
+\item \href{https://wiki.teamfortress.com/wiki/WebAPI}{Valve's official API}
+\end{enumerate}
+
+We will get the match results data from Valve's official API.
+It also provides a key, which we can use to retrieve a replay from the replay server.
+
+In all, we will have two different kinds of data for our further analysis, relatively large-scale but coarse-grained match results data, and very fine-grained replays data.
+Considering the file size of one replay, we decide to include recent professional games and randomly select some public games for the replay data.
+WE will mention how we acquire the data in Data ETL section.
+
+\section{Five Vs of Datasets}
+
+To assess the adequacy of adopting big data to our project, we firstly identify five Vs characteristics of our dataset.
+
+\bigdataVs{Volume}
+
+Replays are one of datasets we plan to use, which are the full records of finished matches. Size of one replay is estimated to be about 60MB. We plan to collect 3000 replays whose size is about 180GB. As for match result data which is JSON-format data, size of each result is about 5KB. We plan to collect 10,000,000 match results whose size is about 50GB. Moreover, if we desire more data in the future implementation, we can always access it as long as dota 2 still has players.
+
+\bigdataVs{Velocity}
+
+According to the statistic data in August 2019 from Steam which is a a video game digital distribution platform, the average number of players is 467,148.3 players and the peak number is 826,690.
+The large number of players makes both the replay data and result data high-velocity.
+Although, in our project, the velocity depends on the velocity of the API request, this statistic data reveals that it's potential to be high-velocity.
+
+\bigdataVs{Variety}
+
+From the APIs mentioned above, we can access JSON format files, the match result data, and binary format files, the replay data.
+
+\bigdataVs{Veracity}
+
+The overall quality of our datasets is good, because we access most of them from the official API.
+But there is still a few noise.
+For example, the time of some games is too short, which makes these game not representative.
+Thus, we plan to implement data validation to filter the undesired matches.
+
+\bigdataVs{Value}
+
+Our datasets are useful for a relatively long time.
+Because we plan to collect 1/3 professional matches and 2/3 public matches.
+The professional matches are durable since we can always extract information about professional teams and players from them.
+As for the normal games, they are valuable as long as they are not too stale, like more than 2 years ago.
+In data validation step, we will set a filter on date for normal games which makes our datasets valuable.
+
+\section{Potential Business Questions}
+
+As mentioned before, we can collect 2 kinds of data, one is match results and one is replays.
+By analyzing them, the following questions might be answered.
+
+\begin{itemize}
+    \item Easy questions:
+    \begin{itemize}
+        \item Who is the hero gaining gold/XP fastest in 15 minutes in normal games/professional games?
+        \item Who is the hero having most kills/assists/heals/deaths in normal games/professional games?
+        \item What is the most purchased item in normal games/professional games?
+        \item Who is the hero having most bad-manner players (players who are AFK or disconnected)?
+        \item Who is the most popular hero (hero who has highest pick rate) in normal games/professional games?
+        \item Who is the hero having highest ban rate in professional games?
+        \item who is the hero having the most ban/pick rate in professional games?
+        \item How long does a game cost in average in normal games/professional games?
+        \item Which item is used most in normal games/professional games?
+    \end{itemize}
+    \item Moderately challenging questions:
+    \begin{itemize}
+        \item How is the benefits gained from buybacks in normal games/professional games？
+        \item How is the vision in normal games/professional games?
+        \item When does the first team battle happen in normal games/professional games?
+        \item Which is lineup having highest win rate in normal games/professional games?
+        \item Which is the most popular lineup (lineup which has the highest pick rate) in normal games/professional games?
+        \item which is the most common ban-pick combo in professional games?
+        \item Who is hero changed most in win/pick/ban rate after release new version of Dota2?
+    \end{itemize}
+    \item Challenging questions:
+    \begin{itemize}
+        \item Does there exist correlation between the time of the first blood and the time of the entire game?
+        \item Does there exist correlation between the gold/XP source of a hero and its win rate?
+        \item Does there exist correlation between the distribution of economy and the result of the game?
+        \item Does there exist correlation between the economic development and the time of the first team battle?
+    \end{itemize}
+\end{itemize}
+
+Moreover, we can use answers above to analyze the difference between normal games and professional games as well as the difference between the blind-pick game and the draft-pick game.
+
+
+\section{Data ETL}
+
+\subsection{Extraction}
+
+Valve, the company that develop the game, initially try to provide all the players with easy APIs to access the data of the game.
+But due to the increasing stress on its data servers, many of its APIs are shut down.
+At the same time, the documentation seems to be never updated since it's created, which makes it much more difficult for us to collect the data.
+For example, the API which returns a bunch of the match results given a starting match id is not usable anymore.
+Another API which returns a key that is critical for construct the URL to download replay of that game is not working as well.
+
+But luckily, we found some hints from the \href{https://dev.dota2.com}{developer's forum of Dota2}.
+We can use the starting sequence number, which works similarly as the match id, to get a series of game results.
+And by calling a third party API from OpenDota, we can get the important key to construct the URL to download replays again.
+
+The specific steps of gaining our data are as following:
 
 \begin{enumerate}
 \item Match Results:
 	\begin{itemize}
-		\item Use \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchHistoryBySequenceNum}{GetMatchHistoryBySequenceNum} API to get the match ids, we will need a a field called \\ \codeinline{start_at_match_seq_num} to specify the starting match sequence number of the results. 
-		\item Then  we can extract the last sequence number of the results as the \codeinline{start_at_match_seq_num} for the next call. By doing this iteratively we can enlarge our dataset for our first kind of data.
+		\item Use \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchHistoryBySequenceNum}{GetMatchHistoryBySequenceNum} API to get the match ids. We will need a a field called \\ \codeinline{start_at_match_seq_num} to specify the starting match sequence number of the results.
+		\item Then we can extract the last sequence number of the results as the \codeinline{start_at_match_seq_num} for the next call. By doing this iteratively we can enlarge our dataset for our first kind of data.
 	\end{itemize}
 \item Replays:
 	\begin{itemize}
-		\item Get the match ids of recent professional games from the first dataset we collect.
+		\item Get the match ids of recent professional games from the last step.
 		\item Use the those ids via \href{https://docs.opendota.com/#tag/matches}{OpenDota API} to get the information we need \\ (\codeinline{cluster} and \codeinline{replay_salt}) for retrieving replays from Valve's replay server
-		\item Constructing links in this format:\\  \codeinline{ http://replay<cluster>.valve.net/570/<match_id>_<replay_salt>.dem.bz2} to get the replays.
+		\item Construct links in this format:\\  \codeinline{ http://replay<cluster>.valve.net/570/<match_id>_<replay_salt>.dem.bz2} to get the replays.
 	\end{itemize}
 \end{enumerate}
 
 
+\subsection{Transformation}
 
-\subsection{Datasets Description}
+The match result is in JSON format so we can almost directly store it. The information it contains are:
 
-We found the approaches to get those data on a \href{https://dev.dota2.com}{developer's forum of Dota2}. Valve's official document of many APIs is outdated so the forum is the only way for us to understand the resulting data.
+\begin{itemize}
+	\item Players information:
+	\begin{itemize}
+		\item Account id
+		\item Player slot
+		\item The hero he use in this match
+		\item The items he possess at the end of the match
+		\item The player's kills/deaths/assists
+		\item The player's leaver status (whether AFK/disconnected or not)
+		\item The gold he possess at the end of the match
+		\item The amount of last-hits and denies the player got during the match
+		\item The average gold/XP he gained per minute
+		\item The total gold he spent during the match
+		\item The amount of damage the player dealt to heroes/towers
+		\item The amount of health the player had healed on heroes
+		\item The player's level at match end
+		\item A list detailing a player's ability upgrades, including the ability and the upgrading time
+		\item Additional playable units owned by the player and its items
+	\end{itemize}
+	\item The season the game was played in
+	\item The winner team of the match
+	\item The length of the match
+	\item Unix timestamp of when the match began
+	\item The matches unique ID
+	\item A 'sequence number', representing the order in which matches were recorded
+	\item The tower status of both teams
+	\item The barracks status of both teams
+	\item The server cluster the match was played upon
+	\item The time in seconds since the match began when first-blood occurred
+	\item The mode of the match
+	\item The amount of human players within the match
+	\item The league that this match was a part of
+	\item The number of thumbs-up/thumbs-down the game has received by users
+	\item A list of the picks and bans in the match, if the game mode is Captains Mode
+\end{itemize}
 
-The match results data is in JSON format, which contains snapshot information about a game's end, like how much gold one player earned at the end of the match, and also contains some information after a match, like how many players thumbs-up the game.
 
-The JSON file for one match will be between 3KB\textasciitilde 5KB, we planed to collect 1,000,000 matches' results data, which will add up to about 5GB.
+On the other hand, the replay data is completely unstructured \codeinline{.dem.bz2} binary file,
+data transformation must be done before we can store the data in our database.
 
-The replay data is originally in binary format, but we found an open-source program to parse it into strings. So we will be handling the logs of all the activity happens in a single game. We may further parse this file considering that the file size of one single match and it contains many irrelevant information. The size of one replay's size is between 20MB\textasciitilde 80MB. We plan to collect 1,000 matches' replays, which will add up to about 50GB.
-
-
-
-\subsection{Data Preprocessing and Specification}
-
-As the raw data is completely unstructured \codeinline{.dem.bz2} file,
-preliminary preprocessing must be done before we store the data in our database.
-
-Firstly, we can decompress the \codeinline{.bz2} file with \codeinline{bzip2},
+Firstly, we can decompress the \codeinline{.bz2} file with \codeinline{org.apache.commons.compress.compressors.bzip2} package in Java,
 which will give us a \codeinline{.dem} file:
-
-\begin{console}
-$ bzip2 -d data.dem.bz2
-\end{console}
 
 Next, we can utilize \href{https://github.com/skadistats/clarity}{clarity},
 an open source Dota2 replay parser, to extract useful information from the \codeinline{.dem} file.
-Based on our exploration and the \href{https://github.com/skadistats/clarity-examples}{examples}
-provided by clarity, the following data will be available:
+
+It cannot be achieved by a single click, though. We have to write a lot of code to invoke its function.
+What's more, clarity does not provide a detailed documentation, instead there are only some \href{https://github.com/skadistats/clarity-examples}{examples} which forces us to iteratively attempt and learn the usage of this tool.
+
+Based on our exploration, the following data will be available:
 
 \begin{itemize}
 	% info
@@ -146,18 +281,17 @@ provided by clarity, the following data will be available:
 	\end{itemize}
 	% lifestate
 	\item Spawn/death of heros and NPCs
-	% matchend
-	\item Summary of each player's performance in the whole match, including:
-	\begin{itemize}
-		\item Final level
-		\item Kills
-		\item Deaths
-		\item Assistance
-		\item Gold
-		\item Last hit
-		\item Deny
-	\end{itemize}
 \end{itemize}
+
+These information will be organized in a Document and store to our database.
+
+Most fields in our datasets are related to some of the above-mentioned business questions.
+They are all important.
+We will generally validate them, for example, fields like the HP, XP, total gold cannot be negative.
+
+What's more important is to filter out invalid data on the game level. Some of the games lasts for only two or three minutes, because some players are disconnected and others just quit the game very quick. Others are practicing games where most players are computer bots. We will completely drop these game records.
+
+
 
 % --------------------------------------------
 
@@ -176,47 +310,63 @@ provided by clarity, the following data will be available:
 %	- tempentities: No output
 
 % --------------------------------------------
+\subsection{NoSQL Storage Technology}
 
-The following fields are critical to answering our Business Question, ``???".
-They will need to be cleansed and validated.
+As we mentioned above, we have two datasets - one is the match results data in JSON format, which is a kind of document that can be encoded using a text-based encoding scheme; the other one is preprocessed replay data. After we parsing those replay data, we can gather useful information from replay data in string format instead of binary format(which is inappropriate for document NoSQL database to store).
 
-% --------------------------------------------
-\subsection{NoSQL Storage Technology}\\
-As we mentioned above, we have two datasets - one is the match results data in JSON format, which is a kind of document that can be encoded using a text-based encoding scheme; the other one is preprocessed replay data. After we parsing those replay data, we can gather useful information from replay data in string format instead of binary format(which is inappropriate for document NoSQL database to store).\\
+Therefore, we choose to use MongoDB as our primary NoSQL storage technology.
 
-Therefore, we choose to use MongoDB as our primary NoSQL storage technology.\\
+\subsection{MongoDB}
+    
+MongoDB is a popular NoSQL storage device that can store high volume, high velocity, high variety Big Data datasets. It's a document storage device, which make storing semi-structure document-oriented data such as JSON much easier. It is an open source NoSQL database, so we are free to use it.
+
+Also, MongoDB support partial update. This will help us aggregate values in future games that we would potentially use.
+    
+\subsection{Docker}
+    
+In order to combine different needs, programming languages and developing environment of many technologies, we will adopt Docker to our project. Using Docker, we can deploy our application into any environment.
+
+Docker is a container technology that provide consistency. It's open source and there are many open source applications that have been made in \href{https://hub.docker.com}{Docker Hub}. Docker Hub provides official or verified images, so it's safe to use.
+
+In our project, we will build Dockerfile to let it connect with our project. We will use Scala as programming language, and we will get the match results data from Dota2’s official API. MongoDB will be used as database. And then we will put all of this into a Docker container.
+    
+\subsection{AWS(Amazon Web Service)}
+    
+As we mentioned before, we need 50GB to store JSON file, and we need 180GB to store replay data, and the scale would be extended if we add more data in the datasets. In order to have enough capacity to store datasets, we will use AWS(Amazon Web Server) to deploy our project on cloud server. Running Docker on AWS will provide us a open source and free way to build and run distributed application and provide a reliable and easy way to scale out.
+
+AWS provides numbers of official ways to deploy docker on AWS, such as Amazon ECS, which is a highly scalable, high-performance container orchestration service to run Docker containers on the AWS cloud. After we package datasets and analytics packages into Docker, we will deploy Docker to Amazon ECS.
+    
+%-------%
+
+\section{Potential Challenge}
+
+There are several aspects where we may have potential challenge.
+
+During the environment setup:
 
 \begin{itemize}
-\item \textbf{MongoDB}\\
-MongoDB is a popular NoSQL storage device that can store high volume, high velocity, high variety Big Data datasets. It's a document storage device, which make storing semi-structure document-oriented data such as JSON much easier. It is an open source NoSQL database, so we are free to use it.\\
+	\item We are trying to build a docker containerized application, but none of our team members have previous experience
+\end{itemize}
 
-Also, MongoDB support partial update. This will help us aggregate values in future games that we would potentially use.\\
+In the data ETL phase:
 
-\item \textbf{Docker}\\
-In order to combine different needs, programming languages and developing environment of many technologies, we will adopt Docker to our project. Using Docker, we can deploy our application into any environment.\\
-
-Docker is a container technology that provide consistency. It's open source and there are many open source applications that have been made in \href{https://hub.docker.com}{Docker Hub}. Docker Hub provides official or verified images, so it's safe to use.\\
-
-In our project, we will build Dockerfile to let it connect with our project. We will use Scala as programming language, and we will get the match results data from Dota2’s official API. MongoDB will be used as database. And then we will put all of this into a Docker container.\\
-
-\item \textbf{AWS(Amazon Web Server)}\\
-As we mentioned before, we need 5GB to store JSON file, and we need 50GB to store replay data. In order to have enough capacity to store datasets, we will use AWS(Amazon Web Server) to deploy our project on cloud server. Running Docker on AWS will provide us a open source and free way to build and run distributed application and provide a reliable and easy way to scale out.\\
-
-AWS provides numbers of official ways to deploy docker on AWS, such as Amazon ECS, which is a highly scalable, high-performance container orchestration service to run Docker containers on the AWS cloud. After we package datasets and analytics packages into Docker, we will deploy Docker to Amazon ECS.\\
+\begin{itemize}
+	\item Download replays from the server can be slow, the links may not work
+	\item Both apis have call limits, even though we can control our request frequency, some request may still fail
+	\item Some downloaded replay files may be broken so that no information can be extracted, or they may even cause exceptions in the pipeline
+	\item The open source replay parser does not have a documentation, thus some of our parsing code may cause unexpected exceptions when there are some corner case
 \end{itemize}
 
 
-% TODO:
-% In order to "Describe fields that are critical for your analysis that will need to be cleansed/validated.",
-% I need the Business Question first
+In the data analysis phase:
 
+\begin{itemize}
+	\item Lots of joins and aggregations between the two datasets will be involved
+	\item We must quantitatively define some generally used concepts which are often qualitatively used, for example, the measurement of vision, team battle, etc. An inappropriate definition can make the whole conclusion meaningless
+\end{itemize}
 
 
 %-------%
 
-
-
 \end{document}
-
-
 

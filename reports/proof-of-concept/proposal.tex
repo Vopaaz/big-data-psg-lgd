@@ -315,10 +315,35 @@ What's more important is to filter out invalid data on the game level. Some of t
 
 %-------%
 
-% potential challenge:
-% 1.download replays from the server can be slow, the links may not work
-% 2.Both apis have call limits
-% 3.It may be really slow to process a relatively large JSON file of each replay
+\section{Potential Challenge}
+
+There are several aspects where we may have potential challenge.
+
+During the environment setup:
+
+\begin{itemize}
+	\item We are trying to build a docker containerized application, but none of our team members have previous experience
+\end{itemize}
+
+In the data ETL phase:
+
+\begin{itemize}
+	\item Download replays from the server can be slow, the links may not work
+	\item Both apis have call limits, even though we can control our request frequency, some request may still fail
+	\item Some downloaded replay files may be broken so that no information can be extracted, or they may even cause exceptions in the pipeline
+	\item The open source replay parser does not have a documentation, thus some of our parsing code may cause unexpected exceptions when there are some corner case
+\end{itemize}
+
+
+In the data analysis phase:
+
+\begin{itemize}
+	\item Lots of joins and aggregations between the two datasets will be involved
+	\item We must quantitatively define some generally used concepts which are often qualitatively used, for example, the measurement of vision, team battle, etc. An inappropriate definition can make the whole conclusion meaningless
+\end{itemize}
+
+
+%-------%
 
 \end{document}
 

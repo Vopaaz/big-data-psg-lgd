@@ -312,7 +312,7 @@ What's more important is to filter out invalid data on the game level. Some of t
 % --------------------------------------------
 \subsection{NoSQL Storage Technology}
 
-As we mentioned above, we have two datasets - one is the match results data in JSON format, which is a kind of document that can be encoded using a text-based encoding scheme; the other one is preprocessed replay data. After we parsing those replay data, we can gather useful information from replay data in string format instead of binary format(which is inappropriate for document NoSQL database to store).
+As we mentioned above, we have two datasets - one is the match results data in JSON format, which is a kind of document that can be encoded using a text-based encoding scheme; the other one is preprocessed replay data. After we parsing those replay data, we can gather useful information from replay data in string format instead of binary format(which is inappropriate for document NoSQL database to store). It is appropriate to store such documents of JSON format in document-oriented NoSQL database like MongoDB.
 
 Therefore, we choose to use MongoDB as our primary NoSQL storage technology.
 

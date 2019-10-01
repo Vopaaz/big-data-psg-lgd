@@ -109,13 +109,13 @@ To assess the adequacy of adopting big data to our project, we firstly identify 
 
 \bigdataVs{Volume}
 
-Replays are one of datasets we plan to use, which are the full records of finished matches. Size of one replay is estimated to be about 60MB. We plan to collect 3000 replays whose size is about 180GB. As for match result data which is JSON-format data, size of each result is about 5KB. We plan to collect 10,000,000 match results whose size is about 50GB. Moreover, if we desire more data in the future implementation, we can always access it as long as dota 2 still has players.
+Replays are one of the datasets we plan to use, which are the full records of finished matches. The size of one replay is estimated to be about 60MB. We plan to collect 3000 replays whose size is about 180GB. As for match result data which is JSON-format data, the size of each result is about 5KB. We plan to collect 10,000,000 match results whose size is about 50GB. Moreover, if we desire more data in future implementation, we can always access it as long as Dota 2 still has players.
 
 \bigdataVs{Velocity}
 
-According to the statistic data in August 2019 from Steam which is a a video game digital distribution platform, the average number of players is 467,148.3 players and the peak number is 826,690.
-The large number of players makes both the replay data and result data high-velocity.
-Although, in our project, the velocity depends on the velocity of the API request, this statistic data reveals that it's potential to be high-velocity.
+According to the statistic data in August 2019 from Steam which is a video game digital distribution platform, the average number of players is 467,148.3 players and the peak number is 826,690.
+A large number of players makes both the replay data and result data high-velocity.
+Although in our project, the velocity depends on the velocity of the API request, this statistic data reveals that it's potential to be high-velocity.
 
 \bigdataVs{Variety}
 
@@ -123,9 +123,9 @@ From the APIs mentioned above, we can access JSON format files, the match result
 
 \bigdataVs{Veracity}
 
-The overall quality of our datasets is good, because we access most of them from the official API.
-But there is still a few noise.
-For example, the time of some games is too short, which makes these game not representative.
+The overall quality of our datasets is good because we access most of them from the official API.
+But there is still a few noises.
+For example, the time of some games is too short, which makes these game lack of representativeness.
 Thus, we plan to implement data validation to filter the undesired matches.
 
 \bigdataVs{Value}
@@ -133,8 +133,8 @@ Thus, we plan to implement data validation to filter the undesired matches.
 Our datasets are useful for a relatively long time.
 Because we plan to collect 1/3 professional matches and 2/3 public matches.
 The professional matches are durable since we can always extract information about professional teams and players from them.
-As for the normal games, they are valuable as long as they are not too stale, like more than 2 years ago.
-In data validation step, we will set a filter on date for normal games which makes our datasets valuable.
+As for the public games, they are valuable as long as they are not too stale, like more than 2 years ago.
+In the data validation step, we will set a filter on the date for public games which makes our datasets valuable.
 
 \section{Potential Business Questions}
 
@@ -144,36 +144,39 @@ By analyzing them, the following questions might be answered.
 \begin{itemize}
     \item Easy questions:
     \begin{itemize}
-        \item Who is the hero gaining gold/XP fastest in 15 minutes in normal games/professional games?
-        \item Who is the hero having most kills/assists/heals/deaths in normal games/professional games?
-        \item What is the most purchased item in normal games/professional games?
+        \item Who is the hero gaining gold/XP fastest in 15 minutes in public games/professional games?
+        \item Who is the hero having most kills/assists/heals/deaths in public games/professional games?
+        \item What is the most purchased item in public games/professional games?
         \item Who is the hero having most bad-manner players (players who are AFK or disconnected)?
-        \item Who is the most popular hero (hero who has highest pick rate) in normal games/professional games?
-        \item Who is the hero having highest ban rate in professional games?
+        \item Who is the most popular hero (the hero who has the highest pick rate) in public games/professional games?
+        \item Who is the hero having the highest ban rate in professional games?
         \item who is the hero having the most ban/pick rate in professional games?
-        \item How long does a game cost in average in normal games/professional games?
-        \item Which item is used most in normal games/professional games?
+        \item How long does a game cost on average in public games/professional games?
+        \item Which item is used most in public games/professional games?
     \end{itemize}
     \item Moderately challenging questions:
     \begin{itemize}
-        \item How is the benefits gained from buybacks in normal games/professional games？
-        \item How is the vision in normal games/professional games?
-        \item When does the first team battle happen in normal games/professional games?
-        \item Which is lineup having highest win rate in normal games/professional games?
-        \item Which is the most popular lineup (lineup which has the highest pick rate) in normal games/professional games?
+        \item How are the benefits gained from buybacks in public games/professional games？
+        \item How is the vision in public games/professional games?
+        \item When does the first team battle happen in public games/professional games?
+        \item Which is lineup having the highest win rate in public games/professional games?
+        \item Which is the most popular lineup (lineup which has the highest pick rate) in public games/professional games?
         \item which is the most common ban-pick combo in professional games?
-        \item Who is hero changed most in win/pick/ban rate after release new version of Dota2?
+        \item Who is the hero changed most in win/pick/ban rate after releasing a new version of Dota2?
+        \item Who is the hero having the highest winning rate in each lane?
     \end{itemize}
     \item Challenging questions:
     \begin{itemize}
-        \item Does there exist correlation between the time of the first blood and the time of the entire game?
-        \item Does there exist correlation between the gold/XP source of a hero and its win rate?
-        \item Does there exist correlation between the distribution of economy and the result of the game?
-        \item Does there exist correlation between the economic development and the time of the first team battle?
+        \item How is the winning-losing relationship between Dota 2 professional teams?
+        \item Does there exist a regular farming path for some professional players?
+        \item Does there exist a correlation between the time of the first blood and the time of the entire game?
+        \item Does there exist a correlation between the gold/XP source of a hero and its win rate?
+        \item Does there exist a correlation between the distribution of the economy and the result of the game?
+        \item Does there exist a correlation between economic development and the time of the first team battle?
     \end{itemize}
 \end{itemize}
 
-Moreover, we can use answers above to analyze the difference between normal games and professional games as well as the difference between the blind-pick game and the draft-pick game.
+Moreover, we can use the answers above to analyze the difference between public games and professional games as well as the difference between the blind-pick game and the draft-pick game.
 
 
 \section{Data ETL}

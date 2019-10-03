@@ -77,9 +77,17 @@
 
 %-------%
 
-\section{Potential Datasets}
+\section{Project Background}
 
-Our team aims at exploring data about a popular and long-lived computer game, Dota2.
+Our team aims at exploring data about a popular and long-lived computer game, Dota2. Dota2 is a multiplayer online battle arena (MOBA) video game developed and published by Valve Corporation. Each game will involves ten players that are divided to two teams play against each other on a same map. Every player chooses one "hero" that has unique abilities and different styles of playing. The aim for each team is to destroy the building called "Ancient" of the other team. Players collect gold to buy powerful items and gain experience by killing players on the other team, destroy building of the other team, or kill creeps.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\linewidth]{pic/combat.png}
+	\caption{A screenshot of the game}
+\end{figure}
+This game has a large quantity of players, accordingly a huge amount of replays will be produced every day. Also, it's a real-time game, hundreds of operations and some decisions will be made each second, and all of them will have some influence on the final results of the game. Both of the above two features make the game a great subject to big data analysis. Actually, there are some professional teams start hiring data engineers to help their players perform better in a game. This means that our analysis has some realistic meaning.
+\section{Potential Datasets}
 We will mainly use two datasets:
 
 \begin{enumerate}
@@ -368,6 +376,7 @@ After we package datasets and analytics packages into Docker, we will deploy Doc
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\linewidth]{pic/arc.png}
+	\caption{The diagram of our project's structure}
 \end{figure}
 
 \section{Potential Challenges}
@@ -389,6 +398,7 @@ In the data ETL phase:
 	\item Both APIs have call limits, even though we can control our request frequency, some request may still fail
 	\item Some downloaded replay files may be broken so that no information can be extracted, or they may even cause exceptions in the pipeline
 	\item The open-source replay parser does not have documentation, thus some of our parsing code may cause unexpected exceptions when there are some corner case
+	\item Although we try our best to write the code to handle errors to avoid the program failing, but there still can be cases that are not covered, since our architecture involves a lot of network communications and i/o. We might need to design a log system to help us restore from a crash.
 \end{itemize}
 
 

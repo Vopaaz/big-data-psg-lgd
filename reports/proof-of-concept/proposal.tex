@@ -102,7 +102,7 @@ It also provides a key, which we can use to retrieve a replay from the replay se
 
 In all, we will have two different kinds of data for our further analysis, relatively large-scale but coarse-grained match results data, and very fine-grained replays data.
 Considering the file size of one replay, we decide to include recent professional games and randomly select some public games for the replay data.
-WE will mention how we acquire the data in Data ETL section.
+We will mention how we acquire the data in Data ETL section.
 
 \section{Five Vs of Datasets}
 
@@ -182,14 +182,14 @@ By analyzing them, the following questions might be answered.
     \end{itemize}
 \end{itemize}
 
-Moreover, we can use the answers above to analyze the difference between public games and professional games as well as the difference between the blind-pick game and the draft-pick game.
+Moreover, we can use the answers above to analyze the difference between public games and professional games as well as the difference between the public ranking game and the public matching game.
 
 
 \section{Data ETL}
 
 \subsection{Extraction}
 
-Valve, the company that develop the game, initially try to provide all the players with easy APIs to access the data of the game.
+Valve, the company that develops the game, initially try to provide all the players with easy APIs to access the data of the game.
 But due to the increasing stress on its data servers, many of its APIs are shut down.
 At the same time, the documentation seems to be never updated since it's created, which makes it much more difficult for us to collect the data.
 For example, the API which returns a bunch of the match results given a starting match id is not usable anymore.
@@ -197,7 +197,7 @@ Another API which returns a key that is critical for construct the URL to downlo
 
 But luckily, we found some hints from the \href{https://dev.dota2.com}{developer's forum of Dota2}.
 We can use the starting sequence number, which works similarly as the match id, to get a series of game results.
-And by calling a third party API from OpenDota, we can get the important key to construct the URL to download replays again.
+And by calling a third party API from OpenDota, we can get the important key to constructing the URL to download replays again.
 
 The specific steps of gaining our data are as following:
 
@@ -218,18 +218,18 @@ The specific steps of gaining our data are as following:
 
 \subsection{Transformation}
 
-The match result is in JSON format so we can almost directly store it. The information it contains are:
+The match result is in JSON format so we can almost directly store it. The information it contains is:
 
 \begin{itemize}
 	\item Players information:
 	\begin{itemize}
 		\item Account id
 		\item Player slot
-		\item The hero he use in this match
-		\item The items he possess at the end of the match
+		\item The hero he uses in this match
+		\item The items he possesses at the end of the match
 		\item The player's kills/deaths/assists
 		\item The player's leaver status (whether AFK/disconnected or not)
-		\item The gold he possess at the end of the match
+		\item The gold he possesses at the end of the match
 		\item The amount of last-hits and denies the player got during the match
 		\item The average gold/XP he gained per minute
 		\item The total gold he spent during the match
@@ -250,7 +250,7 @@ The match result is in JSON format so we can almost directly store it. The infor
 	\item The server cluster the match was played upon
 	\item The time in seconds since the match began when first-blood occurred
 	\item The mode of the match
-	\item The amount of human players within the match
+	\item The number of human players within the match
 	\item The league that this match was a part of
 	\item The number of thumbs-up/thumbs-down the game has received by users
 	\item A list of the picks and bans in the match, if the game mode is Captains Mode
@@ -267,7 +267,7 @@ Next, we can utilize \href{https://github.com/skadistats/clarity}{clarity},
 an open source Dota2 replay parser, to extract useful information from the \codeinline{.dem} file.
 
 It cannot be achieved by a single click, though. We have to write a lot of code to invoke its function.
-What's more, clarity does not provide a detailed documentation, instead there are only some \href{https://github.com/skadistats/clarity-examples}{examples} which forces us to iteratively attempt and learn the usage of this tool.
+What's more, clarity does not provide detailed documentation, instead there are only some \href{https://github.com/skadistats/clarity-examples}{examples} which forces us to iteratively attempt and learn the usage of this tool.
 
 Based on our exploration, the following data will be available:
 
@@ -331,10 +331,10 @@ But after we parsing those replay data, we can gather useful information from re
 Therefore, we choose to use MongoDB as our primary NoSQL storage technology.
 
 MongoDB is a popular NoSQL storage device that can store high volume, high velocity, high variety Big Data datasets.
-It's a document storage device, which make storing semi-structure document-oriented data such as JSON much easier.
-It is an open source NoSQL database, so we are free to use it.
+It's a document storage device, which makes storing semi-structured document-oriented data such as JSON much easier.
+It is an open-source NoSQL database, so we are free to use it.
 
-Also, MongoDB support partial update.
+Also, MongoDB supports partial update.
 This will help us aggregate values in future games that we would potentially use.
 
 To answer the business question about the relationship between professional teams and players, using only MongoDB may involve considerable aggregations. We may consider using a graph database, neo4j, as our secondary NoSQL technology choice.
@@ -344,8 +344,8 @@ To answer the business question about the relationship between professional team
 In order to combine different needs, programming languages and developing environment of many technologies, we will adopt Docker to our project.
 Using Docker, we can deploy our application into any environment.
 
-Docker is a container technology that provide consistency.
-It's open source and there are many open source applications that have been made in \href{https://hub.docker.com}{Docker Hub}.
+Docker is a container technology that provides consistency.
+It's open-source and there are many open source applications that have been made in \href{https://hub.docker.com}{Docker Hub}.
 Docker Hub provides official or verified images, so it's safe to use.
 
 In our project, we will build Dockerfile to let it connect with our project.
@@ -354,9 +354,9 @@ MongoDB will be used as database. And then we will put all of this into a Docker
 
 \subsubsection{AWS (Amazon Web Service)}
 
-As we mentioned before, we need 50GB to store JSON file, and we need 180GB to store replay data, and the scale would be extended if we add more data in the datasets.
-In order to have enough capacity to store datasets, we will use AWS (Amazon Web Server) to deploy our project on cloud server.
-Running Docker on AWS will provide us a open source and free way to build and run distributed application and provide a reliable and easy way to scale out.
+As we mentioned before, we need 50GB to store the JSON file, and we need 180GB to store replay data, and the scale would be extended if we add more data in the datasets.
+In order to have enough capacity to store datasets, we will use AWS (Amazon Web Server) to deploy our project on a cloud server.
+Running Docker on AWS will provide us an open-source and free way to build and run a distributed application and provide a reliable and easy way to scale out.
 
 AWS provides numbers of official ways to deploy docker on AWS, such as Amazon ECS, which is a highly scalable, high-performance container orchestration service to run Docker containers on the AWS cloud.
 After we package datasets and analytics packages into Docker, we will deploy Docker to Amazon ECS.
@@ -370,9 +370,9 @@ After we package datasets and analytics packages into Docker, we will deploy Doc
 	\includegraphics[width=\linewidth]{pic/arc.png}
 \end{figure}
 
-\section{Potential Challenge}
+\section{Potential Challenges}
 
-There are several aspects where we may have potential challenge.
+There are several aspects where we may have potential challenges.
 
 During the environment setup:
 
@@ -388,7 +388,7 @@ In the data ETL phase:
 	\item Professional games are relatively rare, so more efforts will be needed to find and retrieve the professional replays
 	\item Both APIs have call limits, even though we can control our request frequency, some request may still fail
 	\item Some downloaded replay files may be broken so that no information can be extracted, or they may even cause exceptions in the pipeline
-	\item The open source replay parser does not have a documentation, thus some of our parsing code may cause unexpected exceptions when there are some corner case
+	\item The open-source replay parser does not have documentation, thus some of our parsing code may cause unexpected exceptions when there are some corner case
 \end{itemize}
 
 

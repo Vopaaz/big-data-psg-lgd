@@ -332,6 +332,8 @@ It is an open source NoSQL database, so we are free to use it.
 Also, MongoDB support partial update.
 This will help us aggregate values in future games that we would potentially use.
 
+To answer the business question about the relationship between professional teams and players, using only MongoDB may involve considerable aggregations. We may consider using a graph database, neo4j, as our secondary NoSQL technology choice.
+
 \subsubsection{Docker}
 
 In order to combine different needs, programming languages and developing environment of many technologies, we will adopt Docker to our project.
@@ -390,6 +392,7 @@ In the data analysis phase:
 \begin{itemize}
 	\item Lots of joins and aggregations between the two datasets will be involved
 	\item We must quantitatively define some generally used concepts which are often qualitatively used, for example, the measurement of vision, team battle, etc. An inappropriate definition can make the whole conclusion meaningless
+	\item When we are answering the relationship between the teams or players, we will have to extract and load the data to a secondary database, like neo4j
 \end{itemize}
 
 

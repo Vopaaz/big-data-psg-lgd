@@ -6,6 +6,7 @@
 \usepackage{enumerate}
 \usepackage{enumitem}
 \usepackage{hyperref}
+\usepackage[toc]{glossaries}
 \hypersetup{colorlinks,allcolors=black,urlcolor=blue}
 
 \setenumerate[1]{itemsep=0pt,partopsep=2pt,parsep=0pt ,topsep=2pt}
@@ -67,7 +68,129 @@
 \date{\today}
 
 
+\makeglossaries
 
+
+\newglossaryentry{maths}
+{
+    name=mathematics,
+    description={Mathematics is what mathematicians do}
+}
+\newglossaryentry{Ancient}
+{
+    name=Ancient,
+    description={(also commonly refered to as Thrones, or Tree for Radiant's ancient and Throne for Dire's ancient, as legacy names from DotA) are massive structures found inside each faction's base and are the main objective. In order to win, the enemy team's Ancient must be destroyed, while the own one must be kept alive. Ancients are guarded by their two tier 4 towers. The Ancients are invulnerable until both of their tier 4 towers are destroyed.}
+}
+\newglossaryentry{MOBA}
+{
+    name=MOBA,
+    description={also known as action real-time strategy (ARTS), is a subgenre of strategy video games that originated as a subgenre of real-time strategy in which each player controls a single character, usually on a map in an isometric perspective, as part of a team competing against another team of players.}
+}
+\newglossaryentry{professional matches}
+{
+    name=professional matches,
+    description={Matches played two professional teams hosted officially by Valve.}
+}
+\newglossaryentry{public matches}
+{
+    name=public matches,
+    description={Matches played by ten randomly chosen players, and the results won't influence Matchmaking Rating(MMR) of each player.}
+}
+\newglossaryentry{ranked matches}
+{
+    name=ranked matches,
+    description={Matches played by ten randomly chosen players according to their Matchmaking Rating(MMR), and the results will influence the Matchmaking Rating of each player.}
+}
+\newglossaryentry{gold}
+{
+    name=gold,
+    description={Gold is the currency used to buy items or instantly revive your hero. Gold can be earned from killing heroes, creeps, or buildings.}
+}
+\newglossaryentry{creeps}
+{
+    name=creeps,
+    description={Creeps are basic units in Dota 2. Every unit which is not a hero, building, ward or courier is considered a creep. Creeps can belong to either faction, be neutral, or be player-controlled units. Unlike heroes, creeps do not gain experience and cannot level up. All of their stats are set values (though can still be altered by modifiers). Most creeps grant a set gold and experience bounty to heroes when killed.}
+}
+\newglossaryentry{XP}
+{
+    name=XP,
+    description={A shorthand for experience. Experience is an element heroes can gather by killing enemy units, or being present as enemy units get killed. On its own, experience does nothing, but when accumulated, it increases the hero's level, so that they grow more powerful. Only heroes can gather experience and therefore reach higher levels. With each level gained, a hero's base attributes increase by static values (unique for each hero), which makes them stronger in several.}
+}
+\newglossaryentry{match id}
+{
+    name=match id,
+    description={A unique identifier for each match played on Dota2.}
+}
+\newglossaryentry{sequence number}
+{
+    name=sequence number,
+    description={Similar to match id, which is a unique identifier for each match. But this field will not show up in the Dota2's client.}
+}
+\newglossaryentry{towers}
+{
+    name=towers,
+    description={Towers are the main line of defense for both teams, attacking any non-neutral enemy that gets within their range. Both factions have all three lanes guarded by three towers each.}
+}
+\newglossaryentry{barracks}
+{
+    name=barracks,
+    description={Barracks (commonly shortened to Rax) are buildings, defended by their tier 3 towers, that are responsible for keeping lane creeps as powerful as their counterparts.}
+}
+\newglossaryentry{lane}
+{
+    name=lane,
+    description={A Lane is one of three paths connecting the two Ancients. Lane creeps will push along these lanes after spawning.}
+}
+\newglossaryentry{AFK}
+{
+    name=AFK,
+    description={A shorthand for away-from-keyboard, AFK means a player leaving a match early before it's end.}
+}
+\newglossaryentry{buff}
+{
+    name=buff,
+    description={Buffs are positive status effects that enhance your hero.}
+}
+\newglossaryentry{debuff}
+{
+    name=debuff,
+    description={Debuffs are negative status effects that weaken your hero.}
+}
+\newglossaryentry{mode}
+{
+    name=mode,
+    description={Game modes are a set of restrictions within which the game of Dota 2 can be played. Most game modes alter how heroes are picked by players. There are also some novelty modes that allow 1v1 play, or give a player a new hero every time they die, for example. }
+}
+\newglossaryentry{ban}
+{
+    name=ban,
+    description={A ban will disallow the choose for a specific hero within a match.}
+}
+\newglossaryentry{pick}
+{
+    name=pick,
+    description={A pick is choosing a hero that a player want to play within a match.}
+}
+\newglossaryentry{first-blood}
+{
+    name=first-blood,
+    description={The first kill within a game. The player who makes the first kill will be rewarded with 150 extra gold}.
+}
+\newglossaryentry{team battle}
+{
+    name=team battle,
+    description={A battle involves more than half of the players in a match within a short period of time}.
+}
+\newglossaryentry{buyback}
+{
+    name=buyback,
+    description={While dead, the player has the option to use "buyback", spending money in order to instantly respawn at the fountain. However, the buyback ability has a long cooldown of 480 seconds and has a scaling gold cost.}.
+}
+\newglossaryentry{last-hit}
+{
+    name=last-hit,
+    description={You can only get gold from killing creeps or get a kill from killing a hero if you make the last-hit that cause the creeps or hero to death.}.
+}
 \begin{document}
 
 \maketitle
@@ -79,7 +202,7 @@
 
 \section{Project Background}
 
-Our team aims at exploring data about a popular and long-lived computer game, Dota2. Dota2 is a multiplayer online battle arena (MOBA) video game developed and published by Valve Corporation. Each game will involves ten players that are divided to two teams play against each other on a same map. Every player chooses one ``hero" that has unique abilities and different styles of playing. The aim for each team is to destroy the building called ``Ancient" of the other team. Players collect gold to buy powerful items and gain experience by killing players on the other team, destroy building of the other team, or kill creeps.
+Our team aims at exploring data about a popular and long-lived computer game, Dota2. Dota2 is a multiplayer online battle arena (\gls{MOBA}) video game developed and published by Valve Corporation. Each game will involves ten players that are divided to two teams play against each other on a same map. Every player chooses one ``hero" that has unique abilities and different styles of playing. The aim for each team is to destroy the building called ``\gls{Ancient}" of the other team. Players collect \gls{gold} to buy powerful items and gain \gls{XP} by killing players on the other team, destroy building of the other team, or kill \gls{creeps}.
 
 \begin{figure}[H]
 	\centering
@@ -87,6 +210,8 @@ Our team aims at exploring data about a popular and long-lived computer game, Do
 	\caption{A screenshot of the game}
 \end{figure}
 This game has a large quantity of players, accordingly a huge amount of replays will be produced every day. Also, it's a real-time game, hundreds of operations and some decisions will be made each second, and all of them will have some influence on the final results of the game. Both of the above two features make the game a great subject to big data analysis. Actually, there are some professional teams start hiring data engineers to help their players perform better in a game. This means that our analysis has some realistic meaning.
+
+Knowing that this game is not familiar to everybody, and we may use some words that may be difficult to understand to those who don't play this kind of games for simplicity. I create a glossary at the end of this proposal for your reference.
 \section{Potential Datasets}
 We will mainly use two datasets:
 
@@ -145,7 +270,7 @@ Amateur players can also learn a lot about the techniques, timing, hero choice f
 Our business questions, will focus on these aspects to provide valuable insights.
 
 Even though the game is versioning, our datasets can be useful for a relatively long time.
-Because we plan to collect 1/3 professional matches and 2/3 public matches.
+Because we plan to collect 1/3 \gls{professional matches} and 1/3 \gls{public matches}, 1/3 \gls{ranked matches}.
 The professional matches are durable since we can always extract information about professional teams and players from them.
 As for the public games, they are valuable as long as they are not too stale. Minor changes of the game does not affect the whole picture.
 But we will filter out public games which are too outdated in the data validation step, in order to make our datasets more valuable.
@@ -158,39 +283,43 @@ By analyzing them, the following questions might be answered.
 \begin{itemize}
     \item Easy questions:
     \begin{itemize}
-        \item Who is the hero gaining gold/XP fastest in 15 minutes in public games/professional games?
-        \item Who is the hero having most kills/assists/heals/deaths in public games/professional games?
-        \item What is the most purchased item in public games/professional games?
-        \item Who is the hero having most bad-manner players (players who are AFK or disconnected)?
-        \item Who is the most popular hero (the hero who has the highest pick rate) in public games/professional games?
-        \item Who is the hero having the highest ban rate in professional games?
-        \item who is the hero having the most ban/pick rate in professional games?
-        \item How long does a game cost on average in public games/professional games?
-        \item Which item is used most in public games/professional games?
+        \item Who is the hero gaining \gls{gold}/\gls{XP} fastest in 15 minutes in public games/professional games?
+        \item Who is the hero having most kills/assists/heals/deaths in \gls{public matches}/\gls{ranked matches}/\gls{professional matches}?
+        \item What is the most purchased item in \gls{public matches}/\gls{ranked matches}/\gls{professional matches}?
+        \item Who is the hero having most bad-manner players (players who are \gls{AFK} or disconnected)?
+        \item Who is the most popular hero (the hero who has the highest pick rate) in \gls{public matches}/\gls{ranked matches}/\gls{professional matches}?
+        \item Who is the hero having the highest ban rate in \gls{professional matches}?
+        \item who is the hero having the most \gls{ban}/\gls{pick} rate in \gls{professional matches}?
+        \item How long does a game cost on average in \gls{public matches}/\gls{ranked matches}/\gls{professional matches}?
+        \item Which item is used most in \gls{public matches}/\gls{ranked matches}/\gls{professional matches}?
     \end{itemize}
+    We categorize these questions as easy questions because the solutions to them are straight-forward. These questions can be answered by implementing aggregation on our datasets. And most of the data needed for these questions can be extracted directly from our datasets.
+    \\
+
     \item Moderately challenging questions:
     \begin{itemize}
-        \item How are the benefits gained from buybacks in public games/professional games？
-        \item How is the vision in public games/professional games?
-        \item When does the first team battle happen in public games/professional games?
-        \item Which is lineup having the highest win rate in public games/professional games?
-        \item Which is the most popular lineup (lineup which has the highest pick rate) in public games/professional games?
-        \item which is the most common ban-pick combo in professional games?
-        \item Who is the hero changed most in win/pick/ban rate after releasing a new version of Dota2?
-        \item Who is the hero having the highest winning rate in each lane?
+        \item How are the benefits gained from \gls{buyback}s in \gls{public matches}/\gls{ranked matches}/\gls{professional matches}？
+        \item How is the vision in \gls{public matches}/\gls{ranked matches}/\gls{professional matches}?
+        \item When does the first team battle happen in \gls{public matches}/\gls{ranked matches}/\gls{professional matches}?
+        \item Which is lineup having the highest win rate in \gls{public matches}/\gls{ranked matches}/\gls{professional matches}?
+        \item Which is the most popular lineup (lineup which has the highest pick rate) in \gls{public matches}/\gls{ranked matches}/\gls{professional matches}?
+        \item Which is the most common ban-pick combo in \gls{public matches}/\gls{ranked matches}/\gls{professional matches}?
+        \item Who is the hero changed most in win/\gls{pick}/\gls{ban} rate after releasing a new version of Dota2?
+        \item Who is the hero having the highest winning rate in each \gls{lane}?
     \end{itemize}
+    We categorize these questions as moderately challenging questions because the solutions to them are not that straight-forward as easy questions. The first challenge is to define some terms we used in these questions in the application code. For example, we use the term, vision, which is involved with the lifecycle of ward and sentry (two items provide visibility around them). Besides aggregation, we also need join operations to answer these questions.\\
+
     \item Challenging questions:
     \begin{itemize}
         \item How is the winning-losing relationship between Dota2 professional teams? Can we use a graph to visualize it?
         \item Does there exist a regular farming path for some professional players?
-        \item Does there exist a correlation between the time of the first blood and the time of the entire game?
-        \item Does there exist a correlation between the gold/XP source of a hero and its win rate?
+        \item Does there exist a correlation between the time of the \gls{first-blood} and the time of the entire game?
+        \item Does there exist a correlation between the \gls{gold}/\gls{XP} source of a hero and its win rate?
         \item Does there exist a correlation between the distribution of the economy and the result of the game?
-        \item Does there exist a correlation between economic development and the time of the first team battle?
+        \item Does there exist a correlation between economic development and the time of the first \gls{team battle}?
     \end{itemize}
+    We categorize these questions as challenging questions because they need more techniques than moderately challenging questions. Like moderately challenging questions, they have some ambiguous definition needs to be implemented. But they cannot be answered easily by aggregation and join operations. Instead, we plan to use machine learning techniques to solve them.
 \end{itemize}
-
-Moreover, we can use the answers above to analyze the difference between public games and professional games as well as the difference between the public ranking game and the public matching game.
 
 
 \section{Data ETL}
@@ -204,7 +333,7 @@ For example, the API which returns a bunch of the match results given a starting
 Another API which returns a key that is critical for construct the URL to download replay of that game is not working as well.
 
 But luckily, we found some hints from the \href{https://dev.dota2.com}{developer's forum of Dota2}.
-We can use the starting sequence number, which works similarly as the match id, to get a series of game results.
+We can use the starting \gls{sequence number}, which works similarly as the \gls{match id}, to get a series of game results.
 And by calling a third party API from OpenDota, we can get the important key to constructing the URL to download replays again.
 
 The specific steps of gaining our data are as following:
@@ -236,12 +365,12 @@ The match result is in JSON format so we can almost directly store it. The infor
 		\item The hero he uses in this match
 		\item The items he possesses at the end of the match
 		\item The player's kills/deaths/assists
-		\item The player's leaver status (whether AFK/disconnected or not)
+		\item The player's leaver status (whether \gls{AFK}/disconnected or not)
 		\item The gold he possesses at the end of the match
-		\item The amount of last-hits and denies the player got during the match
-		\item The average gold/XP he gained per minute
+		\item The amount of \gls{last-hit}s and denies the player got during the match
+		\item The average \gls{gold}/\gls{XP} he gained per minute
 		\item The total gold he spent during the match
-		\item The amount of damage the player dealt to heroes/towers
+		\item The amount of damage the player dealt to heroes/\gls{towers}
 		\item The amount of health the player had healed on heroes
 		\item The player's level at match end
 		\item A list detailing a player's ability upgrades, including the ability and the upgrading time
@@ -254,14 +383,14 @@ The match result is in JSON format so we can almost directly store it. The infor
 	\item The matches unique ID
 	\item A sequence number, representing the order in which matches were recorded
 	\item The tower status of both teams
-	\item The barracks status of both teams
+	\item The \gls{barracks} status of both teams
 	\item The server cluster the match was played upon
-	\item The time in seconds since the match began when first-blood occurred
-	\item The mode of the match
+	\item The time in seconds since the match began when \gls{first-blood} occurred
+	\item The \gls{mode} of the match
 	\item The number of human players within the match
 	\item The league that this match was a part of
 	\item The number of thumbs-up/thumbs-down the game has received by users
-	\item A list of the picks and bans in the match, if the game mode is Captains Mode
+	\item A list of the picks and bans in the match, if the game \gls{mode} is Captains Mode
 \end{itemize}
 
 
@@ -287,13 +416,13 @@ Based on our exploration, the following data will be available:
 	\begin{itemize}
 		\item deals damage to another one
 		\item heals another one
-		\item receives/loses a buff/debuff
+		\item receives/loses a \gls{buff}/\gls{debuff}
 		\item kills another one
 		\item uses his ability
 		\item uses an item
 		\item buys an item
-		\item receives/loses some gold
-		\item gains some XP
+		\item receives/loses some \gls{gold}
+		\item gains some \gls{XP}
 		\item buys back (spending money in order to instantly re-spawn)
 	\end{itemize}
 	% lifestate
@@ -410,8 +539,8 @@ In the data analysis phase:
 	\item When we are answering the relationship between the teams or players, we will have to extract and load the data to a secondary database, like neo4j
 \end{itemize}
 
+\printglossary
 
 %-------%
 
 \end{document}
-

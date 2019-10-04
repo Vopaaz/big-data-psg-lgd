@@ -6,6 +6,10 @@
 *.synctex
 *.synctex(busy)
 *.toc
+*.glo
+*.ist
+*.glg
+*.gls
 
 # LaTeX minted package
 _minted*/

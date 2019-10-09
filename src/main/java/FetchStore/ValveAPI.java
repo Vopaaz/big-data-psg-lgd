@@ -20,7 +20,7 @@ import Mongo.MongoConfig;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import java.util.concurrent.Semaphore;
 
 public class ValveAPI {
 
@@ -46,6 +46,8 @@ public class ValveAPI {
 //    private int rankedGamesNum;
     private AtomicInteger publicGamesNum;
     private AtomicInteger rankedGamesNum;
+    final int MAX_NOF_THREADS = 5;
+    final Semaphore mySemaphore = new Semaphore(MAX_NOF_THREADS);
 
     MongoConfig conf;
     MongoClient mongoClient;
@@ -108,33 +110,37 @@ public class ValveAPI {
                 list.add(curMatch.getLong("match_id"));
                 publicGamesNum.incrementAndGet();
                 rankedGamesNum.incrementAndGet();
-                Runnable downloader = new RunDownload(list, professionalGames);
-                Thread downloadTask = new Thread(downloader);
-                syncSet.add(downloadTask);
-                downloadTask.start();
+                startDownloadTask(list, professionalGames);
             }
             if(publicGamesNum.get() > 0 && curMatch.getInt("lobby_type") == 0 && checkValidGame(curMatch)) {
                 List<Long> list = new ArrayList<>();
                 list.add(curMatch.getLong("match_id"));
                 publicGamesNum.decrementAndGet();
-                Runnable downloader = new RunDownload(list, publicGames);
-                Thread downloadTask = new Thread(downloader);
-                syncSet.add(downloadTask);
-                downloadTask.start();
+                startDownloadTask(list, publicGames);
             }
             if(rankedGamesNum.get() > 0 && curMatch.getInt("lobby_type") == 7 && checkValidGame(curMatch)) {
                 List<Long> list = new ArrayList<>();
                 list.add(curMatch.getLong("match_id"));
                 rankedGamesNum.decrementAndGet();
-                Runnable downloader = new RunDownload(list, rankedGames);
-                Thread downloadTask = new Thread(downloader);
-                syncSet.add(downloadTask);
-                downloadTask.start();
+                startDownloadTask(list, rankedGames);
             }
             writeDetailsToDB(curMatch, start);
         }
     }
 
+    private void startDownloadTask(List<Long> list, String directory) {
+        Runnable downloader = new RunDownload(list, directory);
+        Thread downloadTask = new Thread(downloader);
+        syncSet.add(downloadTask);
+        try {
+            mySemaphore.acquire();
+            downloadTask.start();
+        } catch (Exception e) {
+            failToDownload(directory);
+        } finally {
+            mySemaphore.release();
+        }
+    }
     private boolean checkValidGame(JSONObject match) {
         JSONArray playerStatus = match.getJSONArray("players");
         int len = playerStatus.length();

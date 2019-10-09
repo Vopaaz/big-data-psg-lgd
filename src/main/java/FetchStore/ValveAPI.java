@@ -6,6 +6,7 @@ import java.net.URL;
 import java.util.List;
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import ParseReplay.ParseReplayExecutor;
 import org.apache.commons.compress.compressors.bzip2.*;
@@ -41,8 +42,10 @@ public class ValveAPI {
     private final String replaysUnzippedDirSuffix = ".dem";
     private final String jsonPrefix = "./test-data/match-details/";
     private final String jsonSuffix = ".json";
-    private int publicGamesNum;
-    private int rankedGamesNum;
+//    private int publicGamesNum;
+//    private int rankedGamesNum;
+    private AtomicInteger publicGamesNum;
+    private AtomicInteger rankedGamesNum;
 
     MongoConfig conf;
     MongoClient mongoClient;
@@ -54,7 +57,8 @@ public class ValveAPI {
     ParseReplayExecutor parser;
     OpendotaAPI opendotaAPI;
     Logger logger;
-
+    Set<Thread> set;
+    Set<Thread> syncSet;
     public ValveAPI(String configPath) {
         logger = LoggerFactory.getLogger(ValveAPI.class);
         conf = new MongoConfig(configPath);
@@ -66,9 +70,11 @@ public class ValveAPI {
         professionalCollection = database.getCollection(conf.getMongoProfessionalMatchCollectionName());
         matchesCollection = database.getCollection(conf.getMongoMatchDetailsCollectionName());
         opendotaAPI = new OpendotaAPI();
-        publicGamesNum = 0;
-        rankedGamesNum = 0;
+        publicGamesNum = new AtomicInteger(0);
+        rankedGamesNum = new AtomicInteger(0);
         parser = new ParseReplayExecutor();
+        set = new HashSet<>();
+        syncSet = Collections.synchronizedSet(set);
     }
 
     public boolean uncompressBz2(String source, String target) {
@@ -100,26 +106,29 @@ public class ValveAPI {
             if(curMatch.getInt("leagueid") != 0) {
                 List<Long> list = new ArrayList<>();
                 list.add(curMatch.getLong("match_id"));
-                publicGamesNum++;
-                rankedGamesNum++;
+                publicGamesNum.incrementAndGet();
+                rankedGamesNum.incrementAndGet();
                 Runnable downloader = new RunDownload(list, professionalGames);
                 Thread downloadTask = new Thread(downloader);
+                syncSet.add(downloadTask);
                 downloadTask.start();
             }
-            if(publicGamesNum != 0 && curMatch.getInt("lobby_type") == 0 && checkValidGame(curMatch)) {
+            if(publicGamesNum.get() > 0 && curMatch.getInt("lobby_type") == 0 && checkValidGame(curMatch)) {
                 List<Long> list = new ArrayList<>();
                 list.add(curMatch.getLong("match_id"));
-                publicGamesNum--;
+                publicGamesNum.decrementAndGet();
                 Runnable downloader = new RunDownload(list, publicGames);
                 Thread downloadTask = new Thread(downloader);
+                syncSet.add(downloadTask);
                 downloadTask.start();
             }
-            if(rankedGamesNum != 0 && curMatch.getInt("lobby_type") == 7 && checkValidGame(curMatch)) {
+            if(rankedGamesNum.get() > 0 && curMatch.getInt("lobby_type") == 7 && checkValidGame(curMatch)) {
                 List<Long> list = new ArrayList<>();
                 list.add(curMatch.getLong("match_id"));
-                rankedGamesNum--;
+                rankedGamesNum.decrementAndGet();
                 Runnable downloader = new RunDownload(list, rankedGames);
                 Thread downloadTask = new Thread(downloader);
+                syncSet.add(downloadTask);
                 downloadTask.start();
             }
             writeDetailsToDB(curMatch, start);
@@ -193,7 +202,7 @@ public class ValveAPI {
     }
 
 
-    private boolean downloadURL(String url, String fileTarget) {
+    private boolean downloadURL(String url, String fileTarget, String direcotry) {
         try {
             logger.info("Start downloading {} to address {}.", url, fileTarget);
             URL obj = new URL(url);
@@ -205,6 +214,7 @@ public class ValveAPI {
             logger.error("Failed to download {} to address {}.", url, fileTarget);
             logger.error("Skip the file from URL {}.", url);
             e.printStackTrace();
+            failToDownload(direcotry);
             return false;
         }
         return true;
@@ -279,7 +289,11 @@ public class ValveAPI {
             curStartSeqNum = Long.toString(++nextSeqNum);
             logger.info("Next batch starting sequence is {}.", curStartSeqNum);
         }
+        for(Thread t: syncSet) {
+            t.join();
+        }
         Date end = new Date();
+        logger.info("Public games number: {}, ranked games number: {}", publicGamesNum, rankedGamesNum);
         logger.info("Successfully complete the task with start sequence number {}, and total number {}.", startSeqNum, totalNum);
         logger.info("Next batch should start with sequence number: {}.", curStartSeqNum);
         logger.info("The task was done in {} seconds.", (end.getTime() - start.getTime()) / 1000.0);
@@ -356,6 +370,23 @@ public class ValveAPI {
         return sb.toString();
     }
 
+    public void failToDownload(String directory) {
+        if (directory.equals(publicGames)) {
+            publicGamesNum.incrementAndGet();
+            logger.info("Failed to download a public game.");
+            logger.info("Add 1 to public game's number.");
+        } else if (directory.equals(rankedGames)) {
+            logger.info("Failed to download a ranked game.");
+            logger.info("Add 1 to ranked game's number.");
+            rankedGamesNum.incrementAndGet();
+        } else {
+            logger.info("Failed to download a professional game.");
+            logger.info("Subtract 1 to public game's and ranked game's number.");
+            publicGamesNum.decrementAndGet();
+            rankedGamesNum.decrementAndGet();
+        }
+    }
+
     private class RunDownload implements Runnable {
         List<Long> matches;
         String directory;
@@ -374,7 +405,7 @@ public class ValveAPI {
                 for (int i = 0; i < matches.size(); ++i) {
                     String zippedDir = replaysZippedDirPrefix + directory + matches.get(i) + replaysZippedDirSuffix;
                     String unzippedDir = replaysUnzippedDirPrefix + directory + matches.get(i) + replaysUnzippedDirSuffix;
-                    if (downloadURL(urls.get(i), zippedDir)) {
+                    if(downloadURL(urls.get(i), zippedDir, directory)){
                         if (uncompressBz2(zippedDir, unzippedDir)) {
                             if (directory.equals(publicGames)) {
                                 logger.info("One public matching game was downloaded.");
@@ -393,15 +424,9 @@ public class ValveAPI {
                     }
                 }
             } catch (Exception e) {
-                if (directory.equals(publicGames)) {
-                    publicGamesNum++;
-                } else if (directory.equals(rankedGames)) {
-                    rankedGamesNum++;
-                } else {
-                    publicGamesNum--;
-                    rankedGamesNum--;
-                }
+                failToDownload(directory);
             }
+
         }
     }
 }

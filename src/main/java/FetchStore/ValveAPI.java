@@ -134,6 +134,7 @@ public class ValveAPI {
         syncSet.add(downloadTask);
         try {
             mySemaphore.acquire();
+            logger.info("Successfully start a thread to down load a {} replay.", directory);
             downloadTask.start();
         } catch (Exception e) {
             failToDownload(directory);
@@ -152,36 +153,6 @@ public class ValveAPI {
         return true;
     }
 
-//    private void downloadRepByMatchID(List<Long> matches, String directory) throws Exception {
-//        List<String> urls = opendotaAPI.getRepInfo(matches);
-//        for(int i = 0; i < matches.size(); ++i) {
-//            String zippedDir = replaysZippedDirPrefix + directory + matches.get(i) + replaysZippedDirSuffix;
-//            String unzippedDir = replaysUnzippedDirPrefix + directory + matches.get(i) + replaysUnzippedDirSuffix;
-//            if(downloadURL(urls.get(i), zippedDir)) {
-//                if(uncompressBz2(zippedDir, unzippedDir)) {
-//                    if(directory.equals(publicGames)) {
-//                        logger.info("One public matching game was downloaded.");
-//                        logger.info("Start parsing it and save the result to db");
-//                        insertDocumentToDB(parser.getReplayInfoDocument(unzippedDir, matches.get(i)), publicCollection);
-//                        publicGamesNum--;
-//                    }
-//                    else if(directory.equals(rankedGames)) {
-//                        logger.info("One ranked game was downloaded.");
-//                        logger.info("Start parsing it and save the result to db");
-//                        insertDocumentToDB(parser.getReplayInfoDocument(unzippedDir, matches.get(i)), rankedCollection);
-//                        rankedGamesNum--;
-//                    }
-//                    else {
-//                        logger.info("One professional game was downloaded.");
-//                        logger.info("Start parsing it and save the result to db");
-//                        insertDocumentToDB(parser.getReplayInfoDocument(unzippedDir, matches.get(i)), professionalCollection);
-//                        publicGamesNum++;
-//                        rankedGamesNum++;
-//                    }
-//                }
-//            }
-//        }
-//    }
 
     public void writeDetailsToDB(JSONObject match, Date start) throws Exception{
         Document document = Document.parse(match.toString());

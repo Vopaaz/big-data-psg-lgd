@@ -32,7 +32,7 @@ public class ValveAPI {
             "http://api.steampowered.com/IDOTA2Match_570/GetMatchHistory/v1";
     private final String GET_MATCH_HISTORY_BY_SEQUENCE_NUM =
             "http://api.steampowered.com/IDOTA2Match_570/GetMatchHistoryBySequenceNum/v1";
-    private final String version = "v0.1.0";
+    private final String version = "v0.1.1";
     private final String replaysZippedDirPrefix = "./test-data/replays/zipped/";
     private final String replaysZippedDirSuffix = ".dem.bz2";
     private final String professionalGames = "professional/";
@@ -384,26 +384,30 @@ public class ValveAPI {
                     String unzippedDir = replaysUnzippedDirPrefix + directory + matches.get(i) + replaysUnzippedDirSuffix;
                     if(downloadURL(urls.get(i), zippedDir, directory)){
                         if (uncompressBz2(zippedDir, unzippedDir)) {
-                            if (directory.equals(publicGames)) {
-                                logger.info("One public matching game was downloaded.");
-                                logger.info("Start parsing it and save the result to db");
-                                insertDocumentToDB(parser.getReplayInfoDocument(unzippedDir, matches.get(i)), publicCollection);
-                            } else if (directory.equals(rankedGames)) {
-                                logger.info("One ranked game was downloaded.");
-                                logger.info("Start parsing it and save the result to db");
-                                insertDocumentToDB(parser.getReplayInfoDocument(unzippedDir, matches.get(i)), rankedCollection);
-                            } else {
-                                logger.info("One professional game was downloaded.");
-                                logger.info("Start parsing it and save the result to db");
-                                insertDocumentToDB(parser.getReplayInfoDocument(unzippedDir, matches.get(i)), professionalCollection);
-                            }
+                            parseAndSave(unzippedDir, matches.get(i), directory);
                         }
                     }
                 }
             } catch (Exception e) {
                 failToDownload(directory);
             }
-
         }
+
+        private void parseAndSave(String unzippedDir, Long match, String directory) {
+            if (directory.equals(publicGames)) {
+                logger.info("One public matching game was downloaded.");
+                logger.info("Start parsing it and save the result to db");
+                insertDocumentToDB(parser.getReplayInfoDocument(unzippedDir, match), publicCollection);
+            } else if (directory.equals(rankedGames)) {
+                logger.info("One ranked game was downloaded.");
+                logger.info("Start parsing it and save the result to db");
+                insertDocumentToDB(parser.getReplayInfoDocument(unzippedDir, match), rankedCollection);
+            } else {
+                logger.info("One professional game was downloaded.");
+                logger.info("Start parsing it and save the result to db");
+                insertDocumentToDB(parser.getReplayInfoDocument(unzippedDir, match), professionalCollection);
+            }
+        }
+
     }
 }

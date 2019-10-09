@@ -9,7 +9,7 @@ import org.bson.Document;
 public class ParseReplayExecutor {
     private final String version = "v0.1.1";
 
-    public Document getReplayInfoDocument(String file, String matchId) {
+    public Document getReplayInfoDocument(String file, Long matchId) {
         try {
             Date start = new Date();
             Document document = new Document("matchid", matchId);

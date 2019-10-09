@@ -14,7 +14,7 @@ public class OpendotaAPI {
     private final static String AUTHORIZE_KEY = "";
     private final static String REPALYS = "https://api.opendota.com/api/replays";
 
-    public static List<String> getRepInfo(List<String> ids) throws Exception{
+    public static List<String> getRepInfo(List<Long> ids) throws Exception{
         if(ids.size() == 0) return new ArrayList<>();
 
         StringBuilder openAPIUrl = new StringBuilder();

@@ -98,54 +98,75 @@ public class ValveAPI {
             Date start = new Date();
             JSONObject curMatch = matches.getJSONObject(i);
             if(curMatch.getInt("leagueid") != 0) {
-                List<String> list = new ArrayList<>();
-                list.add(Long.toString(curMatch.getLong("match_id")));
-                downloadRepByMatchID(list, professionalGames);
+                List<Long> list = new ArrayList<>();
+                list.add(curMatch.getLong("match_id"));
+                publicGamesNum++;
+                rankedGamesNum++;
+                Runnable downloader = new RunDownload(list, professionalGames);
+                Thread downloadTask = new Thread(downloader);
+                downloadTask.start();
             }
-            if(publicGamesNum != 0 && curMatch.getInt("lobby_type") == 0) {
-                List<String> list = new ArrayList<>();
-                list.add(Long.toString(curMatch.getLong("match_id")));
-                downloadRepByMatchID(list, publicGames);
+            if(publicGamesNum != 0 && curMatch.getInt("lobby_type") == 0 && checkValidGame(curMatch)) {
+                List<Long> list = new ArrayList<>();
+                list.add(curMatch.getLong("match_id"));
+                publicGamesNum--;
+                Runnable downloader = new RunDownload(list, publicGames);
+                Thread downloadTask = new Thread(downloader);
+                downloadTask.start();
             }
-            if(rankedGamesNum != 0 && curMatch.getInt("lobby_type") == 7) {
-                List<String> list = new ArrayList<>();
-                list.add(Long.toString(curMatch.getLong("match_id")));
-                downloadRepByMatchID(list, rankedGames);
+            if(rankedGamesNum != 0 && curMatch.getInt("lobby_type") == 7 && checkValidGame(curMatch)) {
+                List<Long> list = new ArrayList<>();
+                list.add(curMatch.getLong("match_id"));
+                rankedGamesNum--;
+                Runnable downloader = new RunDownload(list, rankedGames);
+                Thread downloadTask = new Thread(downloader);
+                downloadTask.start();
             }
             writeDetailsToDB(curMatch, start);
         }
     }
 
-    private void downloadRepByMatchID(List<String> matches, String directory) throws Exception {
-        List<String> urls = opendotaAPI.getRepInfo(matches);
-        for(int i = 0; i < matches.size(); ++i) {
-            String zippedDir = replaysZippedDirPrefix + directory + matches.get(i) + replaysZippedDirSuffix;
-            String unzippedDir = replaysUnzippedDirPrefix + directory + matches.get(i) + replaysUnzippedDirSuffix;
-            if(downloadURL(urls.get(i), zippedDir)) {
-                if(uncompressBz2(zippedDir, unzippedDir)) {
-                    if(directory.equals(publicGames)) {
-                        logger.info("One public matching game was downloaded.");
-                        logger.info("Start parsing it and save the result to db");
-                        insertDocumentToDB(parser.getReplayInfoDocument(unzippedDir, matches.get(i)), publicCollection);
-                        publicGamesNum--;
-                    }
-                    else if(directory.equals(rankedGames)) {
-                        logger.info("One ranked game was downloaded.");
-                        logger.info("Start parsing it and save the result to db");
-                        insertDocumentToDB(parser.getReplayInfoDocument(unzippedDir, matches.get(i)), rankedCollection);
-                        rankedGamesNum--;
-                    }
-                    else {
-                        logger.info("One professional game was downloaded.");
-                        logger.info("Start parsing it and save the result to db");
-                        insertDocumentToDB(parser.getReplayInfoDocument(unzippedDir, matches.get(i)), professionalCollection);
-                        publicGamesNum++;
-                        rankedGamesNum++;
-                    }
-                }
-            }
+    private boolean checkValidGame(JSONObject match) {
+        JSONArray playerStatus = match.getJSONArray("players");
+        int len = playerStatus.length();
+        if(len != 10) return false;
+        for(int i = 0; i < len; ++i) {
+            JSONObject curPlayer = playerStatus.getJSONObject(i);
+            if(curPlayer.getInt("leaver_status") != 0) return false;
         }
+        return true;
     }
+
+//    private void downloadRepByMatchID(List<Long> matches, String directory) throws Exception {
+//        List<String> urls = opendotaAPI.getRepInfo(matches);
+//        for(int i = 0; i < matches.size(); ++i) {
+//            String zippedDir = replaysZippedDirPrefix + directory + matches.get(i) + replaysZippedDirSuffix;
+//            String unzippedDir = replaysUnzippedDirPrefix + directory + matches.get(i) + replaysUnzippedDirSuffix;
+//            if(downloadURL(urls.get(i), zippedDir)) {
+//                if(uncompressBz2(zippedDir, unzippedDir)) {
+//                    if(directory.equals(publicGames)) {
+//                        logger.info("One public matching game was downloaded.");
+//                        logger.info("Start parsing it and save the result to db");
+//                        insertDocumentToDB(parser.getReplayInfoDocument(unzippedDir, matches.get(i)), publicCollection);
+//                        publicGamesNum--;
+//                    }
+//                    else if(directory.equals(rankedGames)) {
+//                        logger.info("One ranked game was downloaded.");
+//                        logger.info("Start parsing it and save the result to db");
+//                        insertDocumentToDB(parser.getReplayInfoDocument(unzippedDir, matches.get(i)), rankedCollection);
+//                        rankedGamesNum--;
+//                    }
+//                    else {
+//                        logger.info("One professional game was downloaded.");
+//                        logger.info("Start parsing it and save the result to db");
+//                        insertDocumentToDB(parser.getReplayInfoDocument(unzippedDir, matches.get(i)), professionalCollection);
+//                        publicGamesNum++;
+//                        rankedGamesNum++;
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     public void writeDetailsToDB(JSONObject match, Date start) throws Exception{
         Document document = Document.parse(match.toString());
@@ -333,5 +354,54 @@ public class ValveAPI {
         }
 
         return sb.toString();
+    }
+
+    private class RunDownload implements Runnable {
+        List<Long> matches;
+        String directory;
+        public RunDownload(List<Long> matches, String directory) {
+            this.matches = matches;
+            this.directory = directory;
+        }
+
+        public void run() {
+            downloadRepByMatchID(matches, directory);
+        }
+
+        private void downloadRepByMatchID(List<Long> matches, String directory) {
+            try {
+                List<String> urls = opendotaAPI.getRepInfo(matches);
+                for (int i = 0; i < matches.size(); ++i) {
+                    String zippedDir = replaysZippedDirPrefix + directory + matches.get(i) + replaysZippedDirSuffix;
+                    String unzippedDir = replaysUnzippedDirPrefix + directory + matches.get(i) + replaysUnzippedDirSuffix;
+                    if (downloadURL(urls.get(i), zippedDir)) {
+                        if (uncompressBz2(zippedDir, unzippedDir)) {
+                            if (directory.equals(publicGames)) {
+                                logger.info("One public matching game was downloaded.");
+                                logger.info("Start parsing it and save the result to db");
+                                insertDocumentToDB(parser.getReplayInfoDocument(unzippedDir, matches.get(i)), publicCollection);
+                            } else if (directory.equals(rankedGames)) {
+                                logger.info("One ranked game was downloaded.");
+                                logger.info("Start parsing it and save the result to db");
+                                insertDocumentToDB(parser.getReplayInfoDocument(unzippedDir, matches.get(i)), rankedCollection);
+                            } else {
+                                logger.info("One professional game was downloaded.");
+                                logger.info("Start parsing it and save the result to db");
+                                insertDocumentToDB(parser.getReplayInfoDocument(unzippedDir, matches.get(i)), professionalCollection);
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                if (directory.equals(publicGames)) {
+                    publicGamesNum++;
+                } else if (directory.equals(rankedGames)) {
+                    rankedGamesNum++;
+                } else {
+                    publicGamesNum--;
+                    rankedGamesNum--;
+                }
+            }
+        }
     }
 }

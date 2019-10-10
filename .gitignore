@@ -46,3 +46,7 @@ test-data/**/*.dem.bz2
 # log files
 **/*.log
 **/*.txt
+
+# scala support
+.metals/
+.bloop/

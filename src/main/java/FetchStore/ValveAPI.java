@@ -234,6 +234,8 @@ public class ValveAPI {
             if(seqResult == null) {
                 logger.error("Failed to get batch start with sequence number {}", curStartSeqNum);
                 logger.error("Skip the current sequence number");
+                logger.error("Wait 3 seconds before the next call");
+                java.util.concurrent.TimeUnit.SECONDS.sleep(3);
                 long nextSeqNum = Long.parseLong(curStartSeqNum);
                 curStartSeqNum = Long.toString(++nextSeqNum);
                 continue;
@@ -247,7 +249,7 @@ public class ValveAPI {
 
             logger.info("Successfully writing a batch start with sequence number {} to database.", curStartSeqNum);
             sofar += matches.length();
-
+            logger.info("We have read {} matches sofar", sofar);
             if(matches.length() == 0) {
                 logger.error("Current sequence number is larger than the sequence number of every match");
                 Date end = new Date();

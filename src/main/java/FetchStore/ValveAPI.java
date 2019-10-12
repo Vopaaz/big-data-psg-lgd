@@ -25,7 +25,7 @@ import java.util.concurrent.Semaphore;
 public class ValveAPI {
 
     private final String USER_AGENT = "Mozilla/5.0";
-    private final String AUTHORIZE_KEY = "84D40EBACB89D8276076213A092A553C";
+    private List<String> keys;
     private final String GET_MATCH_DETAILS =
             "http://api.steampowered.com/IDOTA2Match_570/GetMatchDetails/v1";
     private final String GET_MATCH_HISTORY =
@@ -42,8 +42,7 @@ public class ValveAPI {
     private final String replaysUnzippedDirSuffix = ".dem";
     private final String jsonPrefix = "./test-data/match-details/";
     private final String jsonSuffix = ".json";
-//    private int publicGamesNum;
-//    private int rankedGamesNum;
+    private final Random rand = new Random();
     private AtomicInteger publicGamesNum;
     private AtomicInteger rankedGamesNum;
     final int MAX_NOF_THREADS = 5;
@@ -77,6 +76,7 @@ public class ValveAPI {
         parser = new ParseReplayExecutor();
         set = new HashSet<>();
         syncSet = Collections.synchronizedSet(set);
+        keys = conf.getKeys();
     }
 
     public boolean uncompressBz2(String source, String target) {
@@ -205,7 +205,7 @@ public class ValveAPI {
             List<String> fields = new ArrayList<>();
 
             fields.add("key");
-            fields.add(AUTHORIZE_KEY);
+            fields.add(keys.get(rand.nextInt(keys.size())));
             fields.add("start_at_match_seq_num");
             fields.add(seqNum);
             fields.add("matches_requested");
@@ -265,6 +265,7 @@ public class ValveAPI {
             logger.info("Successfully writing to a local JSON file");
             curStartSeqNum = Long.toString(++nextSeqNum);
             logger.info("Next batch starting sequence is {}.", curStartSeqNum);
+            java.util.concurrent.TimeUnit.SECONDS.sleep(1);
         }
         for(Thread t: syncSet) {
             t.join();
@@ -292,7 +293,7 @@ public class ValveAPI {
     public void getRecentMatches(String reqNum) throws Exception {
         List<String> fields = new ArrayList<>();
         fields.add("key");
-        fields.add(AUTHORIZE_KEY);
+        fields.add(keys.get(rand.nextInt(keys.size())));
         fields.add("matches_requested");
         fields.add(reqNum);
 

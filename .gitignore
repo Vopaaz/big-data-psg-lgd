@@ -18,7 +18,7 @@ _minted*/
 .DS_Store
 
 # Maven project
-target/
+**/target/
 .classpath
 .factorypath
 .project
@@ -46,3 +46,6 @@ config.yml
 # log files
 **/*.log
 **/*.txt
+
+# sbt project files
+project/

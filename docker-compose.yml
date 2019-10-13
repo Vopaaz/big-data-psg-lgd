@@ -13,15 +13,15 @@ services:
             - 27017:27017
         volumes:
             - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+            - ./mongo-volume:/data/db
     getmatchresult:
         image: ubuntu:18.04
         restart: always
-        volumes:
-            - "./work"
+        build: src/main/java
         depends_on:
             - mongodb
-    analytics:
-        image:
-        depends_on:
-            - getmatchresult
+    #analytics:
+    #    image:
+    #    depends_on:
+    #        - mongodb
         

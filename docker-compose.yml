@@ -1,0 +1,24 @@
+version: '3.7'
+
+services:
+    mongodb:
+        image: mongo:4.2
+        container_name: mongodb
+        restart: always
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: admin
+            MONGO_INITDB_ROOT_PASSWORD: admin1233456
+            MONGO_INITDB_DATABASE: Dota2
+        ports:
+            - 27017:27017
+        volumes:
+            - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    getmatchresult:
+        image: ubuntu:18.04
+        restart: always
+        volumes:
+            - "./work"
+        depends_on:
+            - mongodb
+
+        

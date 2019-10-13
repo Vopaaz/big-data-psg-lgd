@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.List;
 
 public class MongoConfig {
     private String path;
@@ -38,6 +39,11 @@ public class MongoConfig {
         return result;
     }
 
+    private List<String> getConfigItemList(String tags) {
+        Map temp = config;
+        return (List<String>) temp.get(tags);
+    }
+
     public int getMongoPort() {
         return Integer.parseInt(getConfigItem("MongoDB", "port"));
     }
@@ -62,6 +68,10 @@ public class MongoConfig {
 
     public String getMongoMatchDetailsCollectionName() {
         return getConfigItem("MongoDB", "collection", "match-result-collections");
+    }
+
+    public List<String> getKeys() {
+        return getConfigItemList("AuthorizeKey");
     }
 
 }

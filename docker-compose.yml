@@ -20,5 +20,8 @@ services:
             - "./work"
         depends_on:
             - mongodb
-
+    analytics:
+        image:
+        depends_on:
+            - getmatchresult
         

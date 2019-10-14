@@ -7,6 +7,7 @@ import org.apache.spark.SparkContext
 import org.apache.spark.SparkConf
 import java.util.ArrayList
 import scala.collection.JavaConversions._
+import org.bson.Document
 
 import org.apache.log4j.Logger
 import org.apache.log4j.Level
@@ -57,12 +58,11 @@ class TypeOfGame(val collection: String) {
     val rdd   = MongoSpark.load(spark.sparkContext)
 
     val combatlogs = rdd
-      .map(
+      .flatMap(
           x =>
             x.get("combatlog")
-              .asInstanceOf[ArrayList[org.bson.Document]]
+              .asInstanceOf[ArrayList[Document]]
       )
-      .flatMap(x => x)
 
     val valid_events = combatlogs
       .filter(

@@ -16,34 +16,40 @@ object EasyBQ123 {
   def main(args: Array[String]) {
     Logger.getLogger("org").setLevel(Level.OFF)
     Logger.getLogger("com").setLevel(Level.OFF)
-    val answer = new TypeOfGame("rankedGames")
-    println(answer.first_15min_gain("XP"))
+    val rankedGames = new TypeOfGame("rankedGames")
+    println(rankedGames.first_15min_gain("XP"))
+    // println(rankedGames.hero_having_most_stats("kill"))
   }
 }
 
 class TypeOfGame(val collection: String) {
 
   def get_spark_session(): SparkSession = {
-    if (Array("matchResults", "professionalGames", "publicGames", "rankedGames") contains collection) {
-
-      return SparkSession
-        .builder()
-        .master("local")
-        .appName("Test")
-        .config(
-            "spark.mongodb.input.uri",
-            "mongodb://127.0.0.1/dota2." + collection
-        )
-        .config(
-            "spark.mongodb.output.uri",
-            "mongodb://127.0.0.1/dota2." + collection
-        )
-        .getOrCreate()
-    } else {
+    if (!(Array(
+            "matchResults",
+            "professionalGames",
+            "publicGames",
+            "rankedGames"
+        ) contains collection)) {
       throw new IllegalArgumentException(
           collection + "is not a valid collection name"
       )
     }
+
+    return SparkSession
+      .builder()
+      .master("local")
+      .appName("Test")
+      .config(
+          "spark.mongodb.input.uri",
+          "mongodb://127.0.0.1/dota2." + collection
+      )
+      .config(
+          "spark.mongodb.output.uri",
+          "mongodb://127.0.0.1/dota2." + collection
+      )
+      .getOrCreate()
+
   }
 
   def first_15min_gain(gold_or_XP: String): String = {
@@ -94,4 +100,10 @@ class TypeOfGame(val collection: String) {
     return result
   }
 
+  def hero_having_most_stats(stats: String): String = {
+    val spark = get_spark_session()
+    val rdd   = MongoSpark.load(spark.sparkContext)
+
+    return "Nothing yet"
+  }
 }

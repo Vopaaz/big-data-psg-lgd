@@ -1,4 +1,4 @@
-package example
+package EasyBQ
 
 import org.apache.spark.sql.SparkSession
 import com.mongodb.spark._

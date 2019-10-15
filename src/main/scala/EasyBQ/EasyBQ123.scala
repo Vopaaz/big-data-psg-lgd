@@ -57,6 +57,7 @@ class TypeOfGame(val collection: String) {
   }
 
   def first_15min_gain(gold_or_XP: String): String = {
+    // Fixme: consider averaging on the match level
     val spark = get_spark_session()
     val rdd   = MongoSpark.load(spark.sparkContext)
 

@@ -18,8 +18,9 @@ object EasyBQ123 {
     Logger.getLogger("org").setLevel(Level.OFF)
     Logger.getLogger("com").setLevel(Level.OFF)
     val rankedGames = new TypeOfGame("rankedGames")
-    println(rankedGames.first_15min_gain("XP"))
+    // println(rankedGames.first_15min_gain("XP"))
     // println(rankedGames.hero_having_most_stats("kills"))
+    println(rankedGames.most_purchased_item())
   }
 }
 
@@ -60,14 +61,14 @@ class TypeOfGame(val collection: String) {
     val spark = get_spark_session()
     val rdd   = MongoSpark.load(spark.sparkContext)
 
-    val combatlogs = rdd
+    val combatlog = rdd
       .flatMap(
           x =>
             x.get("combatlog")
               .asInstanceOf[ArrayList[Document]]
       )
 
-    val valid_events = combatlogs
+    val valid_events = combatlog
       .filter(
           x => x.get("type") == gold_or_XP
       )
@@ -81,7 +82,7 @@ class TypeOfGame(val collection: String) {
           x =>
             Tuple2(
                 x._1,
-                x._2.aggregate(0D)(
+                x._2.aggregate(0d)(
                     (acc, item) =>
                       acc +
                         item.getInteger(
@@ -104,7 +105,8 @@ class TypeOfGame(val collection: String) {
       .countByValue()
 
     // Fixme: Int may overflow when using large dataset
-    val hero_gain_map: Map[Object, Double] = hero_gain.collect().toMap[Object, Double]
+    val hero_gain_map: Map[Object, Double] =
+      hero_gain.collect().toMap[Object, Double]
 
     var result: String = ""
     var max: Double    = 0
@@ -190,5 +192,30 @@ class TypeOfGame(val collection: String) {
 
     spark.stop()
     return result._1.toString()
+  }
+
+  def most_purchased_item(): String = {
+    val spark = get_spark_session()
+    val rdd   = MongoSpark.load(spark.sparkContext)
+
+    val combatlog = rdd
+      .flatMap(
+          x =>
+            x.get("combatlog")
+              .asInstanceOf[ArrayList[Document]]
+      )
+
+    val purchase_count = combatlog
+      .filter(
+          x => x.get("type") == "purchase"
+      )
+      .map(x => x.get("item"))
+      .countByValue()
+
+    val result =
+      purchase_count.filter(_._2 == purchase_count.values.max).keys.toList(0)
+
+    spark.stop()
+    return result.toString
   }
 }

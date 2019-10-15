@@ -17,15 +17,15 @@ object EasyBQ123 {
   def main(args: Array[String]) {
     Logger.getLogger("org").setLevel(Level.OFF)
     Logger.getLogger("com").setLevel(Level.OFF)
-    val rankedGames = new TypeOfGame("rankedGames")
-    println(rankedGames.first_15min_gain("XP"))
-    // println(rankedGames.hero_having_most_stats("kill"))
+    val rankedGames = new TypeOfGame("professionalGames")
+    // println(rankedGames.first_15min_gain("XP"))
+    println(rankedGames.hero_having_most_stats("kills"))
   }
 }
 
 class TypeOfGame(val collection: String) {
 
-  def get_spark_session(): SparkSession = {
+  def get_spark_session(match_result: Boolean = false): SparkSession = {
     if (!(Array(
             "matchResults",
             "professionalGames",
@@ -33,24 +33,27 @@ class TypeOfGame(val collection: String) {
             "rankedGames"
         ) contains collection)) {
       throw new IllegalArgumentException(
-          collection + "is not a valid collection name"
+          collection + " is not a valid collection name"
       )
     }
 
-    return SparkSession
+    val spark = SparkSession
       .builder()
       .master("local")
       .appName("Test")
       .config(
           "spark.mongodb.input.uri",
-          "mongodb://127.0.0.1/dota2." + collection
+          "mongodb://127.0.0.1/dota2." + (if (match_result) "matchResults"
+                                          else collection)
       )
       .config(
           "spark.mongodb.output.uri",
-          "mongodb://127.0.0.1/dota2." + collection
+          "mongodb://127.0.0.1/dota2." + (if (match_result) "matchResults"
+                                          else collection)
       )
       .getOrCreate()
 
+    return spark
   }
 
   def first_15min_gain(gold_or_XP: String): String = {
@@ -101,9 +104,73 @@ class TypeOfGame(val collection: String) {
   }
 
   def hero_having_most_stats(stats: String): String = {
-    val spark = get_spark_session()
+    if (!(Array(
+            "kills",
+            "assists",
+            "deaths",
+            "hero_healing"
+        ) contains stats)) {
+      throw new IllegalArgumentException(
+          stats + " is not a valid hero statistic."
+      )
+    }
+
+    val spark = get_spark_session(match_result = true)
     val rdd   = MongoSpark.load(spark.sparkContext)
 
-    return "Nothing yet"
+    def is_professional(x: Document): Boolean = {
+      return x.getInteger("leagueid") != 0
+    }
+
+    def is_ranked(x: Document): Boolean = {
+      return x.getInteger("lobby_type") == 7
+    }
+
+    def is_public(x: Document): Boolean = {
+      return x.getInteger("lobby_type") == 0
+    }
+
+    val is_wanted_match_type: Document => Boolean = collection match {
+      case "professionalGames" => is_professional
+      case "publicGames"       => is_public
+      case "rankedGames"       => is_ranked
+    }
+
+    val games = rdd.filter(is_wanted_match_type)
+
+    val hero_group = games
+      .flatMap(
+          x =>
+            x.get("players")
+              .asInstanceOf[ArrayList[Document]]
+      )
+      .groupBy(x => x.getInteger("hero_id"))
+
+    val hero_stats = hero_group
+      .map(
+          x =>
+            Tuple3(
+                x._1,
+                x._2.count(x => true),
+                x._2.aggregate(0)(
+                    (acc, item) => acc + item.getInteger(stats),
+                    (acc1, acc2) => acc1 + acc2
+                )
+            )
+      )
+      .map(
+          x =>
+            Tuple2(
+                x._1,
+                x._3 / x._2
+            )
+      )
+
+    val result = hero_stats.reduce(
+        (x, y) => if (x._2 > y._2) x else y
+    )
+
+    spark.stop()
+    return result._1.toString()
   }
 }

@@ -81,7 +81,7 @@ class TypeOfGame(val collection: String) {
           x =>
             Tuple2(
                 x._1,
-                x._2.aggregate(0)(
+                x._2.aggregate(0D)(
                     (acc, item) =>
                       acc +
                         item.getInteger(
@@ -104,12 +104,12 @@ class TypeOfGame(val collection: String) {
       .countByValue()
 
     // Fixme: Int may overflow when using large dataset
-    val hero_gain_map: Map[Object, Int] = hero_gain.collect().toMap[Object, Int]
+    val hero_gain_map: Map[Object, Double] = hero_gain.collect().toMap[Object, Double]
 
     var result: String = ""
     var max: Double    = 0
     for (key <- hero_gain_map.keys) {
-      var temp = hero_gain_map(key) / hero_game_count(key)
+      var temp = hero_gain_map(key) / hero_game_count(key).toDouble
 
       if (temp > max) {
         max = temp

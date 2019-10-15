@@ -17,9 +17,9 @@ object EasyBQ123 {
   def main(args: Array[String]) {
     Logger.getLogger("org").setLevel(Level.OFF)
     Logger.getLogger("com").setLevel(Level.OFF)
-    val rankedGames = new TypeOfGame("professionalGames")
-    // println(rankedGames.first_15min_gain("XP"))
-    println(rankedGames.hero_having_most_stats("kills"))
+    val rankedGames = new TypeOfGame("rankedGames")
+    println(rankedGames.first_15min_gain("XP"))
+    // println(rankedGames.hero_having_most_stats("kills"))
   }
 }
 
@@ -57,7 +57,6 @@ class TypeOfGame(val collection: String) {
   }
 
   def first_15min_gain(gold_or_XP: String): String = {
-    // Fixme: consider averaging on the match level
     val spark = get_spark_session()
     val rdd   = MongoSpark.load(spark.sparkContext)
 
@@ -93,12 +92,30 @@ class TypeOfGame(val collection: String) {
             )
       )
 
-    val result: String = hero_gain
-      .reduce(
-          (x, y) => if (x._2 > y._2) x else y
+    val hero_game_count = rdd
+      .flatMap(
+          x =>
+            x.get("info")
+              .asInstanceOf[Document]
+              .get("player_info")
+              .asInstanceOf[ArrayList[Document]]
       )
-      ._1
-      .toString()
+      .map(x => x.get("hero_name"))
+      .countByValue()
+
+    // Fixme: Int may overflow when using large dataset
+    val hero_gain_map: Map[Object, Int] = hero_gain.collect().toMap[Object, Int]
+
+    var result: String = ""
+    var max: Double    = 0
+    for (key <- hero_gain_map.keys) {
+      var temp = hero_gain_map(key) / hero_game_count(key)
+
+      if (temp > max) {
+        max = temp
+        result = key.toString()
+      }
+    }
 
     spark.stop()
     return result

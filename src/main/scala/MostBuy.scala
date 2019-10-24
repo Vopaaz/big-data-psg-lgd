@@ -5,29 +5,23 @@ import org.apache.spark.SparkContext
 import org.apache.spark.SparkConf
 import java.util.ArrayList
 import scala.collection.JavaConversions._
+import Mongo.MongoConfig
 
-object EasyBQJZW {
+object MostBuy {
+  val conf: MongoConfig = new MongoConfig("config.yml")
 
   val spark: SparkSession =
     SparkSession
       .builder()
       .master("local")
-      .appName("TEST_JZW")
-      .config("spark.mongodb.input.uri", "mongodb://127.0.0.1/dota2.matchResults")
-      .config("spark.mongodb.output.uri", "mongodb://127.0.0.1/dota2.matchResults")
+      .appName(conf.getAppName())
+      .config("spark.mongodb.input.uri", conf.getInput())
+      .config("spark.mongodb.output.uri", conf.getOutput())
       .getOrCreate()
 
   def main(args: Array[String]) {
-    cost_time()
     most_buy()
     spark.stop()
-  }
-
-  def cost_time() {
-    val rdd = MongoSpark.load(spark.sparkContext)
-    val duration = rdd
-      .map(x => (x.get("duration").toString.toInt, 1)).reduce((x, y) => (x._1 + y._1, x._2 + y._2))
-    println(s"Average cost of time is ${duration._1/(duration._2 * 60)} minutes")
   }
 
   def most_buy() {

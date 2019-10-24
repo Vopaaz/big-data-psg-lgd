@@ -6,6 +6,7 @@ import java.net.URL;
 import java.util.List;
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import ParseReplay.ParseReplayExecutor;
 import org.apache.commons.compress.compressors.bzip2.*;
@@ -19,19 +20,19 @@ import Mongo.MongoConfig;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import java.util.concurrent.Semaphore;
 
 public class ValveAPI {
 
     private final String USER_AGENT = "Mozilla/5.0";
-    private final String AUTHORIZE_KEY = "84D40EBACB89D8276076213A092A553C";
+    private List<String> keys;
     private final String GET_MATCH_DETAILS =
             "http://api.steampowered.com/IDOTA2Match_570/GetMatchDetails/v1";
     private final String GET_MATCH_HISTORY =
             "http://api.steampowered.com/IDOTA2Match_570/GetMatchHistory/v1";
     private final String GET_MATCH_HISTORY_BY_SEQUENCE_NUM =
             "http://api.steampowered.com/IDOTA2Match_570/GetMatchHistoryBySequenceNum/v1";
-    private final String version = "v0.1.0";
+    private final String version = "v0.1.1";
     private final String replaysZippedDirPrefix = "./test-data/replays/zipped/";
     private final String replaysZippedDirSuffix = ".dem.bz2";
     private final String professionalGames = "professional/";
@@ -41,8 +42,11 @@ public class ValveAPI {
     private final String replaysUnzippedDirSuffix = ".dem";
     private final String jsonPrefix = "./test-data/match-details/";
     private final String jsonSuffix = ".json";
-    private int publicGamesNum;
-    private int rankedGamesNum;
+    private final Random rand = new Random();
+    private AtomicInteger publicGamesNum;
+    private AtomicInteger rankedGamesNum;
+    final int MAX_NOF_THREADS = 5;
+    final Semaphore mySemaphore = new Semaphore(MAX_NOF_THREADS);
 
     MongoConfig conf;
     MongoClient mongoClient;
@@ -54,7 +58,8 @@ public class ValveAPI {
     ParseReplayExecutor parser;
     OpendotaAPI opendotaAPI;
     Logger logger;
-
+    Set<Thread> set;
+    Set<Thread> syncSet;
     public ValveAPI(String configPath) {
         logger = LoggerFactory.getLogger(ValveAPI.class);
         conf = new MongoConfig(configPath);
@@ -66,9 +71,12 @@ public class ValveAPI {
         professionalCollection = database.getCollection(conf.getMongoProfessionalMatchCollectionName());
         matchesCollection = database.getCollection(conf.getMongoMatchDetailsCollectionName());
         opendotaAPI = new OpendotaAPI();
-        publicGamesNum = 0;
-        rankedGamesNum = 0;
+        publicGamesNum = new AtomicInteger(0);
+        rankedGamesNum = new AtomicInteger(0);
         parser = new ParseReplayExecutor();
+        set = new HashSet<>();
+        syncSet = Collections.synchronizedSet(set);
+        keys = conf.getKeys();
     }
 
     public boolean uncompressBz2(String source, String target) {
@@ -98,54 +106,53 @@ public class ValveAPI {
             Date start = new Date();
             JSONObject curMatch = matches.getJSONObject(i);
             if(curMatch.getInt("leagueid") != 0) {
-                List<String> list = new ArrayList<>();
-                list.add(Long.toString(curMatch.getLong("match_id")));
-                downloadRepByMatchID(list, professionalGames);
+                List<Long> list = new ArrayList<>();
+                list.add(curMatch.getLong("match_id"));
+                publicGamesNum.incrementAndGet();
+                rankedGamesNum.incrementAndGet();
+                startDownloadTask(list, professionalGames);
             }
-            if(publicGamesNum != 0 && curMatch.getInt("lobby_type") == 0) {
-                List<String> list = new ArrayList<>();
-                list.add(Long.toString(curMatch.getLong("match_id")));
-                downloadRepByMatchID(list, publicGames);
+            if(publicGamesNum.get() > 0 && curMatch.getInt("lobby_type") == 0 && checkValidGame(curMatch)) {
+                List<Long> list = new ArrayList<>();
+                list.add(curMatch.getLong("match_id"));
+                publicGamesNum.decrementAndGet();
+                startDownloadTask(list, publicGames);
             }
-            if(rankedGamesNum != 0 && curMatch.getInt("lobby_type") == 7) {
-                List<String> list = new ArrayList<>();
-                list.add(Long.toString(curMatch.getLong("match_id")));
-                downloadRepByMatchID(list, rankedGames);
+            if(rankedGamesNum.get() > 0 && curMatch.getInt("lobby_type") == 7 && checkValidGame(curMatch)) {
+                List<Long> list = new ArrayList<>();
+                list.add(curMatch.getLong("match_id"));
+                rankedGamesNum.decrementAndGet();
+                startDownloadTask(list, rankedGames);
             }
             writeDetailsToDB(curMatch, start);
         }
     }
 
-    private void downloadRepByMatchID(List<String> matches, String directory) throws Exception {
-        List<String> urls = opendotaAPI.getRepInfo(matches);
-        for(int i = 0; i < matches.size(); ++i) {
-            String zippedDir = replaysZippedDirPrefix + directory + matches.get(i) + replaysZippedDirSuffix;
-            String unzippedDir = replaysUnzippedDirPrefix + directory + matches.get(i) + replaysUnzippedDirSuffix;
-            if(downloadURL(urls.get(i), zippedDir)) {
-                if(uncompressBz2(zippedDir, unzippedDir)) {
-                    if(directory.equals(publicGames)) {
-                        logger.info("One public matching game was downloaded.");
-                        logger.info("Start parsing it and save the result to db");
-                        insertDocumentToDB(parser.getReplayInfoDocument(unzippedDir, matches.get(i)), publicCollection);
-                        publicGamesNum--;
-                    }
-                    else if(directory.equals(rankedGames)) {
-                        logger.info("One ranked game was downloaded.");
-                        logger.info("Start parsing it and save the result to db");
-                        insertDocumentToDB(parser.getReplayInfoDocument(unzippedDir, matches.get(i)), rankedCollection);
-                        rankedGamesNum--;
-                    }
-                    else {
-                        logger.info("One professional game was downloaded.");
-                        logger.info("Start parsing it and save the result to db");
-                        insertDocumentToDB(parser.getReplayInfoDocument(unzippedDir, matches.get(i)), professionalCollection);
-                        publicGamesNum++;
-                        rankedGamesNum++;
-                    }
-                }
-            }
+    private void startDownloadTask(List<Long> list, String directory) {
+        Runnable downloader = new RunDownload(list, directory);
+        Thread downloadTask = new Thread(downloader);
+        syncSet.add(downloadTask);
+        try {
+            mySemaphore.acquire();
+            logger.info("Successfully start a thread to down load a {} replay.", directory);
+            downloadTask.start();
+        } catch (Exception e) {
+            failToDownload(directory);
+        } finally {
+            mySemaphore.release();
         }
     }
+    private boolean checkValidGame(JSONObject match) {
+        JSONArray playerStatus = match.getJSONArray("players");
+        int len = playerStatus.length();
+        if(len != 10) return false;
+        for(int i = 0; i < len; ++i) {
+            JSONObject curPlayer = playerStatus.getJSONObject(i);
+            if(curPlayer.getInt("leaver_status") != 0) return false;
+        }
+        return true;
+    }
+
 
     public void writeDetailsToDB(JSONObject match, Date start) throws Exception{
         Document document = Document.parse(match.toString());
@@ -172,7 +179,7 @@ public class ValveAPI {
     }
 
 
-    private boolean downloadURL(String url, String fileTarget) {
+    private boolean downloadURL(String url, String fileTarget, String direcotry) {
         try {
             logger.info("Start downloading {} to address {}.", url, fileTarget);
             URL obj = new URL(url);
@@ -184,6 +191,7 @@ public class ValveAPI {
             logger.error("Failed to download {} to address {}.", url, fileTarget);
             logger.error("Skip the file from URL {}.", url);
             e.printStackTrace();
+            failToDownload(direcotry);
             return false;
         }
         return true;
@@ -197,7 +205,7 @@ public class ValveAPI {
             List<String> fields = new ArrayList<>();
 
             fields.add("key");
-            fields.add(AUTHORIZE_KEY);
+            fields.add(keys.get(rand.nextInt(keys.size())));
             fields.add("start_at_match_seq_num");
             fields.add(seqNum);
             fields.add("matches_requested");
@@ -226,6 +234,8 @@ public class ValveAPI {
             if(seqResult == null) {
                 logger.error("Failed to get batch start with sequence number {}", curStartSeqNum);
                 logger.error("Skip the current sequence number");
+                logger.error("Wait 3 seconds before the next call");
+                java.util.concurrent.TimeUnit.SECONDS.sleep(3);
                 long nextSeqNum = Long.parseLong(curStartSeqNum);
                 curStartSeqNum = Long.toString(++nextSeqNum);
                 continue;
@@ -239,7 +249,7 @@ public class ValveAPI {
 
             logger.info("Successfully writing a batch start with sequence number {} to database.", curStartSeqNum);
             sofar += matches.length();
-
+            logger.info("We have read {} matches sofar", sofar);
             if(matches.length() == 0) {
                 logger.error("Current sequence number is larger than the sequence number of every match");
                 Date end = new Date();
@@ -257,8 +267,13 @@ public class ValveAPI {
             logger.info("Successfully writing to a local JSON file");
             curStartSeqNum = Long.toString(++nextSeqNum);
             logger.info("Next batch starting sequence is {}.", curStartSeqNum);
+            java.util.concurrent.TimeUnit.SECONDS.sleep(1);
+        }
+        for(Thread t: syncSet) {
+            t.join();
         }
         Date end = new Date();
+        logger.info("Public games number: {}, ranked games number: {}", publicGamesNum, rankedGamesNum);
         logger.info("Successfully complete the task with start sequence number {}, and total number {}.", startSeqNum, totalNum);
         logger.info("Next batch should start with sequence number: {}.", curStartSeqNum);
         logger.info("The task was done in {} seconds.", (end.getTime() - start.getTime()) / 1000.0);
@@ -280,7 +295,7 @@ public class ValveAPI {
     public void getRecentMatches(String reqNum) throws Exception {
         List<String> fields = new ArrayList<>();
         fields.add("key");
-        fields.add(AUTHORIZE_KEY);
+        fields.add(keys.get(rand.nextInt(keys.size())));
         fields.add("matches_requested");
         fields.add(reqNum);
 
@@ -333,5 +348,69 @@ public class ValveAPI {
         }
 
         return sb.toString();
+    }
+
+    public void failToDownload(String directory) {
+        if (directory.equals(publicGames)) {
+            publicGamesNum.incrementAndGet();
+            logger.info("Failed to download a public game.");
+            logger.info("Add 1 to public game's number.");
+        } else if (directory.equals(rankedGames)) {
+            logger.info("Failed to download a ranked game.");
+            logger.info("Add 1 to ranked game's number.");
+            rankedGamesNum.incrementAndGet();
+        } else {
+            logger.info("Failed to download a professional game.");
+            logger.info("Subtract 1 to public game's and ranked game's number.");
+            publicGamesNum.decrementAndGet();
+            rankedGamesNum.decrementAndGet();
+        }
+    }
+
+    private class RunDownload implements Runnable {
+        List<Long> matches;
+        String directory;
+        public RunDownload(List<Long> matches, String directory) {
+            this.matches = matches;
+            this.directory = directory;
+        }
+
+        public void run() {
+            downloadRepByMatchID(matches, directory);
+        }
+
+        private void downloadRepByMatchID(List<Long> matches, String directory) {
+            try {
+                List<String> urls = opendotaAPI.getRepInfo(matches);
+                for (int i = 0; i < matches.size(); ++i) {
+                    String zippedDir = replaysZippedDirPrefix + directory + matches.get(i) + replaysZippedDirSuffix;
+                    String unzippedDir = replaysUnzippedDirPrefix + directory + matches.get(i) + replaysUnzippedDirSuffix;
+                    if(downloadURL(urls.get(i), zippedDir, directory)){
+                        if (uncompressBz2(zippedDir, unzippedDir)) {
+                            parseAndSave(unzippedDir, matches.get(i), directory);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                failToDownload(directory);
+            }
+        }
+
+        private void parseAndSave(String unzippedDir, Long match, String directory) {
+            if (directory.equals(publicGames)) {
+                logger.info("One public matching game was downloaded.");
+                logger.info("Start parsing it and save the result to db");
+                insertDocumentToDB(parser.getReplayInfoDocument(unzippedDir, match), publicCollection);
+            } else if (directory.equals(rankedGames)) {
+                logger.info("One ranked game was downloaded.");
+                logger.info("Start parsing it and save the result to db");
+                insertDocumentToDB(parser.getReplayInfoDocument(unzippedDir, match), rankedCollection);
+            } else {
+                logger.info("One professional game was downloaded.");
+                logger.info("Start parsing it and save the result to db");
+                insertDocumentToDB(parser.getReplayInfoDocument(unzippedDir, match), professionalCollection);
+            }
+        }
+
     }
 }

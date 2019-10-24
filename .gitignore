@@ -50,3 +50,5 @@ config.yml
 # scala support
 .metals/
 .bloop/
+
+project/*

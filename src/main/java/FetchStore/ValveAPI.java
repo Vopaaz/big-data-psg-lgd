@@ -149,8 +149,13 @@ public class ValveAPI {
         if(len != 10) return false;
         for(int i = 0; i < len; ++i) {
             JSONObject curPlayer = playerStatus.getJSONObject(i);
-            Integer curLeaveStatus = curPlayer.getInt("leaver_status");
-            if(curLeaveStatus == null || curLeaveStatus != 0) return false;
+            try {
+                    Integer curLeaveStatus = curPlayer.getInt("leaver_status");
+                    if(curLeaveStatus == null || curLeaveStatus != 0) return false;
+            }
+            catch (Exception e) {
+                return false;
+            }
         }
         return true;
     }

@@ -142,13 +142,15 @@ public class ValveAPI {
             mySemaphore.release();
         }
     }
+
     private boolean checkValidGame(JSONObject match) {
         JSONArray playerStatus = match.getJSONArray("players");
         int len = playerStatus.length();
         if(len != 10) return false;
         for(int i = 0; i < len; ++i) {
             JSONObject curPlayer = playerStatus.getJSONObject(i);
-            if(curPlayer.getInt("leaver_status") != 0) return false;
+            Integer curLeaveStatus = curPlayer.getInt("leaver_status");
+            if(curLeaveStatus == null || curLeaveStatus != 0) return false;
         }
         return true;
     }

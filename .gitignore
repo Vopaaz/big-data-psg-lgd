@@ -49,3 +49,6 @@ config.yml
 
 # sbt project files
 project/
+
+# machine learning models
+models/

@@ -18,18 +18,6 @@ object EasyBQ {
       .getOrCreate()
 
   def main(args: Array[String]) {
-    // val rdd = MongoSpark.load(spark.sparkContext)
-    // // print(typeOf(rdd))
-    // // val prof = rdd.filter(x => x.getInteger("leagueid") != 0 )
-    // // val public = rdd.filter(x => (x.getInteger("game_mode") == 1 || x.getInteger("game_mode")  == 3) && x.getInteger("leagueid") == 0)
-    // val rank = rdd.filter(x => (x.getInteger("game_mode") == 22))
-    // val players = rdd.map(x => x.get("players").asInstanceOf[ArrayList[org.bson.Document]])
-    // // // println(prof.count())
-    // // // println(public.count())
-    // // // println(rank.count())
-    // val hero_ids = players.map(_.toSeq).flatMap(x => x.map(y => y)).map(x => x.getInteger("hero_id"))
-    // println("max is " + hero_ids.max())
-    // println("min is " + hero_ids.min())
     bad_manner()
     most_pick()
     most_ban()

@@ -7,6 +7,7 @@ import java.util.ArrayList
 import scala.collection.JavaConversions._
 import org.bson.Document
 import Spark.SparkSessionCreator
+import Spark.SparkMongoHelper
 import org.apache.log4j.Logger
 import org.apache.log4j.Level
 
@@ -20,13 +21,10 @@ object MostPurchasedItem {
   }
 
   def most_purchased_item(gameType: String) = {
-    gameType match {
-      case "rankedGames" => println("In ranked games:")
-      case "publicGames" => println("In publicGames games:")
-      case "professionalGames" => println("In professionalGames games:")
-    }
     val spark: SparkSession = sessionCreator.getSparkSession("MostUsedItem", gameType, gameType)
     val rdd   = MongoSpark.load(spark.sparkContext)
+
+    SparkMongoHelper.printGame(gameType)
 
     val combatlog = rdd
       .flatMap(

@@ -8,6 +8,7 @@ import scala.collection.JavaConversions._
 import org.apache.log4j.Logger
 import org.apache.log4j.Level
 import Spark.SparkSessionCreator
+import Spark.SparkMongoHelper
 import org.bson.Document
 import scala.collection.immutable.ListMap
 
@@ -15,17 +16,17 @@ object MostUsedItem {
   val sessionCreator: SparkSessionCreator = new SparkSessionCreator()
 
   def main(args: Array[String]) {
-    println("In ranked game:")
-    most_used_item("rankedGames")
-    println("In public game:")
     most_used_item("publicGames")
-    println("In professional game:")
+    most_used_item("rankedGames")
     most_used_item("professionalGames")
   }
 
   def most_used_item(gameType: String) = {
   val spark: SparkSession = sessionCreator.getSparkSession("MostUsedItem", gameType, gameType)
     val rdd = MongoSpark.load(spark.sparkContext)
+
+    SparkMongoHelper.printGame(gameType)
+
     val combatlog = rdd
       .flatMap(
           x =>

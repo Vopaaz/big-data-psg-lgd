@@ -14,13 +14,19 @@ object MostPick {
   val sessionCreator: SparkSessionCreator = new SparkSessionCreator()
 
   def main(args: Array[String]) {
-    most_pick()
+    most_pick("publicGames")
+    most_pick("rankedGames")
+    most_pick("professionalGames")
   }
 
-  def most_pick() {
+  def most_pick(gameType: String) {
     val spark: SparkSession = sessionCreator.getSparkSession("MostUsedItem", "matchResults", "matchResults")
     val rdd = MongoSpark.load(spark.sparkContext)
-    val most_pick_hero = rdd
+
+    SparkMongoHelper.printGame(gameType)
+
+    val games = rdd.filter(SparkMongoHelper.is_wanted_match_type(gameType)).filter(x => x.getInteger("human_players") == 10)
+    val most_pick_hero = games
       .map(x => x.get("players").asInstanceOf[ArrayList[org.bson.Document]])
       .map(_.toSeq)
       .flatMap(x => x.map(y => y))
@@ -31,7 +37,7 @@ object MostPick {
     spark.stop()
 
     val hero_name = SparkMongoHelper.getHeroName(most_pick_hero._1)
-    println("The most picked hero is " + hero_name)
+    println(s"The most picked hero is ${hero_name}. Picked ${most_pick_hero._2} times")
   }
 
 }

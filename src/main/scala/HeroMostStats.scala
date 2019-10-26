@@ -45,33 +45,11 @@ object HeroMostStats {
       )
     }
 
-    gameType match {
-      case "rankedGames" => println("In ranked games:")
-      case "publicGames" => println("In public games games:")
-      case "professionalGames" => println("In professional games games:")
-    }
+    SparkMongoHelper.printGame(gameType)
 
     val rdd   = MongoSpark.load(spark.sparkContext)
 
-    def is_professional(x: Document): Boolean = {
-      return x.getInteger("leagueid") != 0
-    }
-
-    def is_ranked(x: Document): Boolean = {
-      return x.getInteger("lobby_type") == 7
-    }
-
-    def is_public(x: Document): Boolean = {
-      return x.getInteger("lobby_type") == 0
-    }
-
-    val is_wanted_match_type: Document => Boolean = gameType match {
-      case "professionalGames" => is_professional
-      case "publicGames"       => is_public
-      case "rankedGames"       => is_ranked
-    }
-
-    val games = rdd.filter(is_wanted_match_type)
+    val games = rdd.filter(SparkMongoHelper.is_wanted_match_type(gameType))
 
     val hero_group = games
       .flatMap(
@@ -100,7 +78,6 @@ object HeroMostStats {
                 x._3 / x._2
             )
       )
-    // println(s"Hero stats ${hero_stats}")
 
     val result = hero_stats.reduce(
         (x, y) => if (x._2 > y._2) x else y

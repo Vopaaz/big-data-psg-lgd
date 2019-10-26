@@ -33,7 +33,7 @@ object MostBan {
 
     spark.stop()
     val hero_name = SparkMongoHelper.getHeroName(most_ban_hero._1)
-    println("The most banned hero is " + hero_name)
+    println(s"The most banned hero is ${hero_name}. Banned ${most_ban_hero._2} times")
   }
 
 }

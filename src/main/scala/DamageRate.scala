@@ -34,7 +34,7 @@ object DamageRate {
       else (x.getInteger("leaver_status") <= 4 && x.getInteger("leaver_status") >= 2))
       .filter(x => x.getInteger("leaver_status") <= 4)
       .map(x => (x.getInteger("hero_id"),
-        (x.getInteger("hero_damage").toDouble, (x.getInteger("gold_spent") + x.getInteger("gold")))))
+        (x.getInteger("hero_damage").toDouble, (x.getInteger("gold_spent").toLong + x.getInteger("gold").toLong))))
       .reduceByKey((a, b) => (a._1 + b._1, a._2 + b._2))
       .filter(x => (x._2._1 > 1) && (x._2._2 > 1))
       .map(x => (x._1, x._2._1 / x._2._2))

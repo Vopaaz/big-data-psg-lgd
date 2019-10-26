@@ -11,26 +11,24 @@ import scala.collection.JavaConversions._
 import org.apache.log4j.Logger
 import org.apache.log4j.Level
 import java.util.ArrayList
+import Spark.SparkSessionCreator
+import Spark.SparkMongoHelper
+
 object EcoDistributionTrain {
 
-  val spark: SparkSession =
-    SparkSession
-      .builder()
-      .master("local")
-      .appName("Test")
-      .config("spark.mongodb.input.uri", "mongodb://127.0.0.1/dota2.matchResults")
-      .config("spark.mongodb.output.uri", "mongodb://127.0.0.1/dota2.matchResults")
-      .getOrCreate()
+  val sessionCreator: SparkSessionCreator = new SparkSessionCreator()
+
 
   def main(args: Array[String]) {
     Logger.getLogger("org").setLevel(Level.OFF)
     Logger.getLogger("com").setLevel(Level.OFF)
     eco_distribution_train()
-    spark.stop()
   }
 
   def eco_distribution_train() {
+    val spark: SparkSession = sessionCreator.getSparkSession("EcoDistributionTrain", "matchResults", "matchResults")
     val rdd = MongoSpark.load(spark.sparkContext)
+
     val players = rdd
       .filter(x => x.getInteger("human_players") == 10)
       // get all the players and the win relationship
@@ -46,13 +44,19 @@ object EcoDistributionTrain {
       .map(x => (x._2, Vectors.dense( (x._1._1.map(a => a.toDouble / x._1._2 )).sortWith(_ < _).toArray)))
       // .take(10)
       // .foreach(println)
+
       val training_data = spark.createDataFrame(players).toDF("label", "features")
       val lr = new LogisticRegression
       val model = lr.fit(training_data)
+
       model.write.overwrite().save("./models/eco_distribute_model")
+
       val summary = model.binarySummary
       val accuracy = summary.accuracy
+
       println(s"The accuracy is $accuracy")
+
+      spark.stop()
 
 
   }

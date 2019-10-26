@@ -10,26 +10,21 @@ import org.apache.spark.SparkConf
 import scala.collection.JavaConversions._
 import org.apache.log4j.Logger
 import org.apache.log4j.Level
+import Spark.SparkSessionCreator
+import Spark.SparkMongoHelper
 
 object FirstBloodTrain {
 
-  val spark: SparkSession =
-    SparkSession
-      .builder()
-      .master("local")
-      .appName("Test")
-      .config("spark.mongodb.input.uri", "mongodb://127.0.0.1/dota2.matchResults")
-      .config("spark.mongodb.output.uri", "mongodb://127.0.0.1/dota2.matchResults")
-      .getOrCreate()
+  val sessionCreator: SparkSessionCreator = new SparkSessionCreator()
 
   def main(args: Array[String]) {
     Logger.getLogger("org").setLevel(Level.OFF)
     Logger.getLogger("com").setLevel(Level.OFF)
     first_blood_train()
-    spark.stop()
   }
 
   def first_blood_train() {
+    val spark: SparkSession = sessionCreator.getSparkSession("FirstBloodTrain", "matchResults", "matchResults")
     val rdd = MongoSpark.load(spark.sparkContext)
     val fb_and_dur = rdd.map(x => (x.getInteger("duration").toDouble, Vectors.dense(x.getInteger("first_blood_time").toDouble)))
     val training_data = spark.createDataFrame(fb_and_dur).toDF("label", "features")
@@ -41,6 +36,8 @@ object FirstBloodTrain {
     val regEval = new RegressionEvaluator().setMetricName("rmse")
     val rmse = regEval.evaluate(predictions)
     println(s"Root Mean Squared Error on training data: $rmse")
+    spark.stop()
+
   }
 
 }

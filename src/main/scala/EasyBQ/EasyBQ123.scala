@@ -104,7 +104,6 @@ class TypeOfGame(val collection: String) {
       .map(x => x.get("hero_name"))
       .countByValue()
 
-    // Fixme: Int may overflow when using large dataset
     val hero_gain_map: Map[Object, Double] =
       hero_gain.collect().toMap[Object, Double]
 

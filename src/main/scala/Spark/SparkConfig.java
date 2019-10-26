@@ -1,4 +1,4 @@
-package Mongo;
+package Spark;
 
 import org.yaml.snakeyaml.Yaml;
 
@@ -8,11 +8,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.List;
 
-public class MongoConfig {
+public class SparkConfig {
     private String path;
     private LinkedHashMap<String, Object> config;
 
-    public MongoConfig(String path) {
+    public SparkConfig(String path) {
         this.path = path;
         try {
             config = new Yaml().load(new FileReader(path));
@@ -44,34 +44,29 @@ public class MongoConfig {
         return (List<String>) temp.get(tags);
     }
 
-    public int getMongoPort() {
-        return Integer.parseInt(getConfigItem("MongoDB", "port"));
+    public String getCollection(String type) {
+        switch(type) {
+            case "rankedGames":
+                return getConfigItem("Spark", "rankedGames");
+            case "publicGames":
+                return getConfigItem("Spark", "publicGames");
+            case "professionalGames":
+                return getConfigItem("Spark", "professionalGames");
+            case "matchResults":
+                return getConfigItem("Spark", "matchResults");
+            case "heros":
+                return getConfigItem("Spark", "heros");
+            case "items":
+                return getConfigItem("Spark", "items");
+            default:
+                throw new IllegalArgumentException(
+                    type + " is not a valid collection name"
+                    );
+        }
     }
 
-    public String getMongoHost() {
-        return getConfigItem("MongoDB", "host");
-    }
-
-    public String getMongoDatabaseName() {
-        return getConfigItem("MongoDB", "database");
-    }
-
-    public String getMongoRankedMatchCollectionName() {
-        return getConfigItem("MongoDB", "collection", "ranked-collections");
-    }
-    public String getMongoPublicMatchCollectionName() {
-        return getConfigItem("MongoDB", "collection", "public-collections");
-    }
-    public String getMongoProfessionalMatchCollectionName() {
-        return getConfigItem("MongoDB", "collection", "professional-collections");
-    }
-
-    public String getMongoMatchDetailsCollectionName() {
-        return getConfigItem("MongoDB", "collection", "match-result-collections");
-    }
-
-    public List<String> getKeys() {
-        return getConfigItemList("AuthorizeKey");
+    public String getAppName(String funName) {
+        return getConfigItem("Spark", "name") + "+" + funName;
     }
 
 }

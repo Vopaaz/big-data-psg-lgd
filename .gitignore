@@ -18,7 +18,7 @@ _minted*/
 .DS_Store
 
 # Maven project
-target/
+**/target/
 .classpath
 .factorypath
 .project
@@ -47,8 +47,12 @@ config.yml
 **/*.log
 **/*.txt
 
+# sbt project files
+project/
+
+# machine learning models
+models/
+
 # scala support
 .metals/
 .bloop/
-
-project/*

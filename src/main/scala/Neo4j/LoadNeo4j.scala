@@ -49,7 +49,7 @@ object Mongo2NeoLoader {
     val driver = GraphDatabase
       .driver(
           "bolt://" + neo_conf.getHost() + ":" + neo_conf.getPort(),
-          AuthTokens.basic(neo_conf.getUsername, neo_conf.getPassword)
+          AuthTokens.basic(neo_conf.getUsername(), neo_conf.getPassword())
       )
     val session = driver.session()
     session.run("MATCH (n) DETACH DELETE n")

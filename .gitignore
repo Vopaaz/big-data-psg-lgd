@@ -52,3 +52,7 @@ project/
 
 # machine learning models
 models/
+
+# scala support
+.metals/
+.bloop/

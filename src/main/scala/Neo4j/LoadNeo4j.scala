@@ -8,36 +8,17 @@ import org.neo4j.driver.v1.Values.parameters;
 import org.apache.spark.sql.SparkSession
 import com.mongodb.spark._
 import com.mongodb.spark.sql._
-
+import Spark.SparkSessionCreator
 import java.util.ArrayList
 import scala.collection.JavaConversions._
+import Neo4j.Neo4jConfig
 
 object Mongo2NeoLoader {
 
-  def get_spark_session(match_result: Boolean = false): SparkSession = {
-    // TODO: Remove this function and use a public API
-    val spark = SparkSession
-      .builder()
-      .master("local")
-      .appName("Test")
-      .config(
-          "spark.mongodb.input.uri",
-          "mongodb://127.0.0.1/dota2." + "matchResults"
-      )
-      .config(
-          "spark.mongodb.output.uri",
-          "mongodb://127.0.0.1/dota2." + "matchResults"
-      )
-      .getOrCreate()
-
-    return spark
-  }
-
   def main(args: Array[String]) {
-    // TODO: Neo4j account and password add to config.yml
-
-    val spark = get_spark_session()
-    val rdd   = MongoSpark.load(spark.sparkContext)
+    val spark: SparkSession = new SparkSessionCreator()
+      .getSparkSession("Neo4jLoader", "matchResults", "matchResults")
+    val rdd = MongoSpark.load(spark.sparkContext)
 
     val valid_games = rdd
       .filter(x => x.getInteger("leagueid") != 0)
@@ -60,14 +41,16 @@ object Mongo2NeoLoader {
       )
       .collect()
 
-    spark.close()
-
     val all_teams_map = all_teams.map(
         x => mapAsJavaMap(Map("name" -> x))
     )
 
+    val neo_conf: Neo4jConfig = new Neo4jConfig("config.yml")
     val driver = GraphDatabase
-      .driver("bolt://localhost:7687", AuthTokens.basic("neo4j", "123456"));
+      .driver(
+          "bolt://" + neo_conf.getHost() + ":" + neo_conf.getPort(),
+          AuthTokens.basic(neo_conf.getUsername, neo_conf.getPassword)
+      )
     val session = driver.session()
     session.run("MATCH (n) DETACH DELETE n")
     session.run(
@@ -86,6 +69,7 @@ object Mongo2NeoLoader {
               parameters("winner", x._1, "loser", x._2)
           )
     )
+    spark.close()
     session.close()
     driver.close()
   }

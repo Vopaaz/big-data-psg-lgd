@@ -21,7 +21,7 @@ object BadManner {
 
   def bad_manner(gameType: String) {
     val spark: SparkSession = sessionCreator.getSparkSession("BadManner", "matchResults", "matchResults")
-    val rdd = MongoSpark.load(spark.sparkContext)  
+    val rdd = MongoSpark.load(spark.sparkContext)
 
     SparkMongoHelper.printGame(gameType)
 
@@ -48,7 +48,7 @@ object BadManner {
 
     spark.stop()
     val hero_name = SparkMongoHelper.getHeroName(afk_players_count._1)
-    println(s"The most bad manner hero is: ${hero_name}. AFK ${afk_players_count._2} times") 
+    println(s"The most bad manner hero is: ${hero_name}. AFK ${afk_players_count._2} times")
   }
 
 }

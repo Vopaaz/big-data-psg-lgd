@@ -48,7 +48,7 @@ object SparkMongoHelper{
 
     def printGame(gameType: String) = gameType match {
       case "rankedGames" => println("In ranked games:")
-      case "publicGames" => println("In public games games:")
-      case "professionalGames" => println("In professional games games:")
+      case "publicGames" => println("In public games:")
+      case "professionalGames" => println("In professional games:")
     }
 }

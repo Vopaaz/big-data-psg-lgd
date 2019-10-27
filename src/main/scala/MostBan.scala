@@ -29,11 +29,14 @@ object MostBan {
       .filter(x => !x.getBoolean("is_pick"))
       .map(x => (x.getInteger("hero_id"), 1))
       .reduceByKey(_ + _)
-      .reduce((x, y) => if(x._2 > y._2) x else y)
+      .collect()
+      .sortWith(_._2 > _._2)
 
     spark.stop()
-    val hero_name = SparkMongoHelper.getHeroName(most_ban_hero._1)
-    println(s"The most banned hero is ${hero_name}. Banned ${most_ban_hero._2} times")
+    for (i <- 0 to 4) {
+        val hero_name = SparkMongoHelper.getHeroName(most_ban_hero(i)._1)
+        println(s"${i + 1}th most banned hero is ${hero_name}. Banned ${most_ban_hero(i)._2} times.")
+    }
   }
 
 }

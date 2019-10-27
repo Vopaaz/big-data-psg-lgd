@@ -44,6 +44,7 @@ object DamageRate {
       .collect()
 
     val sorted_results = gold_damage_per_player
+      .map(x => (SparkMongoHelper.getHeroName(x._1), x._2))
       .sortWith((a, b) => (a._2 > b._2))
       .foreach(println)
 

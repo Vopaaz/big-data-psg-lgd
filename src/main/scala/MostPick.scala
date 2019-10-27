@@ -32,12 +32,14 @@ object MostPick {
       .flatMap(x => x.map(y => y))
       .map(x => (x.getInteger("hero_id"), 1))
       .reduceByKey(_ + _)
-      .reduce((x, y) => if(x._2 > y._2) x else y)
+      .collect()
+      .sortWith(_._2 > _._2)
 
     spark.stop()
-
-    val hero_name = SparkMongoHelper.getHeroName(most_pick_hero._1)
-    println(s"The most picked hero is ${hero_name}. Picked ${most_pick_hero._2} times")
+    for (i <- 0 to 4) {
+      val hero_name = SparkMongoHelper.getHeroName(most_pick_hero(i)._1)
+      println(s"The ${i+1}th picked hero is ${hero_name}. Picked ${most_pick_hero(i)._2} times")
+    }
   }
 
 }

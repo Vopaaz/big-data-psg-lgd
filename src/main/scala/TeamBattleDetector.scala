@@ -9,15 +9,15 @@ import java.util.ArrayList
 import scala.collection.mutable.PriorityQueue
 import Spark.SparkSessionCreator
 import Spark.SparkMongoHelper
+import java.io._
+
 object TeamBattleDetector {
 
   val sessionCreator: SparkSessionCreator = new SparkSessionCreator()
 
   def main(args: Array[String]) {
-    Logger.getLogger("org").setLevel(Level.OFF)
-    Logger.getLogger("com").setLevel(Level.OFF)
-    team_battles_generator("rankedGames")
     team_battles_generator("publicGames")
+    team_battles_generator("rankedGames")
     team_battles_generator("professionalGames")
   }
 
@@ -47,9 +47,14 @@ object TeamBattleDetector {
       .map(x => (x, 1))
       .reduce((a, b) => (a._1 + b._1, a._2 + b._2))
 
-    println("The time of the first team battle is " + (first_battle._1.toDouble / first_battle._2))
-    println("The average number of team battles is " + (battle_times._1.toDouble / battle_times._2))
+    println("The time of the first team battle is " + (first_battle._1.toDouble / (first_battle._2 * 60)) + " mins\n")
+    println("The average number of team battles is " + (battle_times._1.toDouble / battle_times._2) + " s")
     spark.stop()
+
+    val pw = new PrintWriter(new File("result/team_battle_result.txt" ))
+    pw.write("The time of the first team battle is " + (first_battle._1.toDouble / first_battle._2) + " mins\n")
+    pw.write("The average number of team battles is " + (battle_times._1.toDouble / battle_times._2) + " s\n")
+    pw.close
 
   }
 
@@ -60,7 +65,7 @@ object TeamBattleDetector {
         pq.enqueue(time)
         if(!pq.isEmpty && (pq.last + 180) < time) {
           if(pq.size() >= 4) {
-            res = pq.head :: res
+            res = res :+ pq.head
           }
           pq = PriorityQueue.empty[Double]
         }

@@ -33,22 +33,26 @@ object BadManner {
       .map(_.toSeq)
       .flatMap(x => x.map(y => y))
 
-    val afk_players = players.filter(x => if(x.getInteger("leaver_status") == null) false
-      else (x.getInteger("leaver_status") <= 4 && x.getInteger("leaver_status") >= 2))
-      .filter(x => x.getInteger("leaver_status") <= 4)
+    val afk_players = players.map(x => if(x.getInteger("leaver_status") == null || 
+      x.getInteger("leaver_status") == 0) (x.getInteger("hero_id"), (0, 1))
+      else (x.getInteger("hero_id"), (1, 1)))
 
     if (afk_players.take(1).length == 0 ) {
       println("No AFK players.")
       spark.stop()
       return
     }
-    val afk_players_count = afk_players.map(x => (x.getInteger("hero_id"), 1))
-      .reduceByKey(_ + _)
+
+    val afk_players_count = afk_players
+      .reduceByKey((a, b) => (a._1 + b._1, a._2 + b._2))
+      .map(x => (x._1, x._2._1.toDouble / x._2._2))
+      .filter(_._1 != 0)
       .reduce((x, y) => if(x._2 > y._2) x else y)
+
 
     spark.stop()
     val hero_name = SparkMongoHelper.getHeroName(afk_players_count._1)
-    println(s"The most bad manner hero is: ${hero_name}. AFK ${afk_players_count._2} times")
+    println(s"The most bad manner hero is: ${hero_name}. AFK rate is ${afk_players_count._2} per game")
   }
 
 }

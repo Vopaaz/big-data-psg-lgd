@@ -58,14 +58,15 @@ object HeroMostStats {
       .flatMap(x => x.map(y => y))
       .filter(x => (x.getInteger("hero_id") != null))
       .filter(x => (x.getInteger(stats) != null))
-      .map(x => (x.getInteger("hero_id"), x.getInteger(stats)))
-      .reduceByKey(_ + _)
+      .map(x => (x.getInteger("hero_id"), (x.getInteger(stats), 1)))
+      .reduceByKey((a, b) => (a._1 + b._1, a._2 + b._2))
+      .map(x => (x._1, x._2._1.toDouble / x._2._2))
       .collect()
       .sortWith(_._2 > _._2)
     spark.stop()
     for (i <- 0 to 4) {
         val hero_name = SparkMongoHelper.getHeroName(hero_group(i)._1)
-        println(s"Hero who has most ${stats} is ${hero_name}. Has ${hero_group(i)._2} times.")
+        println(s"Hero who has most ${stats} is ${hero_name}. Has rate ${hero_group(i)._2} per games.")
     }
   }
 }

@@ -20,10 +20,10 @@
 \usepackage{fontspec}
 
 \defaultfontfeatures{%
-	RawFeature={%
-		% +swsh,
-		+calt
-	}%
+    RawFeature={%
+        % +swsh,
+        +calt
+    }%
 }
 
 \setmainfont{EB Garamond}
@@ -39,31 +39,31 @@
 
 \definecolor{bg}{rgb}{0.95,0.95,0.95}
 \newcommand{\codeinline}[1]{
-	\mintinline[bgcolor=bg, fontsize=\scriptsize]{text}{#1}
+    \mintinline[bgcolor=bg, fontsize=\scriptsize]{text}{#1}
 }
 
 
 \usepackage{relsize}
 \newcommand{\bigdataVs}[1]{
-	\subsection{#1}
+    \subsection{#1}
 }
 
 \newenvironment{console}{% Caution:
-	\VerbatimEnvironment
-	\begin{minted}[xleftmargin=2em,bgcolor=bg,fontsize=\small]{console}% Do NOT delete these comments
-	}% Otherwise there will be error when compiling
-	{%
-	\end{minted}%
+    \VerbatimEnvironment
+    \begin{minted}[xleftmargin=2em,bgcolor=bg,fontsize=\small]{console}% Do NOT delete these comments
+    }% Otherwise there will be error when compiling
+    {%
+    \end{minted}%
 }
 %-----------%
 
 \title{NoSQL Write-up -- Dota2 Game Replay Analysis}
 \author{
-	Team name: PSG.LGD \\ \\
-	Yichun Yan \\
-	Ziwei Jiang \\
-	Yifan Li \\
-	Weiqi Wang
+    Team name: PSG.LGD \\ \\
+    Yichun Yan \\
+    Ziwei Jiang \\
+    Yifan Li \\
+    Weiqi Wang
 }
 \date{\today}
 
@@ -202,9 +202,9 @@
 Our team aims at exploring data about a popular and long-lived computer game, Dota2. Dota2 is a multiplayer online battle arena (\gls{MOBA}) video game developed and published by Valve Corporation. Each game will involve ten players that are divided to two teams play against each other on a same map. Every player chooses one ``hero" that has unique abilities and different styles of playing. The aim for each team is to destroy the building called ``\gls{Ancient}" of the other team. Players collect \gls{gold} to buy powerful items and gain \gls{XP} by killing players on the other team, destroy building of the other team, or kill \gls{creeps}.
 
 \begin{figure}[H]
-	\centering
-	\includegraphics[width=\linewidth]{pic/combat.png}
-	\caption{A screenshot of the game}
+    \centering
+    \includegraphics[width=\linewidth]{pic/combat.png}
+    \caption{A screenshot of the game}
 \end{figure}
 
 It is a real-time game, hundreds of operations and some decisions will be made each second, and all of them will have some influence on the final results of the game. Therefore, there are some professional teams start hiring data engineers to help their players perform better in a game. For example, by using big data pipeline to answer the business question "Does there exist a regular farming path for some professional players?", we can understand both our teammates and the players from other team better, and therefore optimize our strategies.
@@ -212,47 +212,98 @@ It is a real-time game, hundreds of operations and some decisions will be made e
 \subsection{Source of Datasets}
 
 \begin{center}
-    \begin{tabular}{|c|c|}
+    \begin{tabular}{|p{4.5cm}|p{6cm}|p{2.5cm}|}
     \hline
-    Dataset Name & Dataset Source \\
+    Dataset Name & Dataset Source & format \\
     \hline\hline
-    \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchDetails}{Dota2 match result dataset} & \href{https://wiki.teamfortress.com/wiki/WebAPI}{Valve's official API} \\
+    \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchDetails}{Dota2 match result dataset} & \href{https://wiki.teamfortress.com/wiki/WebAPI}{Valve's official API} & JSON file in \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchDetails}{this schema}\\
     \hline
-    \href{https://wiki.teamfortress.com/wiki/Replay}{Dota2 replay dataset} & Valve's Dota2 replay servers \\
+    \href{https://wiki.teamfortress.com/wiki/Replay}{Dota2 replay dataset} & Valve's Dota2 replay servers(url to download replays from the servers can  be constructed by information obtained by \href{https://docs.opendota.com/}{this api} and \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchDetails}{this api}.) & \codeinline{.dem} binary format, can only be executed by Dota2's client, need to be parsed\\
     \hline
     \end{tabular}
 \end{center}
 
 \subsection{Descriptions of Datasets}
+\begin{enumerate}
+\item Dota2 match result dataset: Snapshot of some important information about a game and each player, which includes things like which sides win, the duration of the whole game and each player‘s ending level, items and damage caused.
+\item Dota2 replay dataset: Every thing happens in a game, which includes the whole combat log of the game, chatting information and the spawn and death of NPCs.
+\end{enumerate}
 
-\begin{center}
-    \begin{tabular}{|p{4.5cm}|p{3.5cm}|p{5cm}|}
-    \hline
-    Dataset Name & Format & Usage \\
-    \hline\hline
-    Dota2 match result dataset & JSON & \begin{itemize}
-        \item Get match result (containing important information of players and the game such as player name, level, first blood time etc.)
-        \item Provide keys for replay dataset
-    \end{itemize} \\
-    \hline
-    Dota2 replay dataset & \codeinline{.dem.bz2} binary file & \begin{itemize}
-        \item Get player name, id, team formation and hero choice
-        \item Get detail log of the game
-        \item Get spawn/death of heros and NPCs
-    \end{itemize} \\
-    \hline
-    \end{tabular}
-\end{center}
-
-We will describe how we use Dota2 replay parser to transform different datasets format into usable format in the ETL section.
+We will discuss how we acquire those data how it is transformed into a usable format in details in the ETL selection.
 
 \subsection{Data Dictionaries}
+The Dota2 match result data is already in JSON format, we can use it straightforwardly in the same schema to save it into our database, the data dictionary for this dataset should be: \\
+\begin{tabular}{|p{3cm}|p{2cm}|p{5cm}|p{3cm}|}
+\hline
+Field Name& Data Type& Description & Example\\
+\hline
+players& JSON Array & status about each player at the end of the game, I will talk about it in details in the next table.& Will be mentioned in details in the next table.
+\\
+\hline
+radiant\_win& boolean & Dictates the winner of the match, true for radiant; false for dire.&true \\
+\hline
+duration & int & The length of the match, in seconds since the match began. & 2452 \\
+\hline
+start\_time & long & Unix timestamp of when the match began. & 1566731204 \\
+\hline
+match\_id & long & The matches unique ID. & 4986382845 \\
+\hline
+match\_seq\_num & long & A 'sequence number', representing the order in which matches were recorded. & 4182489897 \\
+\hline
+tower\_status\_radiant and tower\_status\_dire & int & see this in details https://wiki.teamfortress.com/wiki/WebAPI/GetMatchDetails\#Tower\_Status & 260 \\
+\hline
+barracks\_status\_radiant and barracks\_status\_dire & int & see this in details https://wiki.teamfortress.com/wiki/WebAPI/GetMatchDetails\#Barracks\_Status & 51 \\
+\hline
+first\_blood\_time & int & The time in seconds since the match began when first-blood occurred. & 102 \\
+\hline
+lobby\_type & int & The type of the match & 0 \\
+\hline
+human\_players & int & The amount of human players within the match. & 10 \\
+\hline
+leagueid & int & The league that this match was a part of. A list of league IDs can be found via the \href{https://wiki.teamfortress.com/wiki/WebAPI/GetLeagueListing}{GetLeagueListing} method.
+ & 0 \\
+\hline
+positive\_votes & int & The number of thumbs-up the game has received by users. & 0 \\
+\hline
+negative\_votes & int & The number of thumbs-down the game has received by users. & 1 \\
+\hline
+game\_mode & int & The mode of the match & 11 \\
+\hline
+picks\_bans & JSON Array & A list of the picks and bans in the match, if the game mode is Captains Mode. & I will describe it in details in another table \\
+\hline
+radiant\_score & int & The total amount of kills that radiant team make & 52 \\
+\hline
+dire\_score & int & The total amount of kills that dire team make & 42 \\
+\hline
+\end{tabular}
 
+The data dictionary for one JSON object that mentioned before should be: \\
+\begin{tabular}{|p{3cm}|p{2cm}|p{5cm}|p{3cm}|}
+\hline
+Field Name& Data Type& Description & Example\\
+\hline
+account\_id & long & An unique identifier for each steam account & 4294967295 \\
+\hline
+player\_slot & int & see this in details https://wiki.teamfortress.com/wiki/WebAPI/GetMatchDetails\#Player\_Slot & 1 \\
+\hline
+hero\_id & int & The hero's unique ID. A list of hero IDs can be found via the \href{https://wiki.teamfortress.com/wiki/WebAPI/GetHeroes}{GetHeroes} method. & 97 \\
+
+\hline
+\end{tabular}
 \section{Data ETL}
-
+Our aim is to collect about 1,500,000 records for our match result dataset and about 1000 professional games, 1000 ranked games and 1000 public games for our replay dataset. Our data is mainly three sources:
+\begin{enumerate}
+\item \href{https://wiki.teamfortress.com/wiki/WebAPI/}{Valve's official api}.
+\item \href{https://docs.opendota.com/}{OpenDota's third party api}.
+\item \href{https://dev.dota2.com/showthread.php?t=47115}{Dota2's replay cluster}.
+\end{enumerate}
+    I will walk through how I create a pipeline to make use of the above three sources to collect all the data I want in the Extraction section. \\
 \subsection{Extraction}
 
+    First, in order to call the Valve's official api, we need a key to get authorized. To avoid the api call limits of the api, I create a key pool that contains 5 different authorizing keys that are obtained using our steam accounts. Every time I need to call the api I just randomly pick one key from the poll. Tha api we are mainly using is \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchHistoryBySequenceNum}{this one}. Which requires three parameters: \codeinline{start_at_match_seq_num} and \codeinline{matches_requested}.
+    The first one is an unique identifier for each match, and the api will return a number of results that equals to the second parameter you give to the api in \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchDetails}{this JSON format}. After we get a list of match result in the previous call, we can use the sequence number of the last record we get from the last call then plus one as the \codeinline{start_at_match_seq_num} for the next iteration. Also, considering the ratio of professional games is very small, I iterate the whole result to find out whether there is a professional game. If I find a professional game, I will call \href{https://docs.opendota.com}{OpenDota's API} using the \codeinline{match_id}, which is also an unique identifier of the professional game and can be obtained by the previous results to get the information we need to download the replays. Then we use this information to construct a url like this format \codeinline{http://replay<cluster>.valve.net/570/<match_id>_<replay_salt>.dem.bz2} and start another thread to to download and unzip the replay. At the same time, since we want to get a same number of ranked matches and public matches, we maintain two integers to record how many public matches and ranked matches to download. As we finish downloading a professional match, we add one to those two integers, and if the numbers are not zero when we encounter a public match result or a ranked match, we start to download them using the same method I used for professional games. This way we can get game replays of three types in same amount for the second dataset while we collect the data for the first dataset.
 \subsection{Transformation}
+    The match result dataset is easy to handle, since the result of  \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchHistoryBySequenceNum}{this api} is just a JSON string, which can be easily parsed into Document datatype by the MongoDB Driver in Java and saved to MongoDB. But the replay is in binary format, which can only be executed by the Dota2's client. We need to use some open-source parser to help us transform it into something that makes more sense to us. Luckily, we found \href{https://github.com/skadistats/clarity}{this parser} on GitHub
 
 \subsection{Loading}
 
@@ -262,7 +313,7 @@ As mentioned in the proposal, we tried to containerized the project by docker. I
 
 \begin{enumerate}
     \item Getting Started\\\\
-    At this phase, I installed docker, read docker documents, explored docker hub and played around with docker. The objective of this phase is to get familiar with docker and in the end find the way to build the project in Docker way. I learned that we need to build an image, which is an executable package to run the project in the environment of docker. 
+    At this phase, I installed docker, read docker documents, explored docker hub and played around with docker. The objective of this phase is to get familiar with docker and in the end find the way to build the project in Docker way. I learned that we need to build an image, which is an executable package to run the project in the environment of docker.
     \begin{itemize}
         \item This "package" contains:
         \begin{itemize}
@@ -273,42 +324,32 @@ As mentioned in the proposal, we tried to containerized the project by docker. I
             \item Working directory set up;\\(i.e.\codeinline{WORKDIR /app} from Dockerfile . line44)
         \end{itemize}
     \end{itemize}
-    
+
     By launching this image, we can get a running container. In other words, a container is an instance of the image. And then we can share our images in a repository on docker hub. When this is done, my teammates can pull and run the image remotely.\\
-    
+
     \item Dockerfile\\\\
     According to the \href{https://docs.docker.com/}{docker documents}, Dockerfile "defines what is going on in the environment inside your container". At the very beginning, I thought dockerize a project just need to pull all the official images in docker, and then we can start manipulate it. But then, after reading documents, I found that we need to construct a Dockerfile to define how a project work, so that it can behaves exactly the same wherever it runs. We can pull an image as a parent image, and then install needed packages in it. \\
-    
+
     For example, in the project, I use ubuntu as a parent image, then docker virtualize an ubuntu operation system environment on your host machine, and then I use Dockerfile as if it is the terminal of ubuntu, writing codes of installing java8, maven, mongodb in the Dockerfile. As mentioned above, then I can use \codeinline{RUN} command to run project code.\\
-    
+
     After I constructed the Dockerfile and try to build the project using \codeinline{$docker build .} in command line, I failed every time when it trying to connect to the database. After reading documents and google for reasons, I realized that it is cramped to put all the service on a Dockerfile. I should construct a docker-compose.yml to define, run and scale service with Docker. \\
-    
+
     \item docker-compose.yml\\
-    
-    According to our data pipeline, I intended to build 4 services in the docker-compose:\\ 
+
+    According to our data pipeline, I intended to build 4 services in the docker-compose:\\
     \begin{itemize}
         \item Data acquisition and filtering (as "fetchstore" service in the docker-compose, line 17-24)
         \item Data Extraction (as "parsereplay" service in the docker-compose, line 27)
         \item Data Aggregation and Representation (as "mongodb" service in the docker-compose, line 4-16)
         \item Data Analysis (as "analytics" service in the docker-compose, line 29-32)\\
     \end{itemize}
-    
+
     In the docker-compose, we can also use the Dockerfile using the command \codeinline{build} in a service. Therefore, my thought is to construct Dockerfile for "fetchstore", "paresereplay", and "analytics" service using the code and configuration file we have. And use the official image of mongodb, using \codeinline{volume} in the service to reflect the direction of configuration file and mongodb initial javascipt (mogo-init.js, a file to define initial user, database, collections). Also, we used \codeinline{depends_on} to define simple interaction between the services.\\
-
 \end{enumerate}
-
 As the result, we still have a hard time connecting the database. When the problem is fixed, we only finished the configuration of the "fetchstore" service and the "mongodb". Then we realized we got limited time left, therefore, we discard docker for now, and move on to deploy our project on amazon web service (AWS). And we hope to complete this part in the future.
-
 The reason of failure is that I got misunderstanding on Docker's architecture. Also, it is hard for me to consider our system's architecture in Docker's way. And it also need many times of failure to realize the right way to deploy a project on Docker. This experience help us learn how to make the best of documents and google, and also push me to learn a lot about Linux and to read a lot of configuration file.
-
 \section{Data Analysis}
-
 \section{Challenges}
-
-
-
 \printglossary
-
 %-------%
-
 \end{document}

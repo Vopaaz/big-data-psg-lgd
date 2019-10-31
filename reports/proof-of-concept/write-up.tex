@@ -409,47 +409,6 @@ Our aim is to collect about 1,500,000 records for our match result dataset and a
 
 \subsection{Loading}
 We deploy our database on AWS EC2, I used \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/ValveAPI.java#L164-L178}{this snippet} of code to save the JSON format match result data into MongoDB and \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/ValveAPI.java#L406-L420}{this snippet} of code to write parsed replay data into MongoDB.
-\subsubsection{Docker}
-
-As mentioned in the proposal, we tried to containerized the project by docker. It is convenient to split up the works for every team mates if we containerized our project. By learning from documents, I tried to configure our project on docker but it ends up with failures. Considering the limited time, we decided to discard using docker for installing our NoSQL technology. However, we learned a lot from this experience.
-
-\begin{enumerate}
-    \item Getting Started\\\\
-    At this phase, I installed docker, read docker documents, explored docker hub and played around with docker. The objective of this phase is to get familiar with docker and in the end find the way to build the project in Docker way. I learned that we need to build an image, which is an executable package to run the project in the environment of docker.
-    \begin{itemize}
-        \item This "package" contains:
-        \begin{itemize}
-            \item A runtime as a parent image, the overall environment for the container launched by this image;\\(i.e.\codeinline{FROM ubuntu:18.04} from Dockerfile . line2)
-            \item Our project code;\\ (i.e.\codeinline{RUN java -jar target/FetchStore.one-jar.jar 4182489531 10 100} from Dockerfile .\ line52)
-            \item How we define environment variables;\\ (i.e. \codeinline{ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/} from Dockerfile .\ line23)
-            \item Installed packages such as java8, maven, mongodb, as the prerequisite of Data ETL;
-            \item Working directory set up;\\(i.e.\codeinline{WORKDIR /app} from Dockerfile . line44)
-        \end{itemize}
-    \end{itemize}
-
-    By launching this image, we can get a running container. In other words, a container is an instance of the image. And then we can share our images in a repository on docker hub. When this is done, my teammates can pull and run the image remotely.\\
-
-    \item Dockerfile\\\\
-    According to the \href{https://docs.docker.com/}{docker documents}, Dockerfile "defines what is going on in the environment inside your container". At the very beginning, I thought dockerize a project just need to pull all the official images in docker, and then we can start manipulate it. But then, after reading documents, I found that we need to construct a Dockerfile to define how a project work, so that it can behaves exactly the same wherever it runs. We can pull an image as a parent image, and then install needed packages in it. \\
-
-    For example, in the project, I use ubuntu as a parent image, then docker virtualize an ubuntu operation system environment on your host machine, and then I use Dockerfile as if it is the terminal of ubuntu, writing codes of installing java8, maven, mongodb in the Dockerfile. As mentioned above, then I can use \codeinline{RUN} command to run project code.\\
-
-    After I constructed the Dockerfile and try to build the project using \codeinline{docker build .} in command line, I failed every time when it trying to connect to the database. After reading documents and google for reasons, I realized that it is cramped to put all the service on a Dockerfile. I should construct a docker-compose.yml to define, run and scale service with Docker. \\
-
-    \item docker-compose.yml\\
-
-    According to our data pipeline, I intended to build 4 services in the docker-compose:\\
-    \begin{itemize}
-        \item Data acquisition and filtering (as "fetchstore" service in the docker-compose, line 17-24)
-        \item Data Extraction (as "parsereplay" service in the docker-compose, line 27)
-        \item Data Aggregation and Representation (as "mongodb" service in the docker-compose, line 4-16)
-        \item Data Analysis (as "analytics" service in the docker-compose, line 29-32)\\
-    \end{itemize}
-
-    In the docker-compose, we can also use the Dockerfile using the command \codeinline{build} in a service. Therefore, my thought is to construct Dockerfile for "fetchstore", "paresereplay", and "analytics" service using the code and configuration file we have. And use the official image of mongodb, using \codeinline{volume} in the service to reflect the direction of configuration file and mongodb initial javascipt (mogo-init.js, a file to define initial user, database, collections). Also, we used \codeinline{depends_on} to define simple interaction between the services.\\
-\end{enumerate}
-As the result, we still have a hard time connecting the database. When the problem is fixed, we only finished the configuration of the "fetchstore" service and the "mongodb". Then we realized we got limited time left, therefore, we discard docker for now, and move on to deploy our project on amazon web service (AWS). And we hope to complete this part in the future.
-The reason of failure is that I got misunderstanding on Docker's architecture. Also, it is hard for me to consider our system's architecture in Docker's way. And it also need many times of failure to realize the right way to deploy a project on Docker. This experience help us learn how to make the best of documents and google, and also push me to learn a lot about Linux and to read a lot of configuration file.
 
 \section{Data Analysis}
 In data analysis we used Neo4j to analyze the win-lose relationship between professional games. And use Spark to analyze business questions raised in our proposal. We don't fulfill all business questions and we will state the reason for it in the challenges section. Here are business questions we completed:
@@ -485,6 +444,31 @@ Valve provides us with various apis to get match results, but they're not well d
 \subsection{Dota2 replays}
 The replay dataset can be constructed by using url like this format: \\
 \codeinline{http://replay<cluster>.valve.net/570/<matchid><replaysalt>.dem.bz2}. In the past, by calling this \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchDetails}{api} using match ID of a game to get the cluster number and "replay salt" for a specific match. But now Valve disallowed us to do this too by hiding the "replay salt" field it the result due to the pressure on it's replay clusters is too large. Fortunately, I found another \href{third-party api}{https://docs.opendota.com/} that can help me find the fields I need to download a replay. So I thought of purely rely on this api to get the data in the first dataset, this way I can only use one kind of api to simplify the data pipeline. But this can't be done too, this third party api will ask us to pay if our request exceeds a certain number, that will cause cost exceeding our budget(which is zero). Also, we don't want to collect all the replays. It's clear that the matches played by the professional teams worth more than the normal ones. Given the limited time and storage we have, I think I will first collect a certain number of professional games, then collect public games and ranked games of the same number for comparing analysis with the professional games.
+
+\subsection{Docker}
+
+As mentioned in the proposal, we tried to containerized the project by docker, but it ends up with failures. Considering to the limited time, we decided to discard using docker for installing our NoSQL technology.
+
+At first, I tried to dockerize our project by using a single Dockerfile. According to the \href{https://docs.docker.com/}{docker documents}, Dockerfile "defines what is going on in the environment inside your container". At the very beginning, I thought dockerize a project just need to pull all the official images in docker, and then we can start manipulate it. But then, after reading documents, I found that we need to construct a Dockerfile to define how a project work, so that it can behaves exactly the same wherever it runs. We can pull an image as a parent image, and then install needed packages in it.
+
+For example, in the project, I used ubuntu as a parent image, then docker virtualized an ubuntu operation system environment on our host machine, and then I used Dockerfile as if it is the terminal of ubuntu, writing codes of installing java8, maven, mongodb in the Dockerfile.
+
+After I constructed the Dockerfile, I failed every time when it was trying to connect to the database. Realized that it is cramped to put all the services on a Dockerfile, I tried to construct a docker-compose.yml to define, run and scale services with Docker.
+
+According to our data pipeline, I intended to build 4 services in the docker-compose:
+    \begin{itemize}
+        \item Data acquisition and filtering (as "fetchstore" service in the docker-compose)
+        \item Data Extraction (as "parsereplay" service in the docker-compose)
+        \item Data Aggregation and Representation (as "mongodb" service in the docker-compose)
+        \item Data Analysis (as "analytics" service in the docker-compose)
+    \end{itemize}
+
+In the docker-compose, we can also use the Dockerfile by using the command \codeinline{build} in a service. Therefore, I constructed Dockerfiles for Extraction, Transformation and Analysis services. And I used the official image of mongodb, and used \codeinline{volume} in the service to reflect the direction of configuration file and mongodb initial javascipt. Also, we used \codeinline{depends_on} to define simple interaction between the services.
+
+As the result, we still have a hard time connecting the database. There are a lot of things to be considered when running multiple containers. When this problem is fixed, we only finished the configuration of the extraction and database service. Then we realized we got limited time left, therefore, we discard docker for now, and move on to deploy our project on amazon web service (AWS). And we hope to complete this part in the future.
+
+The reason of failure is that I got misunderstanding on Docker's architecture. Also, it is hard for me to consider our system's architecture in Docker's way. Also it is time consuming to try those failures to realize the right way to deploy a project on Docker. This experience pushed me to learn a lot about Linux and to read a lot of configuration file.
+
 \printglossary
 %-------%
 

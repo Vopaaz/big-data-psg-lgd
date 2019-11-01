@@ -225,7 +225,7 @@ Dota2 is a multiplayer online battle arena (\gls{MOBA}) video game developed and
 This game has a large quantity of players, accordingly a huge amount of replays will be produced every day. Also, it's a real-time game, hundreds of operations and some decisions will be made each second, and all of them will have some influence on the final results of the game. Both of the above two features make the game a great subject to big data analysis.
 
 Actually, there are some professional teams start hiring data engineers to help their players perform better in a game. This means that our analysis has some realistic meaning.
-For example, by using big data pipeline to answer the business question "Does there exist a regular farming path for some professional players?", we can understand both our teammates and the opponents better, and therefore optimize our strategies.
+For example, by using big data pipeline to answer the business question ``Does there exist a regular farming path for some professional players?", we can understand both our teammates and the opponents better, and therefore optimize our strategies.
 
 We have used technologies like MongoDB, Apache Spark, Neo4j for this project. All of the code of this project can be found in \href{https://github.com/Vopaaz/big-data-psg-lgd/}{this repository}, and I will explain the logic of our project and reference to some lines of code when necessary in the following sections.
 
@@ -348,10 +348,10 @@ The code to parse the \codeinline{.dem} file into our schema is as follows:
 
 \begin{enumerate}
 \item \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/java/ParseReplay/ParseReplayExecutor.java}{The overall logic}.
-\item \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/java/ParseReplay/Info.java}{For the "info" field}.
-\item \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/java/ParseReplay/Combatlog.java}{For the "combatlog" field }.
-\item \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/java/ParseReplay/Chat.java}{For the "chat" field}.
-\item \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/java/ParseReplay/Lifestate.java}{For the "lifestate" field}.
+\item \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/java/ParseReplay/Info.java}{For the ``info" field}.
+\item \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/java/ParseReplay/Combatlog.java}{For the ``combatlog" field }.
+\item \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/java/ParseReplay/Chat.java}{For the ``chat" field}.
+\item \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/java/ParseReplay/Lifestate.java}{For the ``lifestate" field}.
 \end{enumerate}
 
 \subsection{Loading}
@@ -489,7 +489,9 @@ The figure in the next page demonstrates the result of the above two questions. 
 
 These two analysis are aimed to find out the top 5 most used/purchased items.
 
-We use replay data in this analysis because it contains all events happen during a game. In Most Used Item analysis, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostUsedItem.scala#L38-L40}{filter events contained in replay data to get all 'use item' events}. Then we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostUsedItem.scala#L41-L42}{do aggregation on the item id} to get the pairs of an item id and an item use count. Finally, we can get the top 5 most used items by \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostUsedItem.scala#L44}{sorting the pairs by the use count}. We have similar steps in \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostPurchasedItem.scala}{Most Purchased Item} analysis.
+We use replay data in this analysis because it contains all events happen during a game. In Most Used Item analysis, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostUsedItem.scala#L38-L40}{filter events contained in replay data to get all ``use item" events}.
+Then we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostUsedItem.scala#L41-L42}{do aggregation on the item id} to get the pairs of an item id and an item use count.
+Finally, we can get the top 5 most used items by \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostUsedItem.scala#L44}{sorting the pairs by the use count}. We have similar steps in \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostPurchasedItem.scala}{Most Purchased Item} analysis.
 
 The figure in the next page demonstrates the result. A table for this can also be found in the Appendix.
 
@@ -546,7 +548,7 @@ As I mentioned, the api call limits are much less than it is described and it se
 \subsection{Dota2 replays Parameters}
 
 The request to download Dota2 replays requires three parameters, \codeinline{cluster}, \codeinline{matchid}, and \codeinline{replaysalt}.
-In the past, by calling \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchDetails}{GetMatchDetails API} with match ID of a game, the cluster number and "replay salt" of a specific match can be acquired. However, now Valve disallowed us to do so, by hiding the "replay salt" field it the result.
+In the past, by calling \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchDetails}{GetMatchDetails API} with match ID of a game, the cluster number and ``replay salt" of a specific match can be acquired. However, now Valve disallowed us to do so, by hiding the ``replay salt" field it the result.
 
 Fortunately, we found another \href{third-party api}{https://docs.opendota.com/} that can help finding the fields needed to download a replay.
 
@@ -661,7 +663,7 @@ dire\_score  & int  & The total amount of kills that dire team make  & 42 \\
 \end{longtable}
 
 
-The data dictionary for one JSON object of field "players" in table \ref{match-result-data-dictionary} is as follows.
+The data dictionary for one JSON object of field ``players" in table \ref{match-result-data-dictionary} is as follows.
 
 \begin{longtable}{|p{2.5cm}|p{2cm}|p{5.5cm}|p{3cm}|}
 
@@ -711,7 +713,7 @@ level & int & The player's level at match end. & 23 \\
 \end{longtable}
 
 
-The data dictionary for one JSON object of field "picks\_bans" in table \ref{match-result-data-dictionary} is as follows.
+The data dictionary for one JSON object of field ``picks\_bans" in table \ref{match-result-data-dictionary} is as follows.
 
 \begin{longtable}{|p{2.5cm}|p{2cm}|p{5.5cm}|p{3cm}|}
 
@@ -735,7 +737,7 @@ order & int & The order of which the picks and bans were selected. & 10 \\
 \subsubsection{Parsed Replay Dataset}
 
 
-The data dictionary for one JSON object of field "combatlog" in table \ref{replay-data-dictionary} is as follows.
+The data dictionary for one JSON object of field ``combatlog" in table \ref{replay-data-dictionary} is as follows.
 
 \begin{longtable}{|p{2.5cm}|p{2cm}|p{5.5cm}|p{3cm}|}
 
@@ -746,25 +748,25 @@ The data dictionary for one JSON object of field "combatlog" in table \ref{repla
 
 time & double & The time when this action happens & 325.608734130432 \\
 \hline
-type & String & The type of this action. & "purchase" \\
+type & String & The type of this action. & ``purchase" \\
 \hline
-target & String & The target of this action & "npc\_dota\_hero\_nevermore" \\
+target & String & The target of this action & ``npc\_dota\_hero\_nevermore" \\
 \hline
-item & String & This field only occurs when the type of the action is "purchase". Indicates which item was bought by this action & "item\_enchanted\_mongo" \\
+item & String & This field only occurs when the type of the action is ``purchase". Indicates which item was bought by this action & ``item\_enchanted\_mongo" \\
 \hline
-inflictor & String & This field only occurs when the type of the action is "damage", "lose\_buff" and "add\_buff". The inflictor of the current action & "modifier\_tower\_aura\_bonus" \\
+inflictor & String & This field only occurs when the type of the action is ``damage", ``lose\_buff" and ``add\_buff". The inflictor of the current action & ``modifier\_tower\_aura\_bonus" \\
 \hline
-damage & int & This field only occurs when the type of the action is "damage", which indicates the damage caused by the current action. & 80 \\
+damage & int & This field only occurs when the type of the action is ``damage", which indicates the damage caused by the current action. & 80 \\
 \hline
-before\_hp & int &  This field only occurs when the type of the action is "damage", which indicates the hp of the target before the action. & 725 \\
+before\_hp & int &  This field only occurs when the type of the action is ``damage", which indicates the hp of the target before the action. & 725 \\
 \hline
-after\_hp & int &  This field only occurs when the type of the action is "damage", which indicates the hp of the target after the action. & 718 \\
+after\_hp & int &  This field only occurs when the type of the action is ``damage", which indicates the hp of the target after the action. & 718 \\
 \hline
 \caption{Combatlog Field in Replay}
 \label{combat-field-in-replay}
 \end{longtable}
 
-The data dictionary for one JSON object of field "info" in table \ref{replay-data-dictionary} is as follows.
+The data dictionary for one JSON object of field ``info" in table \ref{replay-data-dictionary} is as follows.
 
 \begin{longtable}{|p{2.5cm}|p{2cm}|p{5.5cm}|p{3cm}|}
 

@@ -370,8 +370,26 @@ Dota2 replay dataset & About 3500 & About 35 GB \\
 \end{tabular}
 \end{table}
 
-\section{Data Analysis}
+As described in the proposal, we also applied Neo4j to support relationship visualization. We wrote \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/9916e0a5a95245062d110446eb4014312087ef9e/src/main/scala/Neo4j/LoadNeo4j.scala#L16}{Neo4jLoader} to extract the data from MongoDB, filter it with the help of Spark and load it into our Neo4j database.
 
+\section{Overview of our Architecture}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{pic/arc-new.png}
+\caption{System Architecture}
+\label{system-architecture}
+\end{figure}
+
+The whole pipeline starts from top-left, where the data collector send API requests to ValveAPI and OpendotaAPI.
+Log is output to the disk so that we know where to resume after a batch is processed, or if our system crushes.
+The match result data is stored into MongoDB and the information needed to download game replays is delivered to the ``Data Extraction" part. Here the replays are downloaded, parsed and stored into MongoDB.
+Neo4j loader extract data from MongoDB and store it into Neo4j.
+
+After the ETL, we use Spark as the analytics engine to answer our business questions.
+The results are visualized by Tableau. For the relationship BQ, we use the built-in Neo4j Browser to visualize the relationship between professional teams.
+
+\section{Data Analysis}
 
 We use Spark as our analytics engine to analyze business questions raised in our proposal. We don't fulfill all business questions and we will state the reason for it in the challenges section. We have 3 game types: the public game, the ranked game, the professional game. Most following business questions are answered in these three game types. So most of them applied \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/Spark/SparkMongoHelper.scala#L31-L47}{filtering games by their types}.
 
@@ -451,6 +469,19 @@ This analysis aimed to find out the average first time of a team battle and the 
 We use the replay data which has all events. But these events do not contain the location information. Thus, we roughly define the team battle as in 3 minutes there are 4 or more hero deaths. \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/TeamBattleDetector.scala#L61-L78}{A sliding-window algorithm} is applied to build a team battle detector. We \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/TeamBattleDetector.scala#L33-L36}{extract the death events} and use the detector to detect all team battles in a game. The time of the first team battle is at 11 minutes, 13 minutes and 19 minutes in public, ranked, and professional game. The average number of team battles is 7, 9, and 6 in public, ranked, and professional game respectively.
 
 Additionally, for most analysis above, we can only get the hero id or item id. To provide better readability, we add two metadata collection heros and items which contain hero/item ids and their names. So after getting the id, we do one more \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/Spark/SparkMongoHelper.scala#L15-L29}{query on the matadata collections to get the its name}.
+
+\subsection{Win-lose Relationship Visualization}
+
+This analysis aimed to visualize the result between the professional teams.
+It could serve as a proof of concept that we have the ability to further explore other relational topics.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{pic/win-lose-viz.png}
+\caption{Win-lose Relationship Visualization Result}
+\label{win-lose-relationship-visualization-result}
+\end{figure}
+
 
 \section{Challenges}
 

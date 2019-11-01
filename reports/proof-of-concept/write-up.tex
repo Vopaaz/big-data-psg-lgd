@@ -411,7 +411,9 @@ This analysis is aimed to find out the average time of a game. We use the match 
 
 This analysis is aimed to find out the heroes who have the top 20 damage rate and the heroes who have the bottom 20 damage/gold rate.
 
-We define the such rate of a hero as ``the damage to other heroes per gold gained by the hero". We use match result data which contains damage to other heroes, gold spent, and rest gold of each hero. For each match result, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/DamageRate.scala#L39-L41}{extract the 3tuple of a hero id, a total damage to other heroes, a total gained gold (addition of gold spend and rest gold)}. Then we do \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/DamageRate.scala#L42-L44}{an aggregation on the hero id and divide the damage by the gained gold to get pairs of a hero id and a damage/gold rate}. Finally, to get the top 20 heroes and the bottom 20 heroes, we can simply \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/DamageRate.scala#L47-L48}{sort pairs by the damage rate}. We list the result for this analysis in the Appendix.
+We define the such rate of a hero as ``the damage to other heroes per gold gained by the hero". We use match result data which contains damage to other heroes, gold spent, and rest gold of each hero. For each match result, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/DamageRate.scala#L39-L41}{extract the 3tuple of a hero id, a total damage to other heroes, a total gained gold (addition of gold spend and rest gold)}. Then we do \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/DamageRate.scala#L42-L44}{an aggregation on the hero id and divide the damage by the gained gold to get pairs of a hero id and a damage/gold rate}. Finally, to get the top 20 heroes and the bottom 20 heroes, we can simply \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/DamageRate.scala#L47-L48}{sort pairs by the damage rate}.
+
+The figure in the next page demonstrates the result. A table for this can also be found in the Appendix.
 
 \begin{figure}[H]
 \centering
@@ -451,7 +453,9 @@ To examine our guess, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/m
 
 This analysis is aimed to find out the top 5 heroes who have most kills/assists/deaths/heals.
 
-We use replay data which contains all events during a game. We firstly \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/HeroMostStats.scala#L60}{filter by the event type we want (kill/assist/death/heal)}. For each replay data, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/HeroMostStats.scala#L61}{extract a pair of a hero id and a count of the event type}. Then we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/HeroMostStats.scala#L62}{do aggregation} on the hero id and \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/HeroMostStats.scala#L65}{sort pairs} by the count to extract the top 5 heroes. The result for this analysis is listed in the Appendix.
+We use replay data which contains all events during a game. We firstly \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/HeroMostStats.scala#L60}{filter by the event type we want (kill/assist/death/heal)}. For each replay data, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/HeroMostStats.scala#L61}{extract a pair of a hero id and a count of the event type}. Then we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/HeroMostStats.scala#L62}{do aggregation} on the hero id and \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/HeroMostStats.scala#L65}{sort pairs} by the count to extract the top 5 heroes.
+
+The following figure demonstrates the result in professional games. Other results are listed in the Appendix.
 
 \begin{figure}[H]
 \centering
@@ -470,7 +474,9 @@ We use match result data which contains banned heroes. We first filter games to 
 
 This analysis is aimed to find out the top 5 heroes who are picked.
 
-We use match result data which contains picked heroes of each game. We \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostPick.scala#L34}{extract pairs of a hero id and 1 (denotes picked once)}. After \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostPick.scala#L35}{doing aggregation} on the hero id, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostPick.scala#L37}{sort the picked count} to get the top 5 picked heroes. The result for this analysis is listed in the Appendix.
+We use match result data which contains picked heroes of each game. We \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostPick.scala#L34}{extract pairs of a hero id and 1 (denotes picked once)}. After \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostPick.scala#L35}{doing aggregation} on the hero id, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostPick.scala#L37}{sort the picked count} to get the top 5 picked heroes.
+
+The figure in the next page demonstrates the result of the above two questions. A table for them can also be found in the Appendix.
 
 \begin{figure}[H]
 \centering
@@ -483,7 +489,9 @@ We use match result data which contains picked heroes of each game. We \href{htt
 
 These two analysis are aimed to find out the top 5 most used/purchased items.
 
-We use replay data in this analysis because it contains all events happen during a game. In Most Used Item analysis, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostUsedItem.scala#L38-L40}{filter events contained in replay data to get all 'use item' events}. Then we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostUsedItem.scala#L41-L42}{do aggregation on the item id} to get the pairs of an item id and an item use count. Finally, we can get the top 5 most used items by \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostUsedItem.scala#L44}{sorting the pairs by the use count}. We have similar steps in \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostPurchasedItem.scala}{Most Purchased Item} analysis. The result for this analysis is listed in the Appendix.
+We use replay data in this analysis because it contains all events happen during a game. In Most Used Item analysis, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostUsedItem.scala#L38-L40}{filter events contained in replay data to get all 'use item' events}. Then we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostUsedItem.scala#L41-L42}{do aggregation on the item id} to get the pairs of an item id and an item use count. Finally, we can get the top 5 most used items by \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostUsedItem.scala#L44}{sorting the pairs by the use count}. We have similar steps in \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostPurchasedItem.scala}{Most Purchased Item} analysis.
+
+The figure in the next page demonstrates the result. A table for this can also be found in the Appendix.
 
 \begin{figure}[H]
 \centering

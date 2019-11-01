@@ -357,7 +357,7 @@ We deploy our database on AWS EC2.
 
 The size of our dataset is:
 
-{
+\begin{table}[H]
 \centering
 \begin{tabular}{|c|c|c|}
 \hline
@@ -368,7 +368,7 @@ Dota2 match result & About 1,500,000 & About 15 GB \\
 Dota2 replay dataset & About 3500 & About 35 GB \\
 \hline
 \end{tabular}
-}
+\end{table}
 
 \section{Data Analysis}
 
@@ -564,7 +564,7 @@ As a result, besides printing result on the console, we also write the result to
 \hline
 \endhead
 
-players & JSON Array  & Status about each player at the end of the game, see next table for details & See next table.
+players & JSON Array  & Status about each player at the end of the game, see table \ref{player-field-in-match-result} & See table \ref{player-field-in-match-result}.
 \\
 \hline
 radiant\_win & boolean  & Dictates the winner of the match, true for radiant; false for dire. &true \\
@@ -577,9 +577,9 @@ match\_id  & long  & The matches unique ID.  & 4986382845 \\
 \hline
 match\_seq\_num  & long  & A `sequence number', representing the order in which matches were recorded.  & 4182489897 \\
 \hline
-tower\_status\_radiant and tower\_status\_dire  & int  & check \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchDetails\#Tower\_Status}{this} for details.  & 260 \\
+tower\_status\_radiant and tower\_status\_dire  & int  & See \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchDetails\#Tower\_Status}{API doc} for details.  & 260 \\
 \hline
-barracks\_status\_radiant and barracks\_status\_dire  & int  & check \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchDetails\#Barracks\_Status}{this} for details. & 51 \\
+barracks\_status\_radiant and barracks\_status\_dire  & int  & See \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchDetails\#Barracks\_Status}{API doc} for details. & 51 \\
 \hline
 first\_blood\_time  & int  & The time in seconds since the match began when first-blood occurred.  & 102 \\
 \hline
@@ -732,5 +732,379 @@ game\_mode & int & The mode of the current game & 21 \\
 \caption{Info Field in Replay}
 \label{info-field-in-replay}
 \end{longtable}
+
+
+\subsection{Detailed Analysis Results}
+
+\subsubsection{Damage/Gold Rate}
+
+Public Games:
+
+\begin{longtable}{|p{2.5cm}|p{2.5cm}|p{5.5cm}|}
+
+\hline
+\textbf{Rank} & \textbf{Hero} & \textbf{Damage/Gold Rate} \\
+\hline
+\endhead
+
+1 & Zuus & 2.3004157401846537 \\\hline
+2 & Tinker & 1.6420031038927647 \\\hline
+3 & Bristleback & 1.5771368121914766 \\\hline
+4 & Venomancer & 1.5322559346116191 \\\hline
+5 & Skywrath\_mage & 1.5017875157064025 \\\hline
+6 & Clinkz & 1.4849750590792063 \\\hline
+7 & Huskar & 1.4546674116635778 \\\hline
+8 & Rattletrap & 1.439648234092895 \\\hline
+9 & Techies & 1.4383042472835008 \\\hline
+10 & Spectre & 1.42678633556202 \\\hline
+11 & Pugna & 1.3972072332418493 \\\hline
+12 & Warlock & 1.3632018454946753 \\\hline
+13 & Shredder & 1.35394499161979 \\\hline
+14 & Ember\_spirit & 1.3475096725161406 \\\hline
+15 & Viper & 1.3412099350143785 \\\hline
+16 & Death\_prophet & 1.3278598501932295 \\\hline
+17 & Razor & 1.3192034122801117 \\\hline
+18 & Gyrocopter & 1.3112357419375424 \\\hline
+19 & Queenofpain & 1.3066481175265756 \\\hline
+20 & Axe & 1.2931725267257896 \\\hline
+
+
+\caption{Public Games Damage/Gold Rate}
+\label{public-games-damage-gold-rate}
+\end{longtable}
+
+Ranked Games:
+
+\begin{longtable}{|p{2.5cm}|p{2.5cm}|p{5.5cm}|}
+
+\hline
+\textbf{Rank} & \textbf{Hero} & \textbf{Damage/Gold Rate} \\
+\hline
+\endhead
+
+1 & Zuus & 2.9418056479438626 \\\hline
+2 & Tinker & 2.150859003299626 \\\hline
+3 & Clinkz & 2.0884421511990525 \\\hline
+4 & Skywrath\_mage & 1.9760465643357101 \\\hline
+5 & Bristleback & 1.9501640391382127 \\\hline
+6 & Venomancer & 1.881336238794785 \\\hline
+7 & Huskar & 1.8699499986263792 \\\hline
+8 & Rattletrap & 1.8323486050421012 \\\hline
+9 & Techies & 1.822758345306855 \\\hline
+10 & Pugna & 1.818287376158369 \\\hline
+11 & Ember\_spirit & 1.7799193703114184 \\\hline
+12 & Viper & 1.713903523823672 \\\hline
+13 & Spectre & 1.696238851802073 \\\hline
+14 & Shredder & 1.677920019400073 \\\hline
+15 & Sniper & 1.651809735988255 \\\hline
+16 & Death\_prophet & 1.6508798569324052 \\\hline
+17 & Queenofpain & 1.633404234350671 \\\hline
+18 & Phoenix & 1.6167379442865089 \\\hline
+19 & Warlock & 1.6103239765043673 \\\hline
+20 & Riki & 1.6019336243768927 \\\hline
+
+\caption{Ranked Games Damage/Gold Rate}
+\label{ranked-games-damage-gold-rate}
+\end{longtable}
+
+Professional Games:
+
+\begin{longtable}{|p{2.5cm}|p{2.5cm}|p{5.5cm}|}
+
+\hline
+\textbf{Rank} & \textbf{Hero} & \textbf{Damage/Gold Rate} \\
+\hline
+\endhead
+
+1 & Zuus & 2.5095296155046065 \\\hline
+2 & Techies & 2.1870154722684325 \\\hline
+3 & Tinker & 2.0124433616059756 \\\hline
+4 & Sniper & 1.9783706295917614 \\\hline
+5 & Skywrath\_mage & 1.9535457462792696 \\\hline
+6 & Huskar & 1.8735118229824992 \\\hline
+7 & Clinkz & 1.8606849160752506 \\\hline
+8 & Pugna & 1.7964929829557952 \\\hline
+9 & Venomancer & 1.7848610595534815 \\\hline
+10 & Rattletrap & 1.7661035883036698 \\\hline
+11 & Arc\_warden & 1.6768414694470062 \\\hline
+12 & Bristleback & 1.6745098255685582 \\\hline
+13 & Shredder & 1.673216393476275 \\\hline
+14 & Ember\_spirit & 1.6568609854739513 \\\hline
+15 & Silencer & 1.6489648349788801 \\\hline
+16 & Warlock & 1.6457797988727485 \\\hline
+17 & Razor & 1.613006088280061 \\\hline
+18 & Viper & 1.6119751502444593 \\\hline
+19 & Spectre & 1.611136567135945 \\\hline
+20 & Phoenix & 1.610776975596254 \\\hline
+
+\caption{Professional Games Damage/Gold Rate}
+\label{professional-games-damage-gold-rate}
+\end{longtable}
+
+\subsubsection{Hero Statistics}
+
+Public Games:
+
+\begin{longtable}{|p{1.5cm}|p{2cm}|p{3cm}|p{4.5cm}|}
+
+\hline
+\textbf{Rank} & \textbf{Type} & \textbf{Hero} & \textbf{Average} \\
+\hline
+\endhead
+
+1 & Kill & Skywrath\_mage & 9.669361281499235 \\\hline
+2 & Kill & Riki & 8.918664447370382 \\\hline
+3 & Kill & Bloodseeker & 8.867892841571528 \\\hline
+4 & Kill & Huskar & 8.842363960058828 \\\hline
+5 & Kill & Clinkz & 8.620800198367014 \\\hline
+1 & Assist & Spirit\_breaker & 17.035058859815965 \\\hline
+2 & Assist & Zuus & 16.959805989951498 \\\hline
+3 & Assist & Disruptor & 16.16634037197595 \\\hline
+4 & Assist & Undying & 16.01732058393167 \\\hline
+5 & Assist & Ancient\_apparition & 15.772262124197546 \\\hline
+1 & Death & Shadow\_shaman & 8.704649170353015 \\\hline
+2 & Death & Huskar & 8.60463271151018 \\\hline
+3 & Death & Earth\_spirit & 8.539345711759506 \\\hline
+4 & Death & Venomancer & 8.261024100529708 \\\hline
+5 & Death & Crystal\_maiden & 7.996521181001284 \\\hline
+1 & Healing & Wisp & 8113.96989272119 \\\hline
+2 & Healing & Dazzle & 6512.851949097656 \\\hline
+3 & Healing & Oracle & 4927.196047300997 \\\hline
+4 & Healing & Chen & 4643.917551963049 \\\hline
+5 & Healing & Juggernaut & 4531.026821805381 \\\hline
+
+\caption{Top Hero Statistics for Public Games}
+\label{top-hero-statistics-for-public-games}
+\end{longtable}
+
+
+Ranked Games:
+
+\begin{longtable}{|p{1.5cm}|p{2cm}|p{3cm}|p{4.5cm}|}
+
+\hline
+\textbf{Rank} & \textbf{Type} & \textbf{Hero} & \textbf{Average} \\
+\hline
+\endhead
+
+1 & Kill & Meepo & 12.175918939312277 \\\hline
+2 & Kill & Storm\_spirit & 11.574019337016574 \\\hline
+3 & Kill & Skywrath\_mage & 11.382918886915334 \\\hline
+4 & Kill & Ursa & 11.381844281905803 \\\hline
+5 & Kill & Clinkz & 11.360121362999845 \\\hline
+1 & Assist & Spirit\_breaker & 21.138613691680092 \\\hline
+2 & Assist & Zuus & 19.846135935482504 \\\hline
+3 & Assist & Undying & 19.50708614360113 \\\hline
+4 & Assist & Disruptor & 19.030801114843136 \\\hline
+5 & Assist & Ancient\_apparition & 18.42858021577866 \\\hline
+1 & Death & Shadow\_shaman & 10.57965933174599 \\\hline
+2 & Death & Earth\_spirit & 9.929016097543007 \\\hline
+3 & Death & Venomancer & 9.770501670227812 \\\hline
+4 & Death & Witch\_doctor & 9.737475719383838 \\\hline
+5 & Death & Crystal\_maiden & 9.699951072901378 \\\hline
+1 & Healing & Wisp & 9000.57524051552 \\\hline
+2 & Healing & Dazzle & 7985.429513362119 \\\hline
+3 & Healing & Chen & 6758.288667205896 \\\hline
+4 & Healing & Oracle & 6579.915818722605 \\\hline
+5 & Healing & Juggernaut & 6238.096888357454 \\\hline
+
+
+\caption{Top Hero Statistics for Ranked Games}
+\label{top-hero-statistics-for-ranked-games}
+\end{longtable}
+
+
+Professional Games:
+
+\begin{longtable}{|p{1.5cm}|p{2cm}|p{3cm}|p{4.5cm}|}
+
+\hline
+\textbf{Rank} & \textbf{Type} & \textbf{Hero} & \textbf{Average} \\
+\hline
+\endhead
+
+1 & Kill & Riki & 8.4 \\\hline
+2 & Kill & Tinker & 7.767857142857143 \\\hline
+3 & Kill & Gyrocopter & 7.578313253012048 \\\hline
+4 & Kill & Ember\_spirit & 7.381818181818182 \\\hline
+5 & Kill & Techies & 7.2 \\\hline
+1 & Assist & Spirit\_breaker & 17.448979591836736 \\\hline
+2 & Assist & Earth\_spirit & 15.346153846153847 \\\hline
+3 & Assist & Elder\_titan & 14.785714285714286 \\\hline
+4 & Assist & Nyx\_assassin & 14.526315789473685 \\\hline
+5 & Assist & Undying & 14.5 \\\hline
+1 & Death & Treant & 9.591836734693878 \\\hline
+2 & Death & Techies & 8.266666666666667 \\\hline
+3 & Death & Lich & 7.538461538461538 \\\hline
+4 & Death & Lion & 7.402298850574713 \\\hline
+5 & Death & Nyx\_assassin & 7.368421052631579 \\\hline
+1 & Healing & Wisp & 6486.472222222223 \\\hline
+2 & Healing & Oracle & 4874.9375 \\\hline
+3 & Healing & Abaddon & 4772.2 \\\hline
+4 & Healing & Dazzle & 4236.021739130435 \\\hline
+5 & Healing & Chen & 4141.310344827586 \\\hline
+
+\caption{Top Hero Statistics for Professional Games}
+\label{top-hero-statistics-for-professional-games}
+\end{longtable}
+
+\subsubsection{First 15 min Gold/XP Gain}
+
+\begin{longtable}{|p{2cm}|p{3cm}|p{4.5cm}|}
+
+\hline
+\textbf{Game Type} & \textbf{XP or Gold} & \textbf{Hero} \\
+\hline
+\endhead
+
+Ranked & XP & Broodmother \\\hline
+Ranked & Gold & Broodmother \\\hline
+Public & XP & Meepo \\\hline
+Public & Gold & Arc\_warden \\\hline
+Professional & XP & Visage \\\hline
+Professional & Gold & Broodmother \\\hline
+
+\caption{First 15 min Gold/XP Gain}
+\label{first-15-min-gold-xp-gain}
+\end{longtable}
+
+
+\subsubsection{Most Pick Hero}
+
+Public Games:
+
+\begin{longtable}{|p{2cm}|p{3cm}|p{4.5cm}|}
+
+\hline
+\textbf{Rank} & \textbf{Hero} & \textbf{Time} \\
+\hline
+\endhead
+
+1 & Pudge & 195833 \\\hline
+2 & Sniper & 142191 \\\hline
+3 & Ogre\_magi & 129292 \\\hline
+4 & Windrunner & 128924 \\\hline
+5 & Lion & 126034 \\\hline
+
+\caption{Most Pick Hero for Public Games}
+\label{most-pick-hero-for-public-games}
+\end{longtable}
+
+
+Ranked Games:
+
+\begin{longtable}{|p{2cm}|p{3cm}|p{4.5cm}|}
+
+\hline
+\textbf{Rank} & \textbf{Hero} & \textbf{Time} \\
+\hline
+\endhead
+
+1 & Pudge & 306246 \\\hline
+2 & Ogre\_magi & 252735 \\\hline
+3 & Lion & 238215 \\\hline
+4 & Faceless\_void & 193762 \\\hline
+5 & Invoker & 188404 \\\hline
+
+\caption{Most Pick Hero for Ranked Games}
+\label{most-pick-hero-for-ranked-games}
+\end{longtable}
+
+Profressional Games:
+
+\begin{longtable}{|p{2cm}|p{3cm}|p{4.5cm}|}
+
+\hline
+\textbf{Rank} & \textbf{Hero} & \textbf{Time} \\
+\hline
+\endhead
+
+1 & Ogre\_magi & 142 \\\hline
+2 & Tiny & 141 \\\hline
+3 & Shadow\_demon & 107 \\\hline
+4 & Grimstroke & 87 \\\hline
+5 & Tidehunter & 82 \\\hline
+
+\caption{Most Pick Hero for Professional Games}
+\label{most-pick-hero-for-professional-games}
+\end{longtable}
+
+\subsubsection{Most Purchased/Used Item}
+
+Public Games:
+
+\begin{longtable}{|p{2cm}|p{2cm}|p{3.5cm}|p{2.5cm}|}
+
+\hline
+\textbf{Rank} & \textbf{Purchased/Used} & \textbf{Item} & \textbf{Total Times} \\
+\hline
+\endhead
+
+1 & Purchased & Tpscroll & 83564 \\\hline
+2 & Purchased & Ward\_sentry & 31378 \\\hline
+3 & Purchased & Ward\_dispenser & 25616 \\\hline
+4 & Purchased & Ward\_observer & 23507 \\\hline
+5 & Purchased & Boots & 11906 \\\hline
+1 & Used & Phase\_boots & 202182 \\\hline
+2 & Used & Tpscroll & 79941 \\\hline
+3 & Used & Bottle & 57859 \\\hline
+4 & Used & Blink & 52500 \\\hline
+5 & Used & Ward\_dispenser & 41044 \\\hline
+
+\caption{Most Purcahsed/Used Item for Public Games}
+\label{most-purchased-used-item-for-public-games}
+\end{longtable}
+
+
+Ranked Games:
+
+\begin{longtable}{|p{2cm}|p{2cm}|p{3.5cm}|p{2.5cm}|}
+
+\hline
+\textbf{Rank} & \textbf{Purchased/Used} & \textbf{Item} & \textbf{Total Times} \\
+\hline
+\endhead
+
+1 & Purchased & Tpscroll & 99078 \\\hline
+2 & Purchased & Ward\_sentry & 48867 \\\hline
+3 & Purchased & Ward\_dispenser & 44732 \\\hline
+4 & Purchased & Ward\_observer & 35551 \\\hline
+5 & Purchased & Clarity & 15273 \\\hline
+1 & Used & Phase\_boots & 315978 \\\hline
+2 & Used & Tpscroll & 95651 \\\hline
+3 & Used & Bottle & 87434 \\\hline
+4 & Used & Blink & 75464 \\\hline
+5 & Used & Ward\_dispenser & 71248 \\\hline
+
+\caption{Most Purcahsed/Used Item for Ranked Games}
+\label{most-purchased-used-item-for-ranked-games}
+\end{longtable}
+
+
+Professional Games:
+
+\begin{longtable}{|p{2cm}|p{2cm}|p{3.5cm}|p{2.5cm}|}
+
+\hline
+\textbf{Rank} & \textbf{Purchased/Used} & \textbf{Item} & \textbf{Total Times} \\
+\hline
+\endhead
+
+1 & Purchased & Tpscroll & 28448 \\\hline
+2 & Purchased & Ward\_sentry & 12195 \\\hline
+3 & Purchased & Ward\_dispenser & 11834 \\\hline
+4 & Purchased & Ward\_observer & 11361 \\\hline
+5 & Purchased & Clarity & 6383 \\\hline
+1 & Used & Phase\_boots & 109046 \\\hline
+2 & Used & Bottle & 32853 \\\hline
+3 & Used & Tpscroll & 27472 \\\hline
+4 & Used & Power\_treads & 25600 \\\hline
+
+
+\caption{Most Purcahsed/Used Item for Professional Games}
+\label{most-purchased-used-item-for-professional-games}
+\end{longtable}
+
+
 
 \end{document}

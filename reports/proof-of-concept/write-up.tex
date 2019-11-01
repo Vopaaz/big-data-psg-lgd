@@ -256,20 +256,6 @@ We will discuss how we acquire those data how it is transformed into a usable fo
 
 The Dota2 match result data is already in JSON format, we can use it straightforwardly in the same schema to save it into our database, the data dictionary for this dataset can be found in table \ref{match-result-data-dictionary} in the Appendix.
 
-The data dictionary for one JSON object of field "picks\_bans" that mentioned before should be: \\
-\begin{tabular}{|p{3cm}|p{2cm}|p{5cm}|p{3cm}|}
-\hline
-Field Name& Data Type& Description & Example\\
-\hline
-is\_pick & boolean & Whether this entry is a pick (true) or a ban (false). & true \\
-\hline
-hero\_id & int & The hero's unique ID. & 20 \\
-\hline
-team & int & The team who chose the pick or ban; 0 for Radiant, 1 for Dire. & 1 \\
-\hline
-order & int & The order of which the picks and bans were selected. & 10 \\
-\hline
-\end{tabular}
 
 The second dataset is initially a binary file, we have to parse it first then fit into a schema that we design. After these process, one document(record) of a replay should have the following fields:
 \begin{enumerate}
@@ -535,6 +521,27 @@ level & int & The player's level at match end. & 23 \\
 \end{longtable}
 \label{player-field-in-match-result}
 \end{center}
+
+The data dictionary for one JSON object of field "picks\_bans" in table \ref{match-result-data-dictionary} is as follows.
+
+\begin{longtable}{|p{3cm}|p{2cm}|p{5cm}|p{3cm}|}
+
+\hline
+\textbf{Field Name} & \textbf{Data Type} & \textbf{Description}  & \textbf{Example} \\
+\hline
+\endhead
+
+is\_pick & boolean & Whether this entry is a pick (true) or a ban (false). & true \\
+\hline
+hero\_id & int & The hero's unique ID. & 20 \\
+\hline
+team & int & The team who chose the pick or ban; 0 for Radiant, 1 for Dire. & 1 \\
+\hline
+order & int & The order of which the picks and bans were selected. & 10 \\
+\hline
+\caption{Ban\_pick Field in Match Result}
+\end{longtable}
+\label{ban-pick-in-match-result}
 
 
 \end{document}

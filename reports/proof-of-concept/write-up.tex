@@ -287,7 +287,7 @@ chat &  JSON Array & What the players say in the chat during the match &
 \end{json}
 \end{minipage}
 \\\hline
-lifestate & JSON Array & Spawns and deaths of objects in the game & 
+lifestate & JSON Array & Spawns and deaths of objects in the game &
 \begin{minipage}{4.99cm}
 \begin{json}
 {
@@ -301,48 +301,8 @@ lifestate & JSON Array & Spawns and deaths of objects in the game &
 \\\hline
 \caption{Replay Data Dictionary}
 \end{longtable}
+\label{replay-data-dictionary}
 
-
-The data dictionary for one JSON object of field "combatlog" that mentioned before should be: \\
-
-\begin{tabular}{|p{3cm}|p{2cm}|p{5cm}|p{3cm}|}
-\hline
-Field Name& Data Type& Description & Example\\
-\hline
-time & double & The time when this action happens & 325.608734130432 \\
-\hline
-type & String & The type of this action. & "purchase" \\
-\hline
-target & String & The target of this action & "npc\_dota\_hero\_nevermore" \\
-\hline
-item & String & This field only occurs when the type of the action is "purchase". Indicates which item was bought by this action & "item\_enchanted\_mongo" \\
-\hline
-inflictor & String & This field only occurs when the type of the action is "damage", "lose\_buff" and "add\_buff". The inflictor of the current action & "modifier\_tower\_aura\_bonus" \\
-\hline
-damage & int & This field only occurs when the type of the action is "damage", which indicates the damage caused by the current action. & 80 \\
-\hline
-before\_hp & int &  This field only occurs when the type of the action is "damage", which indicates the hp of the target before the action. & 725 \\
-\hline
-after\_hp & int &  This field only occurs when the type of the action is "damage", which indicates the hp of the target after the action. & 718 \\
-\hline
-\end{tabular}
-
-The more detailed data dictionary of field "info" that mentioned before should be: \\
-\begin{tabular}{|p{3cm}|p{2cm}|p{5cm}|p{3cm}|}
-\hline
-Field Name& Data Type& Description & Example\\
-\hline
-game\_winner & int & 1 if radiant wins and 2 if dire wins. & 1 \\
-\hline
-leagueid & int & The unique league id of the current professional game, 0 if it is not a professional match. & 4122 \\
-\hline
-match\_id & long & The unique identifier for each game. & 4986514901. \\
-\hline
-end\_time & long & The timestamp of the ending of the game. & 1566736571. \\
-\hline
-game\_mode & int & The mode of the current game & 21 \\
-\hline
-\end{tabular}
 \section{Data ETL}
 Our aim is to collect about 1,500,000 records for our match result dataset and about 1000 professional games, 1000 ranked games and 1000 public games for our replay dataset. Our data is mainly three sources:
 \begin{enumerate}
@@ -581,5 +541,57 @@ order & int & The order of which the picks and bans were selected. & 10 \\
 
 \subsubsection{Parsed Replay Dataset}
 
+
+The data dictionary for one JSON object of field "combatlog" in table \ref{replay-data-dictionary} is as follows.
+
+\begin{longtable}{|p{3cm}|p{2cm}|p{5cm}|p{3cm}|}
+
+\hline
+\textbf{Field Name} & \textbf{Data Type} & \textbf{Description}  & \textbf{Example} \\
+\hline
+\endhead
+
+time & double & The time when this action happens & 325.608734130432 \\
+\hline
+type & String & The type of this action. & "purchase" \\
+\hline
+target & String & The target of this action & "npc\_dota\_hero\_nevermore" \\
+\hline
+item & String & This field only occurs when the type of the action is "purchase". Indicates which item was bought by this action & "item\_enchanted\_mongo" \\
+\hline
+inflictor & String & This field only occurs when the type of the action is "damage", "lose\_buff" and "add\_buff". The inflictor of the current action & "modifier\_tower\_aura\_bonus" \\
+\hline
+damage & int & This field only occurs when the type of the action is "damage", which indicates the damage caused by the current action. & 80 \\
+\hline
+before\_hp & int &  This field only occurs when the type of the action is "damage", which indicates the hp of the target before the action. & 725 \\
+\hline
+after\_hp & int &  This field only occurs when the type of the action is "damage", which indicates the hp of the target after the action. & 718 \\
+\hline
+\caption{Combatlog Field in Replay}
+\end{longtable}
+\label{combat-field-in-replay}
+
+The data dictionary for one JSON object of field "info" in table \ref{replay-data-dictionary} is as follows.
+
+\begin{longtable}{|p{3cm}|p{2cm}|p{5cm}|p{3cm}|}
+
+\hline
+\textbf{Field Name} & \textbf{Data Type} & \textbf{Description}  & \textbf{Example} \\
+\hline
+\endhead
+
+game\_winner & int & 1 if radiant wins and 2 if dire wins. & 1 \\
+\hline
+leagueid & int & The unique league id of the current professional game, 0 if it is not a professional match. & 4122 \\
+\hline
+match\_id & long & The unique identifier for each game. & 4986514901. \\
+\hline
+end\_time & long & The timestamp of the ending of the game. & 1566736571. \\
+\hline
+game\_mode & int & The mode of the current game & 21 \\
+\hline
+\caption{Info Field in Replay}
+\end{longtable}
+\label{info-field-in-replay}
 
 \end{document}

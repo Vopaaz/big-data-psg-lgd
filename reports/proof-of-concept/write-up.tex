@@ -587,6 +587,10 @@ But after we deployed our system on AWS, we found a problem that the connection 
 If so, we cannot get the result printed on the console.
 As a result, besides printing result on the console, we also write the result to a file, which prevents missing the output on the console.
 
+\subsection{Limited Information in Parsed Replay Data}
+
+As mentioned in Analysis, some business questions in proposal are not fulfilled because we find that the parsed replay data doesn't contains the information we need. One important information is location. Some of our business questions rely on the location information, for example, analysis on the path of heroes and the lane. Actually, this problem is caused by the parser we used because a replay data contains almost all information of a game. We known this fact when we wrote the proposal, but we still propose these questions. Because we though we can try to find another parser which can extract the location information from the replay data. But we didn't find one which makes our give up these questions.
+
 \printglossary
 %-------%
 

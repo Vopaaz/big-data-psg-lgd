@@ -490,40 +490,21 @@ Given the limited time and storage we have, we decided to first collect a certai
 As mentioned in the proposal, we tried to containerized the project by docker, but it ends up with failures. Considering to the limited time, we decided to discard using docker for installing our NoSQL technology.
 
 At first, I tried to dockerize our project by using a single Dockerfile.
-According to the \href{https://docs.docker.com/}{docker documents}, Dockerfile "defines what is going on in the environment inside your container".
-At the very beginning, we thought dockerizing a project just means pulling all the official images in docker, and then we can start manipulate it.
-However, after reading documents, we found that we need to construct a Dockerfile to define how a project work, so that it behaves exactly the same wherever it runs.
-We can pull an image as a parent image, and then install needed packages in it.
+We used ubuntu as a parent image so that docker can virtualize an ubuntu operation system environment on our host machine, and then install needed packages in it.
+However, we can not connect to the database.
+Realizing that it is cramped to put all the services on a Dockerfile, we tried to construct a docker-compose.yml to define, run, and scale services with Docker.
 
-For example, in the project, we used ubuntu as a parent image, therefore docker virtualized an ubuntu operation system environment on our host machine.
-Then I used Dockerfile as if it is the terminal of ubuntu, writing codes of installing java8, maven, mongoDB in the Dockerfile.
-
-After I constructed the Dockerfile, I failed every time when it was trying to connect to the database.
-Realizing that it is cramped to put all the services on a Dockerfile, we tried to construct a docker-compose.yml to define, run and scale services with Docker.
-
-According to our data pipeline, I intended to build 4 services in the docker-compose:
-\begin{itemize}
-    \item Data acquisition and filtering (as "fetchstore" service in the docker-compose)
-    \item Data Extraction (as "parsereplay" service in the docker-compose)
-    \item Data Aggregation and Representation (as "mongodb" service in the docker-compose)
-    \item Data Analysis (as "analytics" service in the docker-compose)
-\end{itemize}
-
+According to our data pipeline, I intended to build 4 services - FetchStore, ParseReplay, MongoDB, and Analytics - in the docker-compose.
 In the docker-compose, we can also use the Dockerfile by using the command \codeinline{build} in a service.
-Therefore, I constructed Dockerfiles for Extraction, Transformation and Analysis services.
+Therefore, I constructed Dockerfiles for FetchStore, ParseReplay, and Analytics services.
 And I used the official image of MongoDB, and used \codeinline{volume} in the service to reflect the direction of configuration file and MongoDB initial JavaScipt.
-Also, we used \codeinline{depends_on} to define simple interaction between the services.
+Also, I utilized \codeinline{depends_on} to define simple interaction between the services.
+There are a lot of things to consider when running multiple containers, and it's easy to make mistakes if not being thoughtful enough.
 
-As the result, we still have a hard time connecting the database.
-There are a lot of things to be considered when running multiple containers.
-When this problem is fixed, we only finished the configuration of the extraction and database service.
-Then we realized we got limited time left, therefore, we discard docker for now, and move on to deploy our project on amazon web service (AWS).
+As a result, we still had a hard time connecting to the database.
+When this problem was fixed, we only finished the configuration of the FetchStore and MongoDB service.
+Then we realized we got limited time left. Therefore, we discard docker for now and move on to deploy our project on amazon web service (AWS).
 And we hope to complete this part in the future.
-
-The reason of failure is that I got misunderstanding on Docker's architecture.
-Also, it is hard for me to consider our system's architecture in Docker's way.
-Also it is time consuming to try those failures to realize the right way to deploy a project on Docker.
-This experience pushed me to learn a lot about Linux and to read a lot of configuration file.
 
 \subsection{Setup AWS environment}
 

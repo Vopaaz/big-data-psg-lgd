@@ -9,6 +9,7 @@ import Spark.SparkSessionCreator
 import Spark.SparkMongoHelper
 import org.apache.log4j.Logger
 import org.apache.log4j.Level
+import java.io._
 
 object MostPick {
   val sessionCreator: SparkSessionCreator = new SparkSessionCreator()
@@ -26,18 +27,21 @@ object MostPick {
     SparkMongoHelper.printGame(gameType)
 
     val games = rdd.filter(SparkMongoHelper.is_wanted_match_type(gameType)).filter(x => x.getInteger("human_players") == 10)
-    val most_pick_hero = games
+    val pick_count = games
       .map(x => x.get("players").asInstanceOf[ArrayList[org.bson.Document]])
       .map(_.toSeq)
       .flatMap(x => x.map(y => y))
       .map(x => (x.getInteger("hero_id"), 1))
       .reduceByKey(_ + _)
-      .reduce((x, y) => if(x._2 > y._2) x else y)
+      .collect()
+      .sortWith(_._2 > _._2)
 
     spark.stop()
-
-    val hero_name = SparkMongoHelper.getHeroName(most_pick_hero._1)
-    println(s"The most picked hero is ${hero_name}. Picked ${most_pick_hero._2} times")
+    val pw = new PrintWriter(new File("result/most_pick.txt" ))
+    for (i <- 0 to pick_count.size-1) {
+      pw.write(s"${pick_count(i)._1} : ${pick_count(i)._2} ,\n")
+    }
+    pw.close
   }
 
 }

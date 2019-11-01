@@ -12,6 +12,7 @@ import org.apache.log4j.Logger
 import org.apache.log4j.Level
 import Spark.SparkSessionCreator
 import Spark.SparkMongoHelper
+import java.io._
 
 object FirstBloodTrain {
 
@@ -37,6 +38,9 @@ object FirstBloodTrain {
     val rmse = regEval.evaluate(predictions)
     println(s"Root Mean Squared Error on training data: $rmse")
     spark.stop()
+    val pw = new PrintWriter(new File("result.txt" ))
+    pw.write("Root Mean Squared Error on training data: " + rmse)
+    pw.close
 
   }
 

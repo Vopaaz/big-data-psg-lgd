@@ -7,14 +7,15 @@ import java.util.ArrayList
 import scala.collection.JavaConversions._
 import Spark.SparkSessionCreator
 import Spark.SparkMongoHelper
+import java.io._
 
 object DamageRate {
 
   val sessionCreator: SparkSessionCreator = new SparkSessionCreator()
 
   def main(args: Array[String]) {
-    gold_to_damage("rankedGames")
     gold_to_damage("publicGames")
+    gold_to_damage("rankedGames")
     gold_to_damage("professionalGames")
   }
 
@@ -45,8 +46,24 @@ object DamageRate {
 
     val sorted_results = gold_damage_per_player
       .sortWith((a, b) => (a._2 > b._2))
-      .foreach(println)
 
     spark.stop()
+    val pw = new PrintWriter(new File("result/damage_rate_result.txt" ))
+
+    for(i <- 0 to 19) {
+      val hero_name = SparkMongoHelper.getHeroName(sorted_results(i)._1)
+      pw.write(s"Hero who has top ${i+1} damage rate is ${hero_name}. Damage rate: ${sorted_results(i)._2}\n")
+      println(s"Hero who has top ${i+1} damage rate is ${hero_name}. Damage rate: ${sorted_results(i)._2}")
+    }
+
+    println()
+
+    for(i <- (sorted_results.size-20) to (sorted_results.size-1)) {
+      val hero_name = SparkMongoHelper.getHeroName(sorted_results(i)._1)
+      pw.write(s"Hero who has bottom ${sorted_results.size - i}th damage rate is ${hero_name}. Damage rate: ${sorted_results(i)._2}\n")
+      println(s"Hero who has bottom ${sorted_results.size - i}th damage rate is ${hero_name}. Damage rate: ${sorted_results(i)._2}")
+    }
+
+    pw.close
   }
 }

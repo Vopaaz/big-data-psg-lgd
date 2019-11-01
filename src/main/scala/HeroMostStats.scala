@@ -52,38 +52,21 @@ object HeroMostStats {
     val games = rdd.filter(SparkMongoHelper.is_wanted_match_type(gameType))
 
     val hero_group = games
-      .flatMap(
-          x =>
-            x.get("players")
-              .asInstanceOf[ArrayList[Document]]
-      )
-      .groupBy(x => x.getInteger("hero_id"))
-
-    val hero_stats = hero_group
-      .map(
-          x =>
-            Tuple3(
-                x._1,
-                x._2.count(x => true),
-                x._2.aggregate(0)(
-                    (acc, item) => acc + item.getInteger(stats),
-                    (acc1, acc2) => acc1 + acc2
-                )
-            )
-      )
-      .map(
-          x =>
-            Tuple2(
-                x._1,
-                x._3 / x._2
-            )
-      )
-
-    val result = hero_stats.reduce(
-        (x, y) => if (x._2 > y._2) x else y
-    )
+      .map(x => x.get("players")
+      .asInstanceOf[ArrayList[org.bson.Document]])
+      .map(_.toSeq)
+      .flatMap(x => x.map(y => y))
+      .filter(x => (x.getInteger("hero_id") != null))
+      .filter(x => (x.getInteger(stats) != null))
+      .map(x => (x.getInteger("hero_id"), (x.getInteger(stats), 1)))
+      .reduceByKey((a, b) => (a._1 + b._1, a._2 + b._2))
+      .map(x => (x._1, x._2._1.toDouble / x._2._2))
+      .collect()
+      .sortWith(_._2 > _._2)
     spark.stop()
-    val hero_name = SparkMongoHelper.getHeroName(result._1)
-    println(s"Hero who has most ${stats} is ${hero_name}. Has ${result._2} times.")
+    for (i <- 0 to 4) {
+        val hero_name = SparkMongoHelper.getHeroName(hero_group(i)._1)
+        println(s"Hero who has most ${stats} is ${hero_name}. Has rate ${hero_group(i)._2} per games.")
+    }
   }
 }

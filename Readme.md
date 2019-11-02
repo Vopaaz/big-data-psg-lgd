@@ -4,8 +4,8 @@ Dota 2 big data analysis group project for Big Data Engineering and Architecture
 
 ## Documentations
 
-[Proposal](/reports/proof-of-concept/proposal.pdf)
-[Report](/reports/proof-of-concept/write-up.pdf)
+- [Proposal](/reports/proof-of-concept/proposal.pdf)
+- [Report](/reports/proof-of-concept/write-up.pdf)
 
 ## Environment Setup
 
@@ -19,7 +19,7 @@ Dota 2 big data analysis group project for Big Data Engineering and Architecture
 
 ### Configuration
 
-Create a `config.yml` at the project root. You can refer to the [example](config.example.yml)
+Create a `config.yml` at the project root. You can refer to the [example](config.example.yml).
 
 ## Running
 
@@ -32,7 +32,7 @@ java -jar target/FetchStore.one-jar.jar <start_sequence_num> <total_num> <batch_
 
 You can test by setting the sequence number to `4182489531`, which is a very famous professional dota2 game.
 
-For more detail, you can refer to the ETL pipeline [documentation](src/main/java/FetchStore/doc.md)
+For more detail, you can refer to the ETL pipeline [documentation](src/main/java/FetchStore/doc.md).
 
 ### Analysis
 

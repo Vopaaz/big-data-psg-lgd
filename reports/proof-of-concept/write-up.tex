@@ -8,7 +8,11 @@
 \usepackage{hyperref}
 \usepackage{parskip}
 \usepackage[toc]{glossaries}
-\hypersetup{colorlinks,allcolors=black,urlcolor=blue}
+\usepackage{xcolor}
+
+\definecolor{hrefcolor}{RGB}{0,45,170}
+
+\hypersetup{colorlinks,allcolors=black,urlcolor=hrefcolor}
 
 \setenumerate[1]{itemsep=0pt,partopsep=2pt,parsep=0pt ,topsep=2pt}
 \setitemize[1]{itemsep=0pt,partopsep=2pt,parsep=0pt ,topsep=2pt}
@@ -20,10 +24,10 @@
 \usepackage{fontspec}
 
 \defaultfontfeatures{%
-	RawFeature={%
-		% +swsh,
-		+calt
-	}%
+    RawFeature={%
+        % +swsh,
+        +calt
+    }%
 }
 
 \setmainfont{EB Garamond}
@@ -31,39 +35,48 @@
 \usepackage{multicol}
 \usepackage{float}
 
+\usepackage{longtable}
+
 \usepackage[semibold]{sourcecodepro}
 
-\usepackage{xcolor}
 \usepackage{minted}
 \usemintedstyle{friendly}
 
 \definecolor{bg}{rgb}{0.95,0.95,0.95}
 \newcommand{\codeinline}[1]{
-	\mintinline[bgcolor=bg, fontsize=\scriptsize]{text}{#1}
+    \mintinline[bgcolor=bg, fontsize=\scriptsize]{text}{#1}
 }
 
 
 \usepackage{relsize}
 \newcommand{\bigdataVs}[1]{
-	\subsection{#1}
+    \subsection{#1}
 }
 
 \newenvironment{console}{% Caution:
-	\VerbatimEnvironment
-	\begin{minted}[xleftmargin=2em,bgcolor=bg,fontsize=\small]{console}% Do NOT delete these comments
-	}% Otherwise there will be error when compiling
-	{%
-	\end{minted}%
+    \VerbatimEnvironment
+    \begin{minted}[xleftmargin=2em,bgcolor=bg,fontsize=\small]{console}% Do NOT delete these comments
+    }% Otherwise there will be error when compiling
+    {%
+    \end{minted}%
+}
+
+\newenvironment{json}{% Caution:
+    \VerbatimEnvironment
+    \begin{minted}[xleftmargin=0em,bgcolor=bg,fontsize=\scriptsize]{json}% Do NOT delete these comments
+    }% Otherwise there will be error when compiling
+    {%
+    \end{minted}%
 }
 %-----------%
 
 \title{NoSQL Write-up -- Dota2 Game Replay Analysis}
 \author{
-	Team name: PSG.LGD \\ \\
-	Yichun Yan \\
-	Ziwei Jiang \\
-	Yifan Li \\
-	Weiqi Wang
+    Team name: PSG.LGD \\ \\
+    Yichun Yan \\
+    Ziwei Jiang \\
+    Yifan Li \\
+    Weiqi Wang
 }
 \date{\today}
 
@@ -74,7 +87,7 @@
 \newglossaryentry{Ancient}
 {
     name={Ancient},
-    description={(also commonly refered to as Thrones, or Tree for Radiant's ancient and Throne for Dire's ancient, as legacy names from DotA) are massive structures found inside each faction's base and are the main objective. In order to win, the enemy team's Ancient must be destroyed, while the own one must be kept alive. Ancients are guarded by their two tier 4 towers. The Ancients are invulnerable until both of their tier 4 towers are destroyed.}
+    description={(also commonly referred to as Thrones, or Tree for Radiant's ancient and Throne for Dire's ancient, as legacy names from DotA) are massive structures found inside each faction's base and are the main objective. To win, the enemy team's Ancient must be destroyed, while the own one must be kept alive. Ancients are guarded by their two-tier 4 towers. The Ancients are invulnerable until both of their tier 4 towers are destroyed.}
 }
 \newglossaryentry{MOBA}
 {
@@ -104,12 +117,12 @@
 \newglossaryentry{creeps}
 {
     name={creeps},
-    description={Creeps are basic units in Dota 2. Every unit which is not a hero, building, ward or courier is considered a creep. Creeps can belong to either faction, be neutral, or be player-controlled units. Unlike heroes, creeps do not gain experience and cannot level up. All of their stats are set values (though can still be altered by modifiers). Most creeps grant a set gold and experience bounty to heroes when killed.}
+    description={Creeps are basic units in Dota 2. Every unit which is not a hero, building, ward or courier is considered a creep. Creeps can belong to either faction, be neutral, or be player-controlled units. Unlike heroes, creeps do not gain experience and cannot level up. All of their stats are set values (though they can still be altered by modifiers). Most creeps grant a set gold and experience bounty to heroes when killed.}
 }
 \newglossaryentry{XP}
 {
     name={XP},
-    description={A shorthand for experience. Experience is an element heroes can gather by killing enemy units, or being present as enemy units get killed. On its own, experience does nothing, but when accumulated, it increases the hero's level, so that they grow more powerful. Only heroes can gather experience and therefore reach higher levels. With each level gained, a hero's base attributes increase by static values (unique for each hero), which makes them stronger in several.}
+    description={A shorthand for experience. Experience is an element hero can gather by killing enemy units, or being present as enemy units get killed. On its own, experience does nothing, but when accumulated, it increases the hero's level, so that they grow more powerful. Only heroes can gather experience and therefore reach higher levels. With each level gained, a hero's base attributes increase by static values (unique for each hero), which makes them stronger in several.}
 }
 \newglossaryentry{match id}
 {
@@ -154,7 +167,7 @@
 \newglossaryentry{mode}
 {
     name={mode},
-    description={Game modes are a set of restrictions within which the game of Dota 2 can be played. Most game modes alter how heroes are picked by players. There are also some novelty modes that allow 1v1 play, or give a player a new hero every time they die, for example. }
+    description={Game modes are a set of restrictions within which the game of Dota 2 can be played. Most game modes alter how heroes are picked by players. Some novelty modes allow 1v1 play or give a player a new hero every time they die, for example. }
 }
 \newglossaryentry{ban}
 {
@@ -179,7 +192,7 @@
 \newglossaryentry{buyback}
 {
     name={buyback},
-    description={While dead, the player has the option to use ``buyback", spending money in order to instantly respawn at the fountain. However, the buyback ability has a long cooldown of 480 seconds and has a scaling gold cost.}.
+    description={While dead, the player has the option to use ``buyback", spending money to instantly respawn at the fountain. However, the buyback ability has a long cooldown of 480 seconds and has a scaling gold cost.}.
 }
 \newglossaryentry{last-hit}
 {
@@ -199,116 +212,955 @@
 
 \subsection{Background of Datasets}
 
-Our team aims at exploring data about a popular and long-lived computer game, Dota2. Dota2 is a multiplayer online battle arena (\gls{MOBA}) video game developed and published by Valve Corporation. Each game will involve ten players that are divided to two teams play against each other on a same map. Every player chooses one ``hero" that has unique abilities and different styles of playing. The aim for each team is to destroy the building called ``\gls{Ancient}" of the other team. Players collect \gls{gold} to buy powerful items and gain \gls{XP} by killing players on the other team, destroy building of the other team, or kill \gls{creeps}.
+Our team aims at exploring data about a popular and long-lived computer game, Dota2.
+
+Dota2 is a multiplayer online battle arena (\gls{MOBA}) video game developed and published by Valve Corporation. Each game will involve ten players that are divided into two teams play against each other on the same map. Every player chooses one ``hero" that has unique abilities and different styles of playing. The aim for each team is to destroy the building called ``\gls{Ancient}" of the other team. Players collect \gls{gold} to buy powerful items and gain \gls{XP} by killing players on the other team, destroy the building of the other team, or kill \gls{creeps}.
 
 \begin{figure}[H]
-	\centering
-	\includegraphics[width=\linewidth]{pic/combat.png}
-	\caption{A screenshot of the game}
+    \centering
+    \includegraphics[width=\linewidth]{pic/combat.png}
+    \caption{A screenshot of the game}
 \end{figure}
 
-It is a real-time game, hundreds of operations and some decisions will be made each second, and all of them will have some influence on the final results of the game. Therefore, there are some professional teams start hiring data engineers to help their players perform better in a game. For example, by using big data pipeline to answer the business question "Does there exist a regular farming path for some professional players?", we can understand both our teammates and the players from other team better, and therefore optimize our strategies.
+This game has a large number of players, accordingly, a huge amount of replays will be produced every day. Also, it's a real-time game, hundreds of operations and some decisions will be made each second, and all of them will have some influence on the final results of the game. Both of the above two features make the game a great subject to big data analysis.
+
+There are some professional teams start hiring data engineers to help their players perform better in a game. This means that our analysis has some realistic meaning.
+For example, by using a big data pipeline to answer the business question ``Does there exist a regular farming path for some professional players?", we can understand both our teammates and the opponents better, and therefore optimize our strategies.
+
+We have used technologies like MongoDB, Apache Spark, Neo4j for this project. All of the code of this project can be found in \href{https://github.com/Vopaaz/big-data-psg-lgd/}{this repository}, and I will explain the logic of our project and reference to some lines of code when necessary in the following sections.
 
 \subsection{Source of Datasets}
 
-\begin{center}
-    \begin{tabular}{|c|c|}
-    \hline
-    Dataset Name & Dataset Source \\
-    \hline\hline
-    \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchDetails}{Dota2 match result dataset} & \href{https://wiki.teamfortress.com/wiki/WebAPI}{Valve's official API} \\
-    \hline
-    \href{https://wiki.teamfortress.com/wiki/Replay}{Dota2 replay dataset} & Valve's Dota2 replay servers \\
-    \hline
+\renewcommand{\arraystretch}{1.5}
+\begin{table}[H]
+\centering
+\begin{tabular}{lll}
+    Dataset Name & Source & Format \\\hline
+
+    \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchDetails}{Dota2 match result dataset} &
+    \href{https://wiki.teamfortress.com/wiki/WebAPI}{Valve's official API} &
+    JSON file in \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchDetails}{this schema}\\
+
+    \href{https://wiki.teamfortress.com/wiki/Replay}{Dota2 replay dataset} &
+    Valve's Dota2 replay servers \footnotemark &
+    \renewcommand{\arraystretch}{1}
+    \begin{tabular}{@{}l@{}}
+    \codeinline{.dem} binary format, designed for\\ Dota2 game client and need to be parsed
     \end{tabular}
-\end{center}
+    \renewcommand{\arraystretch}{1.5}
+\end{tabular}
+\end{table}
+
+\footnotetext{urls for downloading replay can be constructed by combining the information in \href{https://docs.opendota.com/}{an OpenDota API} and \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchDetails}{one of the Valve's Official API}.}
+
 
 \subsection{Descriptions of Datasets}
 
-\begin{center}
-    \begin{tabular}{|p{4.5cm}|p{3.5cm}|p{5cm}|}
-    \hline
-    Dataset Name & Format & Usage \\
-    \hline\hline
-    Dota2 match result dataset & JSON & \begin{itemize}
-        \item Get match result (containing important information of players and the game such as player name, level, first blood time etc.)
-        \item Provide keys for replay dataset
-    \end{itemize} \\
-    \hline
-    Dota2 replay dataset & \codeinline{.dem.bz2} binary file & \begin{itemize}
-        \item Get player name, id, team formation and hero choice
-        \item Get detail log of the game
-        \item Get spawn/death of heros and NPCs
-    \end{itemize} \\
-    \hline
-    \end{tabular}
-\end{center}
+\begin{enumerate}
+\item Dota2 match result dataset: Snapshot of the end of a game, including the winner team, the duration of the whole game, each player's ending level, items and kill/death/assist, and other important information about the game and each player.
+\item Dota2 replay dataset: Everything happens in a game, which includes the whole combat log of the game, chatting information and the spawn and death of NPCs.
+\end{enumerate}
 
-We will describe how we use Dota2 replay parser to transform different datasets format into usable format in the ETL section.
+We will discuss how we acquire those data and how it is transformed into a usable format in detail in the ETL selection.
 
 \subsection{Data Dictionaries}
 
+The match result data is already in JSON format, we can use it straightforwardly in the same schema to save it into our database. The data dictionary for this dataset can be found in table \ref{match-result-data-dictionary}, \ref{player-field-in-match-result} and \ref{ban-pick-in-match-result} in the Appendix.
+
+The replay dataset is initially binary files, therefore we have to parse it first then fit into a schema that we design. After this process, one document (record) of a replay should have the following fields:
+
+\begin{longtable}{|p{2cm}|p{2cm}|p{4.5cm}|p{5cm}|}
+
+\hline
+\textbf{Field Name} & \textbf{Data Type} & \textbf{Description}  & \textbf{Example} \\
+\hline
+\endhead
+
+match\_id & long & The unique match id of this match & 4986514901\\\hline
+combatlog & JSON Array & Describing all the events in the game. See table \ref{combat-field-in-replay} for details & See table \ref{combat-field-in-replay} \\\hline
+info & JSON Object & Basic information about the match. See table \ref{info-field-in-replay} for details & See table \ref{info-field-in-replay}
+\\\hline
+chat &  JSON Array & What the players say in the chat during the match &
+\begin{minipage}{4.99cm}
+\begin{json}
+{
+  "sender": "Sk SpwaN",
+  "message": "gg wp"
+}
+\end{json}
+\end{minipage}
+\\\hline
+lifestate & JSON Array & Spawns and deaths of objects in the game &
+\begin{minipage}{4.99cm}
+\begin{json}
+{
+  "tick": 7420,
+  "type": "spawn",
+  "object":
+    "CDOTA_BaseNPC_Creep_Lane"
+}
+\end{json}
+\end{minipage}
+\\\hline
+\caption{Replay Data Dictionary}
+\label{replay-data-dictionary}
+\end{longtable}
+
 \section{Data ETL}
+
+We aim to collect about 1,500,000 records for our match result dataset and about 1000 professional games, 1000 ranked games and 1000 public games for our replay dataset. Our data is mainly three sources:
+\begin{enumerate}
+\item \href{https://wiki.teamfortress.com/wiki/WebAPI/}{Valve's official api}.
+\item \href{https://docs.opendota.com/}{OpenDota's third-party api}.
+\item \href{https://dev.dota2.com/showthread.php?t=47115}{Dota2's replay cluster}.
+\end{enumerate}
+We will walk through how we create a pipeline to make use of the above three sources to collect all the data we want in the Extraction section.
 
 \subsection{Extraction}
 
+To call Valve's official API, we need a key to get authorized. Each key has its API call limits, so we create a key pool that contains 5 different authorizing keys that are obtained using our Steam accounts. Every time we need to call the API, we randomly \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/ValveAPI.java#L215}{pick one key from the poll}.
+
+The api we are mainly using is \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchHistoryBySequenceNum}{GetMatchHistoryBySequenceNum}. It returns an array of game result information in its \codeinline{matches} field\footnote{The schema of each match result is the same as what described in \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchDetails}{GetMatchDetails API}.}. It requires two parameters:\codeinline{start_at_match_seq_num} and \codeinline{matches_requested}.
+The first one is a unique identifier for each match, and the second one is the number of match histories to be returned. We \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/ValveAPI.java#L207-L230}{construct the url} for the API call to get a bunch of match results and \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/ValveAPI.java#L238-L257}{save them into MongoDB}.
+Also, since we always want to keep the HiFi data around, I also \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/ValveAPI.java#L289-L300}{wrote the original JSON file into the disk}.
+
+After we get a list of match result in the previous call, we can use the sequence number of the last record we get from the last call then \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/ValveAPI.java#L275}{plus one} as the \codeinline{start_at_match_seq_num} for the next iteration.
+
+In each API call, I iterate the whole results to find out whether there is a \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/ValveAPI.java#L146-L161}{valid} professional game.
+If a valid professional game is found, we will call \href{https://docs.opendota.com}{OpenDota's API} using the \codeinline{match_id}, which is a part of the previous results, to obtain \codeinline{replay_salt} and \codeinline{cluster}, the information we need to download the replays.
+
+We \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/OpendotaAPI.java#L17-L70}{construct such url}: \codeinline{http://replay<cluster>.valve.net/570/<match_id>_<replay_salt>.dem.bz2} and \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/ValveAPI.java#L131-L144}{start another thread} to \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/ValveAPI.java#L389-L420}{download, unzip and parse the replay}.
+At the same time, since we want to get the same number of ranked matches and public matches, we maintain \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/ValveAPI.java#L46-L47}{two integers} to record how many public matches and ranked matches to download.
+As we start downloading a professional match, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/ValveAPI.java#L111-L112}{add one} to those two integers, and if the numbers are not zero when we encounter a public match result or a ranked match, we start to download them using the same method I used for professional games.
+This logic can be mapped to \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/ValveAPI.java#L104-L129}{this snippet of code}.
+
+In this way, we can get game replays of three types in the same amount for the second dataset while we collect the data for the first dataset.
+
 \subsection{Transformation}
 
-\subsection{Loading}
+The match result dataset is easy to handle, since the result of in JSON format, which can be easily \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/9916e0a5a95245062d110446eb4014312087ef9e/src/main/java/FetchStore/ValveAPI.java#L164-L178}{parsed into Document} datatype by the MongoDB Driver in Java and saved to MongoDB.
 
-\subsubsection{Docker}
+However, the replay is in binary format, which is designed to be executed by the Dota2's game client. Luckily, we found open-source parser, \href{https://github.com/skadistats/clarity}{clarity}, to help us transform it into something useful.
 
-As mentioned in the proposal, we tried to containerized the project by docker. It is convenient to split up the works for every team mates if we containerized our project. By learning from documents, I tried to configure our project on docker but it ends up with failures. Considering the limited time, we decided to discard using docker for installing our NoSQL technology. However, we learned a lot from this experience.
+We create a \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/9916e0a5a95245062d110446eb4014312087ef9e/src/main/java/FetchStore/ValveAPI.java#L389-L418}{pipeline} to download, unzip each replay, parse it into Documents with the schema we mentioned in table \ref{replay-data-dictionary}, and finally store the parsed Document into MongoDB.
+
+The code to parse the \codeinline{.dem} file into our schema is as follows:
 
 \begin{enumerate}
-    \item Getting Started\\\\
-    At this phase, I installed docker, read docker documents, explored docker hub and played around with docker. The objective of this phase is to get familiar with docker and in the end find the way to build the project in Docker way. I learned that we need to build an image, which is an executable package to run the project in the environment of docker. 
-    \begin{itemize}
-        \item This "package" contains:
-        \begin{itemize}
-            \item A runtime as a parent image, the overall environment for the container launched by this image;\\(i.e.\codeinline{FROM ubuntu:18.04} from Dockerfile . line2)
-            \item Our project code;\\ (i.e.\codeinline{RUN java -jar target/FetchStore.one-jar.jar 4182489531 10 100} from Dockerfile .\ line52)
-            \item How we define environment variables;\\ (i.e. \codeinline{ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/} from Dockerfile .\ line23)
-            \item Installed packages such as java8, maven, mongodb, as the prerequisite of Data ETL;
-            \item Working directory set up;\\(i.e.\codeinline{WORKDIR /app} from Dockerfile . line44)
-        \end{itemize}
-    \end{itemize}
-    
-    By launching this image, we can get a running container. In other words, a container is an instance of the image. And then we can share our images in a repository on docker hub. When this is done, my teammates can pull and run the image remotely.\\
-    
-    \item Dockerfile\\\\
-    According to the \href{https://docs.docker.com/}{docker documents}, Dockerfile "defines what is going on in the environment inside your container". At the very beginning, I thought dockerize a project just need to pull all the official images in docker, and then we can start manipulate it. But then, after reading documents, I found that we need to construct a Dockerfile to define how a project work, so that it can behaves exactly the same wherever it runs. We can pull an image as a parent image, and then install needed packages in it. \\
-    
-    For example, in the project, I use ubuntu as a parent image, then docker virtualize an ubuntu operation system environment on your host machine, and then I use Dockerfile as if it is the terminal of ubuntu, writing codes of installing java8, maven, mongodb in the Dockerfile. As mentioned above, then I can use \codeinline{RUN} command to run project code.\\
-    
-    After I constructed the Dockerfile and try to build the project using \codeinline{$docker build .} in command line, I failed every time when it trying to connect to the database. After reading documents and google for reasons, I realized that it is cramped to put all the service on a Dockerfile. I should construct a docker-compose.yml to define, run and scale service with Docker. \\
-    
-    \item docker-compose.yml\\
-    
-    According to our data pipeline, I intended to build 4 services in the docker-compose:\\ 
-    \begin{itemize}
-        \item Data acquisition and filtering (as "fetchstore" service in the docker-compose, line 17-24)
-        \item Data Extraction (as "parsereplay" service in the docker-compose, line 27)
-        \item Data Aggregation and Representation (as "mongodb" service in the docker-compose, line 4-16)
-        \item Data Analysis (as "analytics" service in the docker-compose, line 29-32)\\
-    \end{itemize}
-    
-    In the docker-compose, we can also use the Dockerfile using the command \codeinline{build} in a service. Therefore, my thought is to construct Dockerfile for "fetchstore", "paresereplay", and "analytics" service using the code and configuration file we have. And use the official image of mongodb, using \codeinline{volume} in the service to reflect the direction of configuration file and mongodb initial javascipt (mogo-init.js, a file to define initial user, database, collections). Also, we used \codeinline{depends_on} to define simple interaction between the services.\\
-
+\item \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/java/ParseReplay/ParseReplayExecutor.java}{The overall logic}.
+\item \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/java/ParseReplay/Info.java}{For the ``info" field}.
+\item \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/java/ParseReplay/Combatlog.java}{For the ``combatlog" field }.
+\item \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/java/ParseReplay/Chat.java}{For the ``chat" field}.
+\item \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/java/ParseReplay/Lifestate.java}{For the ``lifestate" field}.
 \end{enumerate}
 
-As the result, we still have a hard time connecting the database. When the problem is fixed, we only finished the configuration of the "fetchstore" service and the "mongodb". Then we realized we got limited time left, therefore, we discard docker for now, and move on to deploy our project on amazon web service (AWS). And we hope to complete this part in the future.
+\subsection{Loading}
+We deploy our database on AWS EC2.
+\href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/ValveAPI.java#L164-L178}{This snippet} of code is used to save the JSON format match result data into MongoDB and \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/ValveAPI.java#L406-L420}{this snippet} is for writing parsed replay data into MongoDB.
 
-The reason of failure is that I got misunderstanding on Docker's architecture. Also, it is hard for me to consider our system's architecture in Docker's way. And it also need many times of failure to realize the right way to deploy a project on Docker. This experience help us learn how to make the best of documents and google, and also push me to learn a lot about Linux and to read a lot of configuration file.
+The size of our dataset is:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+Dataset Name & Number of records & Storage Size \\
+\hline
+Dota2 match result & About 1,500,000 & About 15 GB \\
+\hline
+Dota2 replay dataset & About 3500 & About 35 GB \\
+\hline
+\end{tabular}
+\end{table}
+
+As described in the proposal, we also applied Neo4j to support relationship visualization. We wrote \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/9916e0a5a95245062d110446eb4014312087ef9e/src/main/scala/Neo4j/LoadNeo4j.scala#L16}{Neo4jLoader} to extract the data from MongoDB, filter it with the help of Spark and load it into our Neo4j database.
+
+\section{Overview of our Architecture}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{pic/arc-new.png}
+\caption{System Architecture}
+\label{system-architecture}
+\end{figure}
+
+The whole pipeline starts from top-left, where the data collector sends API requests to ValveAPI and OpendotaAPI.
+The log is output to the disk so that we know where to resume after a batch is processed, or if our system crushes.
+The match result data is stored into MongoDB and the information needed to download game replays is delivered to the ``Data Extraction" part. Here the replays are downloaded, parsed and stored into MongoDB.
+Neo4j loader extracts data from MongoDB and stores it into Neo4j.
+
+After the ETL, we use Spark as the analytics engine to answer our business questions.
+The results are visualized by Tableau. For the relationship BQ, we use the built-in Neo4j Browser to visualize the relationship between professional teams.
 
 \section{Data Analysis}
 
+We use Spark as our analytics engine to analyze business questions raised in our proposal. We don't fulfill all business questions and we will state the reason for it in the challenges section. We have 3 game types: the public game, the ranked game, the professional game. Most following business questions are answered in these three game types. So most of them applied \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/Spark/SparkMongoHelper.scala#L31-L47}{filtering games by their types}.
+
+
+\subsection{Bad Manner Hero}
+
+This analysis is aimed to find out the hero which has the most possibility to be a bad manner player.
+
+We define a bad manner as leaving a game before the game ends. We use match result data since it contains leave game status. We do \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/BadManner.scala#L46-L47}{aggregation on the hero id to get the pairs of a hero id and a leave game count}. Before further steps, we first check if there is no bad manner player, which turns out to be true in professional games. Then for each pair, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/BadManner.scala#L48}{divide the leave game count by the total pick count of this hero to compute the possibility}. Finally, we can get the bad manner hero by \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/BadManner.scala#L50}{sorting the processed pairs}. In public games, the hero who has the most possibility to be a bad manner player is Broodmother, who has a 10\% leave game rate. In ranked games, it is Meepo, who has a 5\% leave rate. And in professional games, there are almost no players leave a game before a game ends. Through the result, we can find out that players are more serious in ranked games than the public ones since ranked games affect their rankings.
+
+\subsection{Game Time}
+
+This analysis is aimed to find out the average time of a game. We use the match result data which has the game duration. For each match result data, we can \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/CostTime.scala#L30}{extract the duration and increment the total game count by 1}. Finally, we can get the average cost of time by \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/CostTime.scala#L31}{dividing the sum of all duration by the total game count}. For public games, the average time is 33 minutes. For ranked games, the average time is 40 minutes. For professional games, the average time is 30 minutes.
+
+\subsection{Damage/Gold Rate}
+
+This analysis is aimed to find out the heroes who have the top 20 damage rate and the heroes who have the bottom 20 damage/gold rate.
+
+We define such a rate of a hero as ``the damage to other heroes per gold gained by the hero". We use match result data which contains damage to other heroes, gold spent, and rest gold of each hero. For each match result, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/DamageRate.scala#L39-L41}{extract the 3tuple of hero id, the total damage to other heroes, total gained gold (addition of gold spend and rest gold)}. Then we do \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/DamageRate.scala#L42-L44}{an aggregation on the hero id and divide the damage by the gained gold to get pairs of a hero id and a damage/gold rate}. Finally, to get the top 20 heroes and the bottom 20 heroes, we can simply \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/DamageRate.scala#L47-L48}{sort pairs by the damage rate}.
+
+The figure on the next page demonstrates the result. A table for this can also be found in the Appendix.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{pic/DamageRate.png}
+\caption{Heroes Ranking of Damage/Gold Rate}
+\label{Heroes Ranking of Damage/Gold Rate}
+\end{figure}
+
+\subsection{Economy Distribution vs Game Result}
+
+This analysis is aimed to find out whether there exists a correlation between economy distribution in a game (evenly distributed or centralized) and the game result.
+
+We define the economy as gold gained in a game
+It's possible that even distribution is better and it's also possible that having good players gaining more gold is better.
+
+To examine the hypothesis, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/EcoDistributionTrain.scala#L48-L50}{applied logistic regression}.
+We use the match result data which contains the amount of gold gained per minute for each player.
+For each match result data, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/EcoDistributionTrain.scala#L36-L42}{extract a pair of a game result and a normalized gold distribution}.
+A gold distribution contains the proportion of gold of 5 players in a game. For each distribution, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/EcoDistributionTrain.scala#L43-L44}{sort it in ascending order} to make the smallest proportion at the head of the distribution.
+Then we can use sorted distribution as the data point for the logistic regression model where each proportion of gold is a feature. The game result is used as the label.
+After running the training data, we find the accuracy is only 0.53 which is close to making a guess. Thus, our hypothesis turns out to be false.
+
+\subsection{Gain in First 15 Minutes}
+
+This analysis is aimed to find out the hero who gains most XP or gold in the first 15 minutes of the game.
+
+We use replay data which contains all events during a game. We firstly \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/First15minGain.scala#L44-L47}{filter all events irrelevant of XP or gold}, and secondly \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/First15minGain.scala#L48-L50}{extract the time of each event happened and filter it}.
+Then we can \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/First15minGain.scala#L81-L82}{do aggregation on hero name} to calculate the total gain XP/gold. Finally, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/First15minGain.scala#L89-L96}{sort the gained XP/gold value} to compute the hero who gains most XP/gold in 3 game types. We list the result for this analysis in the Appendix.
+
+\subsection{First Blood Time vs Game Time}
+
+This analysis is aimed to find out the correlation between the time of first blood and the total cost of time of a game. The first blood is the first kill in a game. We guess early first blood implies a short game.
+
+To examine our guess, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/FirstBloodTrain.scala#L31-L33}{apply linear regression} in this analysis. We use match result data which contains the first blood time and the total duration. For each match result, we extract the first blood time and the game result. The data point used in linear regression is the time of the first blood. The label used is the game result. But the RMSE on training data is 765 which is large. The error shows that there is no correlation between the first blood time and the cost of time.
+
+\subsection{Hero Statistics}
+
+This analysis is aimed to find out the top 5 heroes who have most kills/assists/deaths/heals.
+
+We use replay data which contains all events during a game. We firstly \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/HeroMostStats.scala#L60}{filter by the event type we want (kill/assist/death/heal)}. For each replay data, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/HeroMostStats.scala#L61}{extract a pair of a hero id and a count of the event type}. Then we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/HeroMostStats.scala#L62}{do aggregation} on the hero id and \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/HeroMostStats.scala#L65}{sort pairs} by the count to extract the top 5 heroes.
+
+The following figure demonstrates the result in professional games. Other results are listed in the Appendix.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{pic/ProStat.png}
+\caption{Top 5 Hero Statistics in Professional Game}
+\label{Top 5 Hero Statistics in Professional Game}
+\end{figure}
+
+\subsection{Most Ban}
+
+This analysis is aimed to find out the top 5 heroes who are banned in professional games. (Only professional game allows banning heroes).
+
+We use match result data which contains banned heroes. We first filter games to keep only professional games and then \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostBan.scala#L29-L30}{extract a pair of a hero id and 1 (denotes banned once) for each match result data}. After \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostBan.scala#L31}{doing aggregation} on the hero id, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostBan.scala#L33}{sort the banned count} to get the top 5 banned heroes. They are Alchemist, Enchantress, Shadow Demon, Faceless Void, and Life Stealer. And we can find some of them have a good ranking in the previous analysis. For example, Alchemist has a 7th damage/gold rate in public games.
+
+\subsection{Most Pick}
+
+This analysis is aimed to find out the top 5 heroes who are picked.
+
+We use match result data which contains picked heroes of each game. We \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostPick.scala#L34}{extract pairs of a hero id and 1 (denotes picked once)}. After \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostPick.scala#L35}{doing aggregation} on the hero id, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostPick.scala#L37}{sort the picked count} to get the top 5 picked heroes.
+
+The figure on the next page demonstrates the result of the above two questions. A table for them can also be found in the Appendix.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{pic/MostPickedBanned.png}
+\caption{Top 5 Picked/Banned heroes}
+\label{Top 5 Picked/Banned heroes}
+\end{figure}
+
+\subsection{Most Used/Purchased Item}
+
+These two analyses are aimed to find out the top 5 most used/purchased items.
+
+We use replay data in this analysis because it contains all events happen during a game. In Most Used Item analysis, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostUsedItem.scala#L38-L40}{filter events contained in replay data to get all ``use item" events}.
+Then we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostUsedItem.scala#L41-L42}{do aggregation on the item id} to get the pairs of an item id and an item use count.
+Finally, we can get the top 5 most used items by \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostUsedItem.scala#L44}{sorting the pairs by the usage count}. We have similar steps in \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostPurchasedItem.scala}{Most Purchased Item} analysis.
+
+The figure on the next page demonstrates the result. A table for this can also be found in the Appendix.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{pic/TopItem.png}
+\caption{Top 5 Used/Purchased Items}
+\label{Top 5 Used/Purchased Items}
+\end{figure}
+
+\subsection{Team Battle Detector}
+
+This analysis aimed to find out the average first time of a team battle and the average times of team battle happens in public, ranked, and professional games.
+
+We use the replay data which has all events. But these events do not contain the location information. Thus, we roughly define the team battle as in 3 minutes there are 4 or more hero deaths. \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/TeamBattleDetector.scala#L61-L78}{A sliding-window algorithm} is applied to build a team battle detector. We \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/TeamBattleDetector.scala#L33-L36}{extract the death events} and use the detector to detect all team battles in a game. The time of the first team battle is at 11 minutes, 13 minutes and 19 minutes in public, ranked, and professional game. The average number of team battles is 7, 9, and 6 in public, ranked, and professional game respectively.
+
+Additionally, for most of the analysis above, we can only get the hero id or item id. To provide better readability, we add two metadata collection heroes and items which contain hero/item ids and their names. So after getting the id, we do one more \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/Spark/SparkMongoHelper.scala#L15-L29}{query on the metadata collections to get its name}.
+
+\subsection{Win-lose Relationship Visualization}
+
+This analysis aimed to visualize the result between the professional teams.
+It could serve as a proof of concept that we can further explore other relational topics.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{pic/win-lose-viz.png}
+\caption{Win-lose Relationship Visualization Result}
+\label{win-lose-relationship-visualization-result}
+\end{figure}
+
+
 \section{Challenges}
 
+\subsection{Valve API}
 
+Valve provides us with various APIs to get match results, but they're not well documented and changes all the time without providing changelogs.
+
+At the beginning we tried to use \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchHistory}{GetMatchHistory API}, which seems to be very straightforward in the documentation.
+It says we can specify a starting match ID and will return a bunch of match results starting with it.
+Unfortunately, specify such an ID is actually disallowed and it can just return the newest results that are currently produced, and this was not documented.
+
+We have also thought the \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchHistory}{GetMatchHistory API} can be used to make a data stream for stream analysis, but this couldn't be done to since Valve limited its API calling gap.
+It's said to be 100,000 calls per day but actually, you can do much less. I set the API calling interval to 6 seconds and sometimes it still denies the calls.
+Considering the velocity that the game results are produced we can't make such a stream to catch all the game results that are being produced.
+
+After exploring the Dota2 developers' forum for a while, we found out that we can use the \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchHistoryBySequenceNum}{GetMatchHistoryBySequenceNum API}, which works similarly as the before one but this time we need to specify a starting sequence number, which is also a unique identifier for each game, but we can't see it in the Dota2's client.
+This problem is solved by finding out that the sequence number can be found in the \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchDetails}{GetMatchDetails API}.
+We can first choose a starting sequence number by looking for a match whose date is around the starting date of all the matches er want to collect.
+By calling \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchHistoryBySequenceNum}{GetMatchHistoryBySequenceNum}, we can get a list of match results, then the sequence number of the last match among the results can be extracted. Adding one to it will serve as the starting sequence number of the next request. By doing this repeatedly, we can collect as many matches as we want.
+
+As I mentioned, the API call limits are much less than it is described and it seems to be random. I created a request key pool to randomly select a key for the API call each time and if it was denied, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/ValveAPI.java#L241-L249}{waited for 3 seconds} then do the next call.
+
+
+\subsection{Dota2 replays Parameters}
+
+The request to download Dota2 replays requires three parameters, \codeinline{cluster}, \codeinline{matchid}, and \codeinline{replaysalt}.
+In the past, by calling \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchDetails}{GetMatchDetails API} with match ID of a game, the cluster number and ``replay salt" of a specific match can be acquired. However, now Valve disallowed us to do so, by hiding the ``replay salt" field it the result.
+
+Fortunately, we found another \href{third-party api}{https://docs.opendota.com/} that can help to find the fields needed to download a replay.
+
+Furthermore, we thought of solely rely on it to get the data in the first dataset, the match results. In this way, only one kind of API is used which can simplify the data pipeline. But this can't be done either, this third party API will ask us to pay if our request exceeds a certain number, that will cause cost exceeding our budget (which is zero).
+Also, we don't want to collect all the replays. The matches played by the professional teams worth more than the normal ones.
+Given the limited time and storage we have, we decided to first collect a certain number of professional games, then collect public games and ranked games of the same number for comparison.
+
+\subsection{Docker}
+
+As mentioned in the proposal, we tried to containerize the project by docker, but it ends up with failures. Considering the limited time, we decided to discard using docker for installing our NoSQL technology.
+
+At first, I tried to dockerize our project by using a single Dockerfile.
+We used ubuntu as a parent image so that docker can virtualize an Ubuntu operation system environment on our host machine, and then install needed packages in it.
+However, we can not connect to the database.
+Realizing that it is cramped to put all the services on a Dockerfile, we tried to construct a docker-compose.yml to define, run, and scale services with Docker.
+
+According to our data pipeline, I intended to build 4 services - FetchStore, ParseReplay, MongoDB, and Analytics - in the docker-compose.
+In the docker-compose, we can also use the Dockerfile by using the command \codeinline{build} in a service.
+Therefore, I constructed Dockerfiles for FetchStore, ParseReplay, and Analytics services.
+And I used the official image of MongoDB, and used \codeinline{volume} in the service to reflect the direction of the configuration file and MongoDB initial JavaScipt.
+Also, I utilized \codeinline{depends_on} to define simple interaction between the services.
+There are a lot of things to consider when running multiple containers, and it's easy to make mistakes if not being thoughtful enough.
+
+As a result, we still had a hard time connecting to the database.
+When this problem was fixed, we only finished the configuration of the FetchStore and MongoDB service.
+Then we realized we got limited time left. Therefore, we discard docker for now and move on to deploy our project on amazon web service (AWS).
+And we hope to complete this part in the future.
+
+\subsection{Setup AWS environment}
+
+Because we planned to use over 200GB data, we decided to use AWS EC2 to run our system. We chose EBS (Elastic Block Store) which we thought would automatically have larger storage when our instance is full. But during fetching data, we still met the error which said the file system is full. Then we manually added more storage volume to solve this problem.
+
+\subsection{Result Readability}
+
+We have 2 types of data. But in match result data, the heroes and items inside are denoted by their id. But in replay data, they are denoted by their name. Using a name can increase readability. Thus, we added 2 more metadata collections to store the map from id to name.
+
+\subsection{Corrupted Data}
+
+Although we did some data validation before using it, there are still some unexpected corrupted data problems. For example, one replay data loses part of it which makes out result bad. So we added more filters in analysis, like the filter to the duration of a game.
+
+\subsection{Setup Neo4j on AWS}
+
+We want to set up the Neo4j server on AWS and can be connected by a Neo4j browser on a local laptop. But the find the connection was failed. We first modified the configuration file of Neo4j which doesn't allow remote access in default, which, does not work out. Then we found out that we should modify the security group setting on AWS which controls access to the AWS instance.
+
+\subsection{Missing Output on Console}
+
+Firstly, we just printed the result on the console.
+But after we deployed our system on AWS, we found a problem that the connection from the local machine to AWS might be broken.
+If so, we cannot get the result printed on the console.
+As a result, besides printing results on the console, we also write the result to a file, which prevents missing the output on the console.
+
+\subsection{Limited Information in Parsed Replay Data}
+
+As mentioned in Analysis, some business questions in the proposal are not fulfilled because we find that the parsed replay data doesn't contain the information we need. One important information is the location. Some of our business questions rely on the location information, for example, analysis on the path of heroes and the lane. This problem is caused by the limited ability of our parser. We have known this fact when we wrote the proposal, but we still propose these questions because we thought we can find another parser that can extract the location information from the replay. But we failed, therefore we give up on these questions.
 
 \printglossary
-
 %-------%
+
+\section{Appendix}
+
+\subsection{Detailed Data Dictionaries}
+
+\subsubsection{Match Result Dataset}
+
+\begin{longtable}{|p{2.5cm}|p{2cm}|p{5.5cm}|p{3cm}|}
+
+\hline
+\textbf{Field Name} & \textbf{Data Type} & \textbf{Description}  & \textbf{Example}\\
+\hline
+\endhead
+
+players & JSON Array  & Status about each player at the end of the game, see table \ref{player-field-in-match-result} & See table \ref{player-field-in-match-result}.
+\\
+\hline
+radiant\_win & boolean  & Dictates the winner of the match, true for radiant; false for dire. &true \\
+\hline
+duration  & int  & The length of the match, in seconds since the match began.  & 2452 \\
+\hline
+start\_time  & long  & Unix timestamp of when the match began.  & 1566731204 \\
+\hline
+match\_id  & long  & The matches unique ID.  & 4986382845 \\
+\hline
+match\_seq\_num  & long  & A `sequence number', representing the order in which matches were recorded.  & 4182489897 \\
+\hline
+tower\_status\_radiant and tower\_status\_dire  & int  & See \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchDetails\#Tower\_Status}{API doc} for details.  & 260 \\
+\hline
+barracks\_status\_radiant and barracks\_status\_dire  & int  & See \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchDetails\#Barracks\_Status}{API doc} for details. & 51 \\
+\hline
+first\_blood\_time  & int  & The time in seconds since the match began when first-blood occurred.  & 102 \\
+\hline
+lobby\_type  & int  & The type of the match  & 0 \\
+\hline
+human\_players  & int  & The amount of human players within the match.  & 10 \\
+\hline
+leagueid  & int  & The league that this match was a part of. A list of league IDs can be found via the \href{https://wiki.teamfortress.com/wiki/WebAPI/GetLeagueListing}{GetLeagueListing} method.
+  & 0 \\
+\hline
+positive\_votes  & int  & The number of thumbs-up the game has received by users.  & 0 \\
+\hline
+negative\_votes  & int  & The number of thumbs-down the game has received by users.  & 1 \\
+\hline
+game\_mode  & int  & The mode of the match  & 11 \\
+\hline
+picks\_bans  & JSON Array  & A list of the picks and bans in the match, if the game mode is Captains Mode.  & Details will be described in another table \\
+\hline
+radiant\_score  & int  & The total amount of kills that radiant team make  & 52 \\
+\hline
+dire\_score  & int  & The total amount of kills that dire team make  & 42 \\
+\hline
+\caption{Match Result Data Dictionary}
+\label{match-result-data-dictionary}
+\end{longtable}
+
+
+The data dictionary for one JSON object of field ``players" in table \ref{match-result-data-dictionary} is as follows.
+
+\begin{longtable}{|p{2.5cm}|p{2cm}|p{5.5cm}|p{3cm}|}
+
+\hline
+\textbf{Field Name} & \textbf{Data Type} & \textbf{Description}  & \textbf{Example} \\
+\hline
+\endhead
+
+account\_id & long & An unique identifier for each steam account & 4294967295 \\
+\hline
+player\_slot & int & see this in details https://wiki.teamfortress.com/wiki/WebAPI/GetMatchDetails\#Player\_Slot & 1 \\
+\hline
+hero\_id & int & The hero's unique ID. A list of hero IDs can be found via the \href{https://wiki.teamfortress.com/wiki/WebAPI/GetHeroes}{GetHeroes} method. & 97 \\
+\hline
+item\_0 to item\_5 & int & item id of the inventory item & 48 \\
+\hline
+kills & int & The amount of kills attributed to this player. & 10 \\
+\hline
+deaths & int & The amount of times this player died during the match. & 2 \\
+\hline
+assists & int & The amount of assists attributed to this player. & 7 \\
+\hline
+leaver\_status & int & Indicating whether a player disconnect from the game before the game ends & 0 \\
+\hline
+gold & int & The amount of gold the player had remaining at the end of the match. & 32341 \\
+\hline
+last\_hits & int & The amount of last-hits the player got during the match. & 109 \\
+\hline
+denies & int & The amount of denies the player got during the match. & 24 \\
+\hline
+gold\_per\_min & int &  The player's overall gold/minute. & 601 \\
+\hline
+xp\_per\_min & int & The player's overall experience/minute. & 587 \\
+\hline
+gold\_spent & int & The amount of gold the player spent during the match. & 21239 \\
+\hline
+hero\_damage & int & The amount of damage the player dealt to heroes. & 34034 \\
+\hline
+tower\_damage & int & The amount of damage the player dealt to towers. & 8902 \\
+\hline
+hero\_healing & int & The amount of health the player had healed on heroes. & 452 \\
+\hline
+level & int & The player's level at match end. & 23 \\
+\hline
+\caption{Player Field in Match Result}
+\label{player-field-in-match-result}
+\end{longtable}
+
+
+The data dictionary for one JSON object of field ``picks\_bans" in table \ref{match-result-data-dictionary} is as follows.
+
+\begin{longtable}{|p{2.5cm}|p{2cm}|p{5.5cm}|p{3cm}|}
+
+\hline
+\textbf{Field Name} & \textbf{Data Type} & \textbf{Description}  & \textbf{Example} \\
+\hline
+\endhead
+
+is\_pick & boolean & Whether this entry is a pick (true) or a ban (false). & true \\
+\hline
+hero\_id & int & The hero's unique ID. & 20 \\
+\hline
+team & int & The team who chose the pick or ban; 0 for Radiant, 1 for Dire. & 1 \\
+\hline
+order & int & The order of which the picks and bans were selected. & 10 \\
+\hline
+\caption{Ban\_pick Field in Match Result}
+\label{ban-pick-in-match-result}
+\end{longtable}
+
+\subsubsection{Parsed Replay Dataset}
+
+
+The data dictionary for one JSON object of field ``combatlog" in table \ref{replay-data-dictionary} is as follows.
+
+\begin{longtable}{|p{2.5cm}|p{2cm}|p{5.5cm}|p{3cm}|}
+
+\hline
+\textbf{Field Name} & \textbf{Data Type} & \textbf{Description}  & \textbf{Example} \\
+\hline
+\endhead
+
+time & double & The time when this action happens & 325.608734130432 \\
+\hline
+type & String & The type of this action. & ``purchase" \\
+\hline
+target & String & The target of this action & ``npc\_dota\_hero\_nevermore" \\
+\hline
+item & String & This field only occurs when the type of the action is ``purchase". Indicates which item was bought by this action & ``item\_enchanted\_mongo" \\
+\hline
+inflictor & String & This field only occurs when the type of the action is ``damage", ``lose\_buff" and ``add\_buff". The inflictor of the current action & ``modifier\_tower\_aura\_bonus" \\
+\hline
+damage & int & This field only occurs when the type of the action is ``damage", which indicates the damage caused by the current action. & 80 \\
+\hline
+before\_hp & int &  This field only occurs when the type of the action is ``damage", which indicates the hp of the target before the action. & 725 \\
+\hline
+after\_hp & int &  This field only occurs when the type of the action is ``damage", which indicates the hp of the target after the action. & 718 \\
+\hline
+\caption{Combatlog Field in Replay}
+\label{combat-field-in-replay}
+\end{longtable}
+
+The data dictionary for one JSON object of field ``info" in table \ref{replay-data-dictionary} is as follows.
+
+\begin{longtable}{|p{2.5cm}|p{2cm}|p{5.5cm}|p{3cm}|}
+
+\hline
+\textbf{Field Name} & \textbf{Data Type} & \textbf{Description}  & \textbf{Example} \\
+\hline
+\endhead
+
+game\_winner & int & 1 if radiant wins and 2 if dire wins. & 1 \\
+\hline
+leagueid & int & The unique league id of the current professional game, 0 if it is not a professional match. & 4122 \\
+\hline
+match\_id & long & The unique identifier for each game. & 4986514901. \\
+\hline
+end\_time & long & The timestamp of the ending of the game. & 1566736571. \\
+\hline
+game\_mode & int & The mode of the current game & 21 \\
+\hline
+\caption{Info Field in Replay}
+\label{info-field-in-replay}
+\end{longtable}
+
+
+\subsection{Detailed Analysis Results}
+
+\subsubsection{Damage/Gold Rate}
+
+Public Games:
+
+\begin{longtable}{|p{2.5cm}|p{2.5cm}|p{5.5cm}|}
+
+\hline
+\textbf{Rank} & \textbf{Hero} & \textbf{Damage/Gold Rate} \\
+\hline
+\endhead
+
+1 & Zuus & 2.3004157401846537 \\\hline
+2 & Tinker & 1.6420031038927647 \\\hline
+3 & Bristleback & 1.5771368121914766 \\\hline
+4 & Venomancer & 1.5322559346116191 \\\hline
+5 & Skywrath\_mage & 1.5017875157064025 \\\hline
+6 & Clinkz & 1.4849750590792063 \\\hline
+7 & Huskar & 1.4546674116635778 \\\hline
+8 & Rattletrap & 1.439648234092895 \\\hline
+9 & Techies & 1.4383042472835008 \\\hline
+10 & Spectre & 1.42678633556202 \\\hline
+11 & Pugna & 1.3972072332418493 \\\hline
+12 & Warlock & 1.3632018454946753 \\\hline
+13 & Shredder & 1.35394499161979 \\\hline
+14 & Ember\_spirit & 1.3475096725161406 \\\hline
+15 & Viper & 1.3412099350143785 \\\hline
+16 & Death\_prophet & 1.3278598501932295 \\\hline
+17 & Razor & 1.3192034122801117 \\\hline
+18 & Gyrocopter & 1.3112357419375424 \\\hline
+19 & Queenofpain & 1.3066481175265756 \\\hline
+20 & Axe & 1.2931725267257896 \\\hline
+
+
+\caption{Public Games Damage/Gold Rate}
+\label{public-games-damage-gold-rate}
+\end{longtable}
+
+Ranked Games:
+
+\begin{longtable}{|p{2.5cm}|p{2.5cm}|p{5.5cm}|}
+
+\hline
+\textbf{Rank} & \textbf{Hero} & \textbf{Damage/Gold Rate} \\
+\hline
+\endhead
+
+1 & Zuus & 2.9418056479438626 \\\hline
+2 & Tinker & 2.150859003299626 \\\hline
+3 & Clinkz & 2.0884421511990525 \\\hline
+4 & Skywrath\_mage & 1.9760465643357101 \\\hline
+5 & Bristleback & 1.9501640391382127 \\\hline
+6 & Venomancer & 1.881336238794785 \\\hline
+7 & Huskar & 1.8699499986263792 \\\hline
+8 & Rattletrap & 1.8323486050421012 \\\hline
+9 & Techies & 1.822758345306855 \\\hline
+10 & Pugna & 1.818287376158369 \\\hline
+11 & Ember\_spirit & 1.7799193703114184 \\\hline
+12 & Viper & 1.713903523823672 \\\hline
+13 & Spectre & 1.696238851802073 \\\hline
+14 & Shredder & 1.677920019400073 \\\hline
+15 & Sniper & 1.651809735988255 \\\hline
+16 & Death\_prophet & 1.6508798569324052 \\\hline
+17 & Queenofpain & 1.633404234350671 \\\hline
+18 & Phoenix & 1.6167379442865089 \\\hline
+19 & Warlock & 1.6103239765043673 \\\hline
+20 & Riki & 1.6019336243768927 \\\hline
+
+\caption{Ranked Games Damage/Gold Rate}
+\label{ranked-games-damage-gold-rate}
+\end{longtable}
+
+Professional Games:
+
+\begin{longtable}{|p{2.5cm}|p{2.5cm}|p{5.5cm}|}
+
+\hline
+\textbf{Rank} & \textbf{Hero} & \textbf{Damage/Gold Rate} \\
+\hline
+\endhead
+
+1 & Zuus & 2.5095296155046065 \\\hline
+2 & Techies & 2.1870154722684325 \\\hline
+3 & Tinker & 2.0124433616059756 \\\hline
+4 & Sniper & 1.9783706295917614 \\\hline
+5 & Skywrath\_mage & 1.9535457462792696 \\\hline
+6 & Huskar & 1.8735118229824992 \\\hline
+7 & Clinkz & 1.8606849160752506 \\\hline
+8 & Pugna & 1.7964929829557952 \\\hline
+9 & Venomancer & 1.7848610595534815 \\\hline
+10 & Rattletrap & 1.7661035883036698 \\\hline
+11 & Arc\_warden & 1.6768414694470062 \\\hline
+12 & Bristleback & 1.6745098255685582 \\\hline
+13 & Shredder & 1.673216393476275 \\\hline
+14 & Ember\_spirit & 1.6568609854739513 \\\hline
+15 & Silencer & 1.6489648349788801 \\\hline
+16 & Warlock & 1.6457797988727485 \\\hline
+17 & Razor & 1.613006088280061 \\\hline
+18 & Viper & 1.6119751502444593 \\\hline
+19 & Spectre & 1.611136567135945 \\\hline
+20 & Phoenix & 1.610776975596254 \\\hline
+
+\caption{Professional Games Damage/Gold Rate}
+\label{professional-games-damage-gold-rate}
+\end{longtable}
+
+\subsubsection{Hero Statistics}
+
+Public Games:
+
+\begin{longtable}{|p{1.5cm}|p{2cm}|p{3cm}|p{4.5cm}|}
+
+\hline
+\textbf{Rank} & \textbf{Type} & \textbf{Hero} & \textbf{Average} \\
+\hline
+\endhead
+
+1 & Kill & Skywrath\_mage & 9.669361281499235 \\\hline
+2 & Kill & Riki & 8.918664447370382 \\\hline
+3 & Kill & Bloodseeker & 8.867892841571528 \\\hline
+4 & Kill & Huskar & 8.842363960058828 \\\hline
+5 & Kill & Clinkz & 8.620800198367014 \\\hline
+1 & Assist & Spirit\_breaker & 17.035058859815965 \\\hline
+2 & Assist & Zuus & 16.959805989951498 \\\hline
+3 & Assist & Disruptor & 16.16634037197595 \\\hline
+4 & Assist & Undying & 16.01732058393167 \\\hline
+5 & Assist & Ancient\_apparition & 15.772262124197546 \\\hline
+1 & Death & Shadow\_shaman & 8.704649170353015 \\\hline
+2 & Death & Huskar & 8.60463271151018 \\\hline
+3 & Death & Earth\_spirit & 8.539345711759506 \\\hline
+4 & Death & Venomancer & 8.261024100529708 \\\hline
+5 & Death & Crystal\_maiden & 7.996521181001284 \\\hline
+1 & Healing & Wisp & 8113.96989272119 \\\hline
+2 & Healing & Dazzle & 6512.851949097656 \\\hline
+3 & Healing & Oracle & 4927.196047300997 \\\hline
+4 & Healing & Chen & 4643.917551963049 \\\hline
+5 & Healing & Juggernaut & 4531.026821805381 \\\hline
+
+\caption{Top Hero Statistics for Public Games}
+\label{top-hero-statistics-for-public-games}
+\end{longtable}
+
+
+Ranked Games:
+
+\begin{longtable}{|p{1.5cm}|p{2cm}|p{3cm}|p{4.5cm}|}
+
+\hline
+\textbf{Rank} & \textbf{Type} & \textbf{Hero} & \textbf{Average} \\
+\hline
+\endhead
+
+1 & Kill & Meepo & 12.175918939312277 \\\hline
+2 & Kill & Storm\_spirit & 11.574019337016574 \\\hline
+3 & Kill & Skywrath\_mage & 11.382918886915334 \\\hline
+4 & Kill & Ursa & 11.381844281905803 \\\hline
+5 & Kill & Clinkz & 11.360121362999845 \\\hline
+1 & Assist & Spirit\_breaker & 21.138613691680092 \\\hline
+2 & Assist & Zuus & 19.846135935482504 \\\hline
+3 & Assist & Undying & 19.50708614360113 \\\hline
+4 & Assist & Disruptor & 19.030801114843136 \\\hline
+5 & Assist & Ancient\_apparition & 18.42858021577866 \\\hline
+1 & Death & Shadow\_shaman & 10.57965933174599 \\\hline
+2 & Death & Earth\_spirit & 9.929016097543007 \\\hline
+3 & Death & Venomancer & 9.770501670227812 \\\hline
+4 & Death & Witch\_doctor & 9.737475719383838 \\\hline
+5 & Death & Crystal\_maiden & 9.699951072901378 \\\hline
+1 & Healing & Wisp & 9000.57524051552 \\\hline
+2 & Healing & Dazzle & 7985.429513362119 \\\hline
+3 & Healing & Chen & 6758.288667205896 \\\hline
+4 & Healing & Oracle & 6579.915818722605 \\\hline
+5 & Healing & Juggernaut & 6238.096888357454 \\\hline
+
+
+\caption{Top Hero Statistics for Ranked Games}
+\label{top-hero-statistics-for-ranked-games}
+\end{longtable}
+
+
+Professional Games:
+
+\begin{longtable}{|p{1.5cm}|p{2cm}|p{3cm}|p{4.5cm}|}
+
+\hline
+\textbf{Rank} & \textbf{Type} & \textbf{Hero} & \textbf{Average} \\
+\hline
+\endhead
+
+1 & Kill & Riki & 8.4 \\\hline
+2 & Kill & Tinker & 7.767857142857143 \\\hline
+3 & Kill & Gyrocopter & 7.578313253012048 \\\hline
+4 & Kill & Ember\_spirit & 7.381818181818182 \\\hline
+5 & Kill & Techies & 7.2 \\\hline
+1 & Assist & Spirit\_breaker & 17.448979591836736 \\\hline
+2 & Assist & Earth\_spirit & 15.346153846153847 \\\hline
+3 & Assist & Elder\_titan & 14.785714285714286 \\\hline
+4 & Assist & Nyx\_assassin & 14.526315789473685 \\\hline
+5 & Assist & Undying & 14.5 \\\hline
+1 & Death & Treant & 9.591836734693878 \\\hline
+2 & Death & Techies & 8.266666666666667 \\\hline
+3 & Death & Lich & 7.538461538461538 \\\hline
+4 & Death & Lion & 7.402298850574713 \\\hline
+5 & Death & Nyx\_assassin & 7.368421052631579 \\\hline
+1 & Healing & Wisp & 6486.472222222223 \\\hline
+2 & Healing & Oracle & 4874.9375 \\\hline
+3 & Healing & Abaddon & 4772.2 \\\hline
+4 & Healing & Dazzle & 4236.021739130435 \\\hline
+5 & Healing & Chen & 4141.310344827586 \\\hline
+
+\caption{Top Hero Statistics for Professional Games}
+\label{top-hero-statistics-for-professional-games}
+\end{longtable}
+
+\subsubsection{First 15 min Gold/XP Gain}
+
+\begin{longtable}{|p{2cm}|p{3cm}|p{4.5cm}|}
+
+\hline
+\textbf{Game Type} & \textbf{XP or Gold} & \textbf{Hero} \\
+\hline
+\endhead
+
+Ranked & XP & Broodmother \\\hline
+Ranked & Gold & Broodmother \\\hline
+Public & XP & Meepo \\\hline
+Public & Gold & Arc\_warden \\\hline
+Professional & XP & Visage \\\hline
+Professional & Gold & Broodmother \\\hline
+
+\caption{First 15 min Gold/XP Gain}
+\label{first-15-min-gold-xp-gain}
+\end{longtable}
+
+
+\subsubsection{Most Pick Hero}
+
+Public Games:
+
+\begin{longtable}{|p{2cm}|p{3cm}|p{4.5cm}|}
+
+\hline
+\textbf{Rank} & \textbf{Hero} & \textbf{Time} \\
+\hline
+\endhead
+
+1 & Pudge & 195833 \\\hline
+2 & Sniper & 142191 \\\hline
+3 & Ogre\_magi & 129292 \\\hline
+4 & Windrunner & 128924 \\\hline
+5 & Lion & 126034 \\\hline
+
+\caption{Most Pick Hero for Public Games}
+\label{most-pick-hero-for-public-games}
+\end{longtable}
+
+
+Ranked Games:
+
+\begin{longtable}{|p{2cm}|p{3cm}|p{4.5cm}|}
+
+\hline
+\textbf{Rank} & \textbf{Hero} & \textbf{Time} \\
+\hline
+\endhead
+
+1 & Pudge & 306246 \\\hline
+2 & Ogre\_magi & 252735 \\\hline
+3 & Lion & 238215 \\\hline
+4 & Faceless\_void & 193762 \\\hline
+5 & Invoker & 188404 \\\hline
+
+\caption{Most Pick Hero for Ranked Games}
+\label{most-pick-hero-for-ranked-games}
+\end{longtable}
+
+Profressional Games:
+
+\begin{longtable}{|p{2cm}|p{3cm}|p{4.5cm}|}
+
+\hline
+\textbf{Rank} & \textbf{Hero} & \textbf{Time} \\
+\hline
+\endhead
+
+1 & Ogre\_magi & 142 \\\hline
+2 & Tiny & 141 \\\hline
+3 & Shadow\_demon & 107 \\\hline
+4 & Grimstroke & 87 \\\hline
+5 & Tidehunter & 82 \\\hline
+
+\caption{Most Pick Hero for Professional Games}
+\label{most-pick-hero-for-professional-games}
+\end{longtable}
+
+\subsubsection{Most Purchased/Used Item}
+
+Public Games:
+
+\begin{longtable}{|p{2cm}|p{2cm}|p{3.5cm}|p{2.5cm}|}
+
+\hline
+\textbf{Rank} & \textbf{Purchased/Used} & \textbf{Item} & \textbf{Total Times} \\
+\hline
+\endhead
+
+1 & Purchased & Tpscroll & 83564 \\\hline
+2 & Purchased & Ward\_sentry & 31378 \\\hline
+3 & Purchased & Ward\_dispenser & 25616 \\\hline
+4 & Purchased & Ward\_observer & 23507 \\\hline
+5 & Purchased & Boots & 11906 \\\hline
+1 & Used & Phase\_boots & 202182 \\\hline
+2 & Used & Tpscroll & 79941 \\\hline
+3 & Used & Bottle & 57859 \\\hline
+4 & Used & Blink & 52500 \\\hline
+5 & Used & Ward\_dispenser & 41044 \\\hline
+
+\caption{Most Purcahsed/Used Item for Public Games}
+\label{most-purchased-used-item-for-public-games}
+\end{longtable}
+
+
+Ranked Games:
+
+\begin{longtable}{|p{2cm}|p{2cm}|p{3.5cm}|p{2.5cm}|}
+
+\hline
+\textbf{Rank} & \textbf{Purchased/Used} & \textbf{Item} & \textbf{Total Times} \\
+\hline
+\endhead
+
+1 & Purchased & Tpscroll & 99078 \\\hline
+2 & Purchased & Ward\_sentry & 48867 \\\hline
+3 & Purchased & Ward\_dispenser & 44732 \\\hline
+4 & Purchased & Ward\_observer & 35551 \\\hline
+5 & Purchased & Clarity & 15273 \\\hline
+1 & Used & Phase\_boots & 315978 \\\hline
+2 & Used & Tpscroll & 95651 \\\hline
+3 & Used & Bottle & 87434 \\\hline
+4 & Used & Blink & 75464 \\\hline
+5 & Used & Ward\_dispenser & 71248 \\\hline
+
+\caption{Most Purcahsed/Used Item for Ranked Games}
+\label{most-purchased-used-item-for-ranked-games}
+\end{longtable}
+
+
+Professional Games:
+
+\begin{longtable}{|p{2cm}|p{2cm}|p{3.5cm}|p{2.5cm}|}
+
+\hline
+\textbf{Rank} & \textbf{Purchased/Used} & \textbf{Item} & \textbf{Total Times} \\
+\hline
+\endhead
+
+1 & Purchased & Tpscroll & 28448 \\\hline
+2 & Purchased & Ward\_sentry & 12195 \\\hline
+3 & Purchased & Ward\_dispenser & 11834 \\\hline
+4 & Purchased & Ward\_observer & 11361 \\\hline
+5 & Purchased & Clarity & 6383 \\\hline
+1 & Used & Phase\_boots & 109046 \\\hline
+2 & Used & Bottle & 32853 \\\hline
+3 & Used & Tpscroll & 27472 \\\hline
+4 & Used & Power\_treads & 25600 \\\hline
+
+
+\caption{Most Purcahsed/Used Item for Professional Games}
+\label{most-purchased-used-item-for-professional-games}
+\end{longtable}
+
+
 
 \end{document}

@@ -56,3 +56,6 @@ models/
 # scala support
 .metals/
 .bloop/
+
+# Aux script to make report
+reports/proof-of-concept/res2table.py

@@ -87,7 +87,7 @@
 \newglossaryentry{Ancient}
 {
     name={Ancient},
-    description={(also commonly refered to as Thrones, or Tree for Radiant's ancient and Throne for Dire's ancient, as legacy names from DotA) are massive structures found inside each faction's base and are the main objective. In order to win, the enemy team's Ancient must be destroyed, while the own one must be kept alive. Ancients are guarded by their two tier 4 towers. The Ancients are invulnerable until both of their tier 4 towers are destroyed.}
+    description={(also commonly referred to as Thrones, or Tree for Radiant's ancient and Throne for Dire's ancient, as legacy names from DotA) are massive structures found inside each faction's base and are the main objective. To win, the enemy team's Ancient must be destroyed, while the own one must be kept alive. Ancients are guarded by their two-tier 4 towers. The Ancients are invulnerable until both of their tier 4 towers are destroyed.}
 }
 \newglossaryentry{MOBA}
 {
@@ -117,12 +117,12 @@
 \newglossaryentry{creeps}
 {
     name={creeps},
-    description={Creeps are basic units in Dota 2. Every unit which is not a hero, building, ward or courier is considered a creep. Creeps can belong to either faction, be neutral, or be player-controlled units. Unlike heroes, creeps do not gain experience and cannot level up. All of their stats are set values (though can still be altered by modifiers). Most creeps grant a set gold and experience bounty to heroes when killed.}
+    description={Creeps are basic units in Dota 2. Every unit which is not a hero, building, ward or courier is considered a creep. Creeps can belong to either faction, be neutral, or be player-controlled units. Unlike heroes, creeps do not gain experience and cannot level up. All of their stats are set values (though they can still be altered by modifiers). Most creeps grant a set gold and experience bounty to heroes when killed.}
 }
 \newglossaryentry{XP}
 {
     name={XP},
-    description={A shorthand for experience. Experience is an element heroes can gather by killing enemy units, or being present as enemy units get killed. On its own, experience does nothing, but when accumulated, it increases the hero's level, so that they grow more powerful. Only heroes can gather experience and therefore reach higher levels. With each level gained, a hero's base attributes increase by static values (unique for each hero), which makes them stronger in several.}
+    description={A shorthand for experience. Experience is an element hero can gather by killing enemy units, or being present as enemy units get killed. On its own, experience does nothing, but when accumulated, it increases the hero's level, so that they grow more powerful. Only heroes can gather experience and therefore reach higher levels. With each level gained, a hero's base attributes increase by static values (unique for each hero), which makes them stronger in several.}
 }
 \newglossaryentry{match id}
 {
@@ -167,7 +167,7 @@
 \newglossaryentry{mode}
 {
     name={mode},
-    description={Game modes are a set of restrictions within which the game of Dota 2 can be played. Most game modes alter how heroes are picked by players. There are also some novelty modes that allow 1v1 play, or give a player a new hero every time they die, for example. }
+    description={Game modes are a set of restrictions within which the game of Dota 2 can be played. Most game modes alter how heroes are picked by players. Some novelty modes allow 1v1 play or give a player a new hero every time they die, for example. }
 }
 \newglossaryentry{ban}
 {
@@ -192,7 +192,7 @@
 \newglossaryentry{buyback}
 {
     name={buyback},
-    description={While dead, the player has the option to use ``buyback", spending money in order to instantly respawn at the fountain. However, the buyback ability has a long cooldown of 480 seconds and has a scaling gold cost.}.
+    description={While dead, the player has the option to use ``buyback", spending money to instantly respawn at the fountain. However, the buyback ability has a long cooldown of 480 seconds and has a scaling gold cost.}.
 }
 \newglossaryentry{last-hit}
 {
@@ -214,7 +214,7 @@
 
 Our team aims at exploring data about a popular and long-lived computer game, Dota2.
 
-Dota2 is a multiplayer online battle arena (\gls{MOBA}) video game developed and published by Valve Corporation. Each game will involve ten players that are divided to two teams play against each other on a same map. Every player chooses one ``hero" that has unique abilities and different styles of playing. The aim for each team is to destroy the building called ``\gls{Ancient}" of the other team. Players collect \gls{gold} to buy powerful items and gain \gls{XP} by killing players on the other team, destroy building of the other team, or kill \gls{creeps}.
+Dota2 is a multiplayer online battle arena (\gls{MOBA}) video game developed and published by Valve Corporation. Each game will involve ten players that are divided into two teams play against each other on the same map. Every player chooses one ``hero" that has unique abilities and different styles of playing. The aim for each team is to destroy the building called ``\gls{Ancient}" of the other team. Players collect \gls{gold} to buy powerful items and gain \gls{XP} by killing players on the other team, destroy the building of the other team, or kill \gls{creeps}.
 
 \begin{figure}[H]
     \centering
@@ -222,10 +222,10 @@ Dota2 is a multiplayer online battle arena (\gls{MOBA}) video game developed and
     \caption{A screenshot of the game}
 \end{figure}
 
-This game has a large quantity of players, accordingly a huge amount of replays will be produced every day. Also, it's a real-time game, hundreds of operations and some decisions will be made each second, and all of them will have some influence on the final results of the game. Both of the above two features make the game a great subject to big data analysis.
+This game has a large number of players, accordingly, a huge amount of replays will be produced every day. Also, it's a real-time game, hundreds of operations and some decisions will be made each second, and all of them will have some influence on the final results of the game. Both of the above two features make the game a great subject to big data analysis.
 
-Actually, there are some professional teams start hiring data engineers to help their players perform better in a game. This means that our analysis has some realistic meaning.
-For example, by using big data pipeline to answer the business question ``Does there exist a regular farming path for some professional players?", we can understand both our teammates and the opponents better, and therefore optimize our strategies.
+There are some professional teams start hiring data engineers to help their players perform better in a game. This means that our analysis has some realistic meaning.
+For example, by using a big data pipeline to answer the business question ``Does there exist a regular farming path for some professional players?", we can understand both our teammates and the opponents better, and therefore optimize our strategies.
 
 We have used technologies like MongoDB, Apache Spark, Neo4j for this project. All of the code of this project can be found in \href{https://github.com/Vopaaz/big-data-psg-lgd/}{this repository}, and I will explain the logic of our project and reference to some lines of code when necessary in the following sections.
 
@@ -261,13 +261,13 @@ We have used technologies like MongoDB, Apache Spark, Neo4j for this project. Al
 \item Dota2 replay dataset: Everything happens in a game, which includes the whole combat log of the game, chatting information and the spawn and death of NPCs.
 \end{enumerate}
 
-We will discuss how we acquire those data how it is transformed into a usable format in details in the ETL selection.
+We will discuss how we acquire those data and how it is transformed into a usable format in detail in the ETL selection.
 
 \subsection{Data Dictionaries}
 
 The match result data is already in JSON format, we can use it straightforwardly in the same schema to save it into our database. The data dictionary for this dataset can be found in table \ref{match-result-data-dictionary}, \ref{player-field-in-match-result} and \ref{ban-pick-in-match-result} in the Appendix.
 
-The replay dataset is initially binary files, therefore we have to parse it first then fit into a schema that we design. After these process, one document(record) of a replay should have the following fields:
+The replay dataset is initially binary files, therefore we have to parse it first then fit into a schema that we design. After this process, one document (record) of a replay should have the following fields:
 
 \begin{longtable}{|p{2cm}|p{2cm}|p{4.5cm}|p{5cm}|}
 
@@ -308,20 +308,20 @@ lifestate & JSON Array & Spawns and deaths of objects in the game &
 
 \section{Data ETL}
 
-Our aim is to collect about 1,500,000 records for our match result dataset and about 1000 professional games, 1000 ranked games and 1000 public games for our replay dataset. Our data is mainly three sources:
+We aim to collect about 1,500,000 records for our match result dataset and about 1000 professional games, 1000 ranked games and 1000 public games for our replay dataset. Our data is mainly three sources:
 \begin{enumerate}
 \item \href{https://wiki.teamfortress.com/wiki/WebAPI/}{Valve's official api}.
-\item \href{https://docs.opendota.com/}{OpenDota's third party api}.
+\item \href{https://docs.opendota.com/}{OpenDota's third-party api}.
 \item \href{https://dev.dota2.com/showthread.php?t=47115}{Dota2's replay cluster}.
 \end{enumerate}
 We will walk through how we create a pipeline to make use of the above three sources to collect all the data we want in the Extraction section.
 
 \subsection{Extraction}
 
-In order to call the Valve's official api, we need a key to get authorized. Each key has its api call limits, so we create a key pool that contains 5 different authorizing keys that are obtained using our Steam accounts. Every time we need to call the api, we randomly \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/ValveAPI.java#L215}{pick one key from the poll}.
+To call Valve's official API, we need a key to get authorized. Each key has its API call limits, so we create a key pool that contains 5 different authorizing keys that are obtained using our Steam accounts. Every time we need to call the API, we randomly \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/ValveAPI.java#L215}{pick one key from the poll}.
 
 The api we are mainly using is \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchHistoryBySequenceNum}{GetMatchHistoryBySequenceNum}. It returns an array of game result information in its \codeinline{matches} field\footnote{The schema of each match result is the same as what described in \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchDetails}{GetMatchDetails API}.}. It requires two parameters:\codeinline{start_at_match_seq_num} and \codeinline{matches_requested}.
-The first one is an unique identifier for each match, and the second one is the number of mathch histories to be returned. We \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/ValveAPI.java#L207-L230}{construct the url} for the api call to get a bunch of match results and \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/ValveAPI.java#L238-L257}{save them into MongoDB}.
+The first one is a unique identifier for each match, and the second one is the number of match histories to be returned. We \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/ValveAPI.java#L207-L230}{construct the url} for the API call to get a bunch of match results and \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/ValveAPI.java#L238-L257}{save them into MongoDB}.
 Also, since we always want to keep the HiFi data around, I also \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/ValveAPI.java#L289-L300}{wrote the original JSON file into the disk}.
 
 After we get a list of match result in the previous call, we can use the sequence number of the last record we get from the last call then \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/ValveAPI.java#L275}{plus one} as the \codeinline{start_at_match_seq_num} for the next iteration.
@@ -330,11 +330,11 @@ In each API call, I iterate the whole results to find out whether there is a \hr
 If a valid professional game is found, we will call \href{https://docs.opendota.com}{OpenDota's API} using the \codeinline{match_id}, which is a part of the previous results, to obtain \codeinline{replay_salt} and \codeinline{cluster}, the information we need to download the replays.
 
 We \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/OpendotaAPI.java#L17-L70}{construct such url}: \codeinline{http://replay<cluster>.valve.net/570/<match_id>_<replay_salt>.dem.bz2} and \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/ValveAPI.java#L131-L144}{start another thread} to \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/ValveAPI.java#L389-L420}{download, unzip and parse the replay}.
-At the same time, since we want to get a same number of ranked matches and public matches, we maintain \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/ValveAPI.java#L46-L47}{two integers} to record how many public matches and ranked matches to download.
+At the same time, since we want to get the same number of ranked matches and public matches, we maintain \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/ValveAPI.java#L46-L47}{two integers} to record how many public matches and ranked matches to download.
 As we start downloading a professional match, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/ValveAPI.java#L111-L112}{add one} to those two integers, and if the numbers are not zero when we encounter a public match result or a ranked match, we start to download them using the same method I used for professional games.
 This logic can be mapped to \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/ValveAPI.java#L104-L129}{this snippet of code}.
 
-In this way, we can get game replays of three types in same amount for the second dataset while we collect the data for the first dataset.
+In this way, we can get game replays of three types in the same amount for the second dataset while we collect the data for the first dataset.
 
 \subsection{Transformation}
 
@@ -384,10 +384,10 @@ As described in the proposal, we also applied Neo4j to support relationship visu
 \label{system-architecture}
 \end{figure}
 
-The whole pipeline starts from top-left, where the data collector send API requests to ValveAPI and OpendotaAPI.
-Log is output to the disk so that we know where to resume after a batch is processed, or if our system crushes.
+The whole pipeline starts from top-left, where the data collector sends API requests to ValveAPI and OpendotaAPI.
+The log is output to the disk so that we know where to resume after a batch is processed, or if our system crushes.
 The match result data is stored into MongoDB and the information needed to download game replays is delivered to the ``Data Extraction" part. Here the replays are downloaded, parsed and stored into MongoDB.
-Neo4j loader extract data from MongoDB and store it into Neo4j.
+Neo4j loader extracts data from MongoDB and stores it into Neo4j.
 
 After the ETL, we use Spark as the analytics engine to answer our business questions.
 The results are visualized by Tableau. For the relationship BQ, we use the built-in Neo4j Browser to visualize the relationship between professional teams.
@@ -401,19 +401,19 @@ We use Spark as our analytics engine to analyze business questions raised in our
 
 This analysis is aimed to find out the hero which has the most possibility to be a bad manner player.
 
-We define a bad manner as leaving a game before the game ends. We use match result data, since it contains leave game status. We do \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/BadManner.scala#L46-L47}{aggregation on the hero id to get the pairs of a hero id and a leave game count}. Before further steps, we first check if there is no bad manner player, which turns out to be true in professional games. Then for each pair, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/BadManner.scala#L48}{divide the leave game count by the total pick count of this hero to compute the possibility}. Finally, we can get the bad manner hero by \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/BadManner.scala#L50}{sorting the processed pairs}. In public games, hero which has the most possibility to be a bad manner player is Broodmother, who has 10\% leave game rate. In ranked games, it is Meepo, who has 5\% leave rate. And in professional games, there are almost no players leave a game before a game ends. Through the result, we can find out that players are more serious in ranked games than the public, since ranked games affect their rankings.
+We define a bad manner as leaving a game before the game ends. We use match result data since it contains leave game status. We do \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/BadManner.scala#L46-L47}{aggregation on the hero id to get the pairs of a hero id and a leave game count}. Before further steps, we first check if there is no bad manner player, which turns out to be true in professional games. Then for each pair, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/BadManner.scala#L48}{divide the leave game count by the total pick count of this hero to compute the possibility}. Finally, we can get the bad manner hero by \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/BadManner.scala#L50}{sorting the processed pairs}. In public games, the hero who has the most possibility to be a bad manner player is Broodmother, who has a 10\% leave game rate. In ranked games, it is Meepo, who has a 5\% leave rate. And in professional games, there are almost no players leave a game before a game ends. Through the result, we can find out that players are more serious in ranked games than the public ones since ranked games affect their rankings.
 
 \subsection{Game Time}
 
-This analysis is aimed to find out the average time of a game. We use the match result data which has the game duration. For each match result data, we can \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/CostTime.scala#L30}{extract the duration and increment the total game count by 1}. Finally, we can get the average cost of time by \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/CostTime.scala#L31}{dividing the sum of all duration by the total game count}. For public games, the average time is 33 minutes. For ranked games, the average time is 40 minutes. For professional game, the average time is 30 minutes.
+This analysis is aimed to find out the average time of a game. We use the match result data which has the game duration. For each match result data, we can \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/CostTime.scala#L30}{extract the duration and increment the total game count by 1}. Finally, we can get the average cost of time by \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/CostTime.scala#L31}{dividing the sum of all duration by the total game count}. For public games, the average time is 33 minutes. For ranked games, the average time is 40 minutes. For professional games, the average time is 30 minutes.
 
 \subsection{Damage/Gold Rate}
 
 This analysis is aimed to find out the heroes who have the top 20 damage rate and the heroes who have the bottom 20 damage/gold rate.
 
-We define the such rate of a hero as ``the damage to other heroes per gold gained by the hero". We use match result data which contains damage to other heroes, gold spent, and rest gold of each hero. For each match result, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/DamageRate.scala#L39-L41}{extract the 3tuple of a hero id, a total damage to other heroes, a total gained gold (addition of gold spend and rest gold)}. Then we do \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/DamageRate.scala#L42-L44}{an aggregation on the hero id and divide the damage by the gained gold to get pairs of a hero id and a damage/gold rate}. Finally, to get the top 20 heroes and the bottom 20 heroes, we can simply \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/DamageRate.scala#L47-L48}{sort pairs by the damage rate}.
+We define such a rate of a hero as ``the damage to other heroes per gold gained by the hero". We use match result data which contains damage to other heroes, gold spent, and rest gold of each hero. For each match result, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/DamageRate.scala#L39-L41}{extract the 3tuple of hero id, the total damage to other heroes, total gained gold (addition of gold spend and rest gold)}. Then we do \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/DamageRate.scala#L42-L44}{an aggregation on the hero id and divide the damage by the gained gold to get pairs of a hero id and a damage/gold rate}. Finally, to get the top 20 heroes and the bottom 20 heroes, we can simply \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/DamageRate.scala#L47-L48}{sort pairs by the damage rate}.
 
-The figure in the next page demonstrates the result. A table for this can also be found in the Appendix.
+The figure on the next page demonstrates the result. A table for this can also be found in the Appendix.
 
 \begin{figure}[H]
 \centering
@@ -440,14 +440,14 @@ After running the training data, we find the accuracy is only 0.53 which is clos
 
 This analysis is aimed to find out the hero who gains most XP or gold in the first 15 minutes of the game.
 
-We use replay data which contains all events during a game. We firstly \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/First15minGain.scala#L44-L47}{filter all events irrelavant of XP or gold}, and secondly \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/First15minGain.scala#L48-L50}{extract the time of each event happened and filter it}.
+We use replay data which contains all events during a game. We firstly \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/First15minGain.scala#L44-L47}{filter all events irrelevant of XP or gold}, and secondly \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/First15minGain.scala#L48-L50}{extract the time of each event happened and filter it}.
 Then we can \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/First15minGain.scala#L81-L82}{do aggregation on hero name} to calculate the total gain XP/gold. Finally, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/First15minGain.scala#L89-L96}{sort the gained XP/gold value} to compute the hero who gains most XP/gold in 3 game types. We list the result for this analysis in the Appendix.
 
 \subsection{First Blood Time vs Game Time}
 
 This analysis is aimed to find out the correlation between the time of first blood and the total cost of time of a game. The first blood is the first kill in a game. We guess early first blood implies a short game.
 
-To examine our guess, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/FirstBloodTrain.scala#L31-L33}{apply linear regression} in this analysis. We use match result data which contains the first blood time and the total duration. For each match result, we extract the first blood time and the game result. The data point used in linear regression is the time of the first blood. The label used is the game result. But the root mean squared error on training data is 765 which is large. The error shows that there is no correlation between the first blood time and the cost of time.
+To examine our guess, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/FirstBloodTrain.scala#L31-L33}{apply linear regression} in this analysis. We use match result data which contains the first blood time and the total duration. For each match result, we extract the first blood time and the game result. The data point used in linear regression is the time of the first blood. The label used is the game result. But the RMSE on training data is 765 which is large. The error shows that there is no correlation between the first blood time and the cost of time.
 
 \subsection{Hero Statistics}
 
@@ -466,9 +466,9 @@ The following figure demonstrates the result in professional games. Other result
 
 \subsection{Most Ban}
 
-This analysis is aimed to find out the top 5 heroes who are banned in professional games (only professional game allows banning heroes).
+This analysis is aimed to find out the top 5 heroes who are banned in professional games. (Only professional game allows banning heroes).
 
-We use match result data which contains banned heroes. We first filter games to keep only professional games and then \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostBan.scala#L29-L30}{extract a pair of a hero id and 1 (denotes banned once) for each match result data}. After \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostBan.scala#L31}{doing aggregation} on the hero id, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostBan.scala#L33}{sort the banned count} to get the top 5 banned heroes. They are Alchemist, Enchantress, Shadow Demon, Faceless Void, and Life Stealer. And we can find some of them has a good ranking in the previous analysis. For example, Alchemist has a 7th damage/gold rate in public games.
+We use match result data which contains banned heroes. We first filter games to keep only professional games and then \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostBan.scala#L29-L30}{extract a pair of a hero id and 1 (denotes banned once) for each match result data}. After \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostBan.scala#L31}{doing aggregation} on the hero id, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostBan.scala#L33}{sort the banned count} to get the top 5 banned heroes. They are Alchemist, Enchantress, Shadow Demon, Faceless Void, and Life Stealer. And we can find some of them have a good ranking in the previous analysis. For example, Alchemist has a 7th damage/gold rate in public games.
 
 \subsection{Most Pick}
 
@@ -476,7 +476,7 @@ This analysis is aimed to find out the top 5 heroes who are picked.
 
 We use match result data which contains picked heroes of each game. We \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostPick.scala#L34}{extract pairs of a hero id and 1 (denotes picked once)}. After \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostPick.scala#L35}{doing aggregation} on the hero id, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostPick.scala#L37}{sort the picked count} to get the top 5 picked heroes.
 
-The figure in the next page demonstrates the result of the above two questions. A table for them can also be found in the Appendix.
+The figure on the next page demonstrates the result of the above two questions. A table for them can also be found in the Appendix.
 
 \begin{figure}[H]
 \centering
@@ -487,13 +487,13 @@ The figure in the next page demonstrates the result of the above two questions. 
 
 \subsection{Most Used/Purchased Item}
 
-These two analysis are aimed to find out the top 5 most used/purchased items.
+These two analyses are aimed to find out the top 5 most used/purchased items.
 
 We use replay data in this analysis because it contains all events happen during a game. In Most Used Item analysis, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostUsedItem.scala#L38-L40}{filter events contained in replay data to get all ``use item" events}.
 Then we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostUsedItem.scala#L41-L42}{do aggregation on the item id} to get the pairs of an item id and an item use count.
-Finally, we can get the top 5 most used items by \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostUsedItem.scala#L44}{sorting the pairs by the use count}. We have similar steps in \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostPurchasedItem.scala}{Most Purchased Item} analysis.
+Finally, we can get the top 5 most used items by \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostUsedItem.scala#L44}{sorting the pairs by the usage count}. We have similar steps in \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/MostPurchasedItem.scala}{Most Purchased Item} analysis.
 
-The figure in the next page demonstrates the result. A table for this can also be found in the Appendix.
+The figure on the next page demonstrates the result. A table for this can also be found in the Appendix.
 
 \begin{figure}[H]
 \centering
@@ -508,12 +508,12 @@ This analysis aimed to find out the average first time of a team battle and the 
 
 We use the replay data which has all events. But these events do not contain the location information. Thus, we roughly define the team battle as in 3 minutes there are 4 or more hero deaths. \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/TeamBattleDetector.scala#L61-L78}{A sliding-window algorithm} is applied to build a team battle detector. We \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/TeamBattleDetector.scala#L33-L36}{extract the death events} and use the detector to detect all team battles in a game. The time of the first team battle is at 11 minutes, 13 minutes and 19 minutes in public, ranked, and professional game. The average number of team battles is 7, 9, and 6 in public, ranked, and professional game respectively.
 
-Additionally, for most analysis above, we can only get the hero id or item id. To provide better readability, we add two metadata collection heros and items which contain hero/item ids and their names. So after getting the id, we do one more \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/Spark/SparkMongoHelper.scala#L15-L29}{query on the matadata collections to get the its name}.
+Additionally, for most of the analysis above, we can only get the hero id or item id. To provide better readability, we add two metadata collection heroes and items which contain hero/item ids and their names. So after getting the id, we do one more \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/master/src/main/scala/Spark/SparkMongoHelper.scala#L15-L29}{query on the metadata collections to get its name}.
 
 \subsection{Win-lose Relationship Visualization}
 
 This analysis aimed to visualize the result between the professional teams.
-It could serve as a proof of concept that we have the ability to further explore other relational topics.
+It could serve as a proof of concept that we can further explore other relational topics.
 
 \begin{figure}[H]
 \centering
@@ -527,22 +527,22 @@ It could serve as a proof of concept that we have the ability to further explore
 
 \subsection{Valve API}
 
-Valve provides us with various apis to get match results, but they're not well documented and changes all the time without providing changelogs.
+Valve provides us with various APIs to get match results, but they're not well documented and changes all the time without providing changelogs.
 
 At the beginning we tried to use \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchHistory}{GetMatchHistory API}, which seems to be very straightforward in the documentation.
 It says we can specify a starting match ID and will return a bunch of match results starting with it.
 Unfortunately, specify such an ID is actually disallowed and it can just return the newest results that are currently produced, and this was not documented.
 
-We have also thought the \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchHistory}{GetMatchHistory API} can be used to make a data stream for stream analysis, but this couldn't be done to since Valve limited its api calling gap.
-It's said to be 100,000 calls per day but actually you can do much less. I set the api calling interval to 6 seconds and sometimes it still denies the calls.
+We have also thought the \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchHistory}{GetMatchHistory API} can be used to make a data stream for stream analysis, but this couldn't be done to since Valve limited its API calling gap.
+It's said to be 100,000 calls per day but actually, you can do much less. I set the API calling interval to 6 seconds and sometimes it still denies the calls.
 Considering the velocity that the game results are produced we can't make such a stream to catch all the game results that are being produced.
 
 After exploring the Dota2 developers' forum for a while, we found out that we can use the \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchHistoryBySequenceNum}{GetMatchHistoryBySequenceNum API}, which works similarly as the before one but this time we need to specify a starting sequence number, which is also a unique identifier for each game, but we can't see it in the Dota2's client.
 This problem is solved by finding out that the sequence number can be found in the \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchDetails}{GetMatchDetails API}.
 We can first choose a starting sequence number by looking for a match whose date is around the starting date of all the matches er want to collect.
-By calling \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchHistoryBySequenceNum}{GetMatchHistoryBySequenceNum}, we can get a list of match results, then the sequence number of the last match among the results can be extracted. Adding one to it will serve as starting sequence number of the next request. By doing this repeatedly, we can collect as many matches we want.
+By calling \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchHistoryBySequenceNum}{GetMatchHistoryBySequenceNum}, we can get a list of match results, then the sequence number of the last match among the results can be extracted. Adding one to it will serve as the starting sequence number of the next request. By doing this repeatedly, we can collect as many matches as we want.
 
-As I mentioned, the api call limits are much less than it is described and it seems to be random. I created a request key pool to randomly select a key for the api call each time and if it was denied, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/ValveAPI.java#L241-L249}{waited for 3 seconds} then do the next call.
+As I mentioned, the API call limits are much less than it is described and it seems to be random. I created a request key pool to randomly select a key for the API call each time and if it was denied, we \href{https://github.com/Vopaaz/big-data-psg-lgd/blob/a9a285e0e29c0d9e56b41994875df830c7e7b51b/src/main/java/FetchStore/ValveAPI.java#L241-L249}{waited for 3 seconds} then do the next call.
 
 
 \subsection{Dota2 replays Parameters}
@@ -550,25 +550,25 @@ As I mentioned, the api call limits are much less than it is described and it se
 The request to download Dota2 replays requires three parameters, \codeinline{cluster}, \codeinline{matchid}, and \codeinline{replaysalt}.
 In the past, by calling \href{https://wiki.teamfortress.com/wiki/WebAPI/GetMatchDetails}{GetMatchDetails API} with match ID of a game, the cluster number and ``replay salt" of a specific match can be acquired. However, now Valve disallowed us to do so, by hiding the ``replay salt" field it the result.
 
-Fortunately, we found another \href{third-party api}{https://docs.opendota.com/} that can help finding the fields needed to download a replay.
+Fortunately, we found another \href{third-party api}{https://docs.opendota.com/} that can help to find the fields needed to download a replay.
 
-Furthermore, we thought of solely rely on it to get the data in the first dataset, the match results. In this way, only one kind of api is used which can simplify the data pipeline. But this can't be done neither, this third party api will ask us to pay if our request exceeds a certain number, that will cause cost exceeding our budget (which is zero).
-Also, we don't want to collect all the replays. It's clear that the matches played by the professional teams worth more than the normal ones.
+Furthermore, we thought of solely rely on it to get the data in the first dataset, the match results. In this way, only one kind of API is used which can simplify the data pipeline. But this can't be done either, this third party API will ask us to pay if our request exceeds a certain number, that will cause cost exceeding our budget (which is zero).
+Also, we don't want to collect all the replays. The matches played by the professional teams worth more than the normal ones.
 Given the limited time and storage we have, we decided to first collect a certain number of professional games, then collect public games and ranked games of the same number for comparison.
 
 \subsection{Docker}
 
-As mentioned in the proposal, we tried to containerized the project by docker, but it ends up with failures. Considering to the limited time, we decided to discard using docker for installing our NoSQL technology.
+As mentioned in the proposal, we tried to containerize the project by docker, but it ends up with failures. Considering the limited time, we decided to discard using docker for installing our NoSQL technology.
 
 At first, I tried to dockerize our project by using a single Dockerfile.
-We used ubuntu as a parent image so that docker can virtualize an ubuntu operation system environment on our host machine, and then install needed packages in it.
+We used ubuntu as a parent image so that docker can virtualize an Ubuntu operation system environment on our host machine, and then install needed packages in it.
 However, we can not connect to the database.
 Realizing that it is cramped to put all the services on a Dockerfile, we tried to construct a docker-compose.yml to define, run, and scale services with Docker.
 
 According to our data pipeline, I intended to build 4 services - FetchStore, ParseReplay, MongoDB, and Analytics - in the docker-compose.
 In the docker-compose, we can also use the Dockerfile by using the command \codeinline{build} in a service.
 Therefore, I constructed Dockerfiles for FetchStore, ParseReplay, and Analytics services.
-And I used the official image of MongoDB, and used \codeinline{volume} in the service to reflect the direction of configuration file and MongoDB initial JavaScipt.
+And I used the official image of MongoDB, and used \codeinline{volume} in the service to reflect the direction of the configuration file and MongoDB initial JavaScipt.
 Also, I utilized \codeinline{depends_on} to define simple interaction between the services.
 There are a lot of things to consider when running multiple containers, and it's easy to make mistakes if not being thoughtful enough.
 
@@ -583,7 +583,7 @@ Because we planned to use over 200GB data, we decided to use AWS EC2 to run our 
 
 \subsection{Result Readability}
 
-We have 2 types of data. But in match result data, the heroes and items inside are denoted by their id. But in replay data, they are denoted by their name. Obviously, using a name can increase readability. Thus, we added 2 more metadata collections to store the map from id to name.
+We have 2 types of data. But in match result data, the heroes and items inside are denoted by their id. But in replay data, they are denoted by their name. Using a name can increase readability. Thus, we added 2 more metadata collections to store the map from id to name.
 
 \subsection{Corrupted Data}
 
@@ -591,18 +591,18 @@ Although we did some data validation before using it, there are still some unexp
 
 \subsection{Setup Neo4j on AWS}
 
-We want to setup Neo4j server on AWS and can be connected by a Neo4j browser on a local laptop. But the find the connection was failed. We first modified the configuration file of Neo4j which doesn't allow remote access in default, which, does not work out. Then we found out that we should modify the security group setting on AWS which controls access to the AWS instance.
+We want to set up the Neo4j server on AWS and can be connected by a Neo4j browser on a local laptop. But the find the connection was failed. We first modified the configuration file of Neo4j which doesn't allow remote access in default, which, does not work out. Then we found out that we should modify the security group setting on AWS which controls access to the AWS instance.
 
 \subsection{Missing Output on Console}
 
 Firstly, we just printed the result on the console.
-But after we deployed our system on AWS, we found a problem that the connection from local machine to AWS might be broken.
+But after we deployed our system on AWS, we found a problem that the connection from the local machine to AWS might be broken.
 If so, we cannot get the result printed on the console.
-As a result, besides printing result on the console, we also write the result to a file, which prevents missing the output on the console.
+As a result, besides printing results on the console, we also write the result to a file, which prevents missing the output on the console.
 
 \subsection{Limited Information in Parsed Replay Data}
 
-As mentioned in Analysis, some business questions in proposal are not fulfilled because we find that the parsed replay data doesn't contains the information we need. One important information is location. Some of our business questions rely on the location information, for example, analysis on the path of heroes and the lane. Actually, this problem is caused by the parser we used because a replay data contains almost all information of a game. We known this fact when we wrote the proposal, but we still propose these questions. Because we though we can try to find another parser which can extract the location information from the replay data. But we didn't find one which makes our give up these questions.
+As mentioned in Analysis, some business questions in the proposal are not fulfilled because we find that the parsed replay data doesn't contain the information we need. One important information is the location. Some of our business questions rely on the location information, for example, analysis on the path of heroes and the lane. This problem is caused by the limited ability of our parser. We have known this fact when we wrote the proposal, but we still propose these questions because we thought we can find another parser that can extract the location information from the replay. But we failed, therefore we give up on these questions.
 
 \printglossary
 %-------%

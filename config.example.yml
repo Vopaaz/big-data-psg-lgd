@@ -1,0 +1,29 @@
+MongoDB:
+  host: localhost
+  port: 27017
+  database: dota2
+  collection:
+    ranked-collections: rankedGames
+    public-collections: publicGames
+    professional-collections: professionalGames
+    match-result-collections: matchResults
+
+# Steam Web API Authorize key
+AuthorizeKey:
+  - AuthKey1
+  - AuthKey2
+
+Spark:
+  matchResults: mongodb://127.0.0.1/dota2.matchResults
+  rankedGames: mongodb://127.0.0.1/dota2.rankedGames
+  publicGames: mongodb://127.0.0.1/dota2.publicGames
+  professionalGames: mongodb://127.0.0.1/dota2.professionalGames
+  items: mongodb://127.0.0.1/dota2.items
+  heros: mongodb://127.0.0.1/dota2.heros
+  name: analysis
+
+Neo4j:
+  host: localhost
+  port: 7687
+  username: username
+  password: password
